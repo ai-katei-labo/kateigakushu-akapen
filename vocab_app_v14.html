@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>家庭学習ナビ｜単語フラッシュ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+  :root {
+    --bg: #0f0e17; --surface: #1a1927; --card: #22203a;
+    --accent: #ff6b6b; --accent2: #ffd166; --accent3: #06d6a0;
+    --text: #fffffe; --text-muted: #a7a9be; --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Nunito','Noto Sans JP',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image: radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.3) 0%,transparent 100%), radial-gradient(1px 1px at 80% 10%,rgba(255,255,255,.2) 0%,transparent 100%), radial-gradient(1px 1px at 50% 70%,rgba(255,255,255,.15) 0%,transparent 100%); pointer-events:none; z-index:0; }
+  #app { position:relative; z-index:1; }
+  .screen { display:none; min-height:100vh; padding:20px; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  #home-screen { align-items:center; justify-content:center; gap:32px; padding:40px 24px; }
+  .logo-icon { font-size:56px; display:block; margin-bottom:8px; animation:float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .logo-title { font-size:28px; font-weight:900; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .logo-sub { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
+  .mode-cards { width:100%; max-width:380px; display:flex; flex-direction:column; gap:14px; }
+  .mode-card { background:var(--card); border-radius:var(--radius); padding:20px 24px; display:flex; align-items:center; gap:16px; cursor:pointer; border:2px solid transparent; transition:all .25s; }
+  .mode-card.flash:hover,.mode-card.flash:active { border-color:var(--accent); }
+  .mode-card:active { transform:scale(.97); }
+  .mode-icon { font-size:36px; flex-shrink:0; }
+  .mode-name { font-size:18px; font-weight:800; margin-bottom:2px; }
+  .mode-desc { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .mode-arrow { font-size:20px; color:var(--text-muted); }
+
+  #settings-screen { gap:16px; max-width:440px; margin:0 auto; width:100%; padding-bottom:40px; }
+  .screen-header { display:flex; align-items:center; gap:12px; padding:8px 0; }
+  .back-btn { width:40px; height:40px; border-radius:12px; background:var(--card); border:none; color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .back-btn:active { background:#2a2845; }
+  .screen-title { font-size:20px; font-weight:800; }
+  .settings-section { background:var(--card); border-radius:var(--radius); padding:18px; display:flex; flex-direction:column; gap:14px; }
+  .settings-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+  .source-block { display:flex; flex-direction:column; gap:10px; }
+  .source-header { display:flex; align-items:center; gap:10px; }
+  .source-checkbox { width:20px; height:20px; accent-color:var(--accent2); cursor:pointer; flex-shrink:0; }
+  .source-name { font-size:15px; font-weight:800; flex:1; }
+  .source-count { font-size:12px; color:var(--text-muted); }
+  .unit-grid { display:flex; flex-wrap:wrap; gap:6px; padding-left:30px; }
+  .unit-btn { padding:6px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .unit-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .unit-btn:disabled { opacity:.3; pointer-events:none; }
+  .unit-btn.unit-all-btn { border-color:var(--accent2); color:var(--accent2); }
+  .unit-btn.unit-all-btn:hover,.unit-btn.unit-all-btn:active { background:rgba(255,209,102,.15); }
+  .selected-count { font-size:13px; color:var(--accent2); font-weight:700; text-align:center; padding:4px; font-family:'Noto Sans JP',sans-serif; }
+  .priority-btns { display:flex; gap:8px; }
+  .priority-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid transparent; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
+  .priority-btn.active-all { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.1); }
+  .timer-toggle { display:flex; align-items:center; justify-content:space-between; }
+  .toggle-info { flex:1; }
+  .toggle-name { font-size:15px; font-weight:700; }
+  .toggle-desc { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .toggle-switch { width:52px; height:28px; background:var(--surface); border-radius:14px; position:relative; cursor:pointer; transition:background .3s; border:none; flex-shrink:0; }
+  .toggle-switch.on { background:var(--accent3); }
+  .toggle-switch::after { content:''; position:absolute; width:22px; height:22px; background:white; border-radius:50%; top:3px; left:3px; transition:left .3s; box-shadow:0 2px 4px rgba(0,0,0,.3); }
+  .toggle-switch.on::after { left:27px; }
+  .timer-seconds { display:flex; gap:8px; }
+  .timer-btn { flex:1; padding:10px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .timer-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .start-btn { width:100%; padding:18px; background:linear-gradient(135deg,var(--accent),#ff4757); border:none; border-radius:var(--radius); color:white; font-size:18px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; box-shadow:0 8px 24px rgba(255,107,107,.4); }
+  .start-btn:active { transform:scale(.97); }
+
+  #flash-screen { gap:14px; max-width:440px; margin:0 auto; width:100%; }
+  .flash-header { display:flex; align-items:center; gap:12px; }
+  .progress-bar-wrap { flex:1; height:6px; background:var(--card); border-radius:3px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width .4s ease; }
+  .progress-text { font-size:13px; font-weight:700; color:var(--text-muted); min-width:45px; text-align:right; }
+  .timer-display { text-align:center; font-size:13px; font-weight:700; height:20px; }
+  .timer-bar { width:100%; height:4px; background:var(--card); border-radius:2px; overflow:hidden; }
+  .timer-fill { height:100%; background:var(--accent3); border-radius:2px; transition:width .1s linear,background .3s; }
+  .timer-fill.warning { background:var(--accent2); }
+  .timer-fill.danger { background:var(--accent); }
+  .card-area { flex:1; display:flex; align-items:center; justify-content:center; padding:8px 0; }
+  .flashcard { width:100%; background:var(--card); border-radius:24px; padding:32px 28px; text-align:center; position:relative; min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; box-shadow:0 20px 60px rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.05); }
+  .card-source-badge { position:absolute; top:14px; right:14px; font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; background:var(--surface); color:var(--text-muted); }
+  .priority-dot { position:absolute; top:18px; left:18px; width:10px; height:10px; border-radius:50%; }
+  .priority-dot.high { background:#ff6b6b; box-shadow:0 0 8px #ff6b6b; }
+  .priority-dot.mid { background:var(--accent2); box-shadow:0 0 8px var(--accent2); }
+  .priority-dot.low { background:var(--accent3); box-shadow:0 0 8px var(--accent3); }
+  .card-meaning-main { font-size:42px; font-weight:800; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; line-height:1.2; }
+  .pos-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(255,209,102,.15); color:var(--accent2); }
+  .card-answer-wrap { display:none; flex-direction:column; align-items:center; gap:6px; animation:fadeIn .3s ease; }
+  .card-answer-wrap.visible { display:flex; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card-word-answer { font-size:38px; font-weight:900; letter-spacing:-.5px; color:var(--text); }
+  .card-phonetic { font-size:13px; color:var(--text-muted); font-style:italic; }
+  .input-area { background:var(--card); border-radius:var(--radius); padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .input-mode-tabs { display:flex; gap:6px; }
+  .input-tab { flex:1; padding:8px; border-radius:10px; border:none; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .input-tab.active { background:var(--accent2); color:var(--bg); }
+  .letter-boxes { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; min-height:52px; align-items:center; }
+  .letter-box { width:36px; height:44px; border-radius:8px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; font-family:'Nunito',sans-serif; border:2px solid var(--surface); transition:all .15s; color:var(--text); }
+  .letter-box.correct { background:rgba(6,214,160,.15); border-color:var(--accent3); color:var(--accent3); }
+  .letter-box.wrong { background:rgba(255,107,107,.15); border-color:var(--accent); color:var(--accent); }
+  .letter-box.empty { color:transparent; }
+  .letter-box.cursor { border-color:var(--accent2); }
+  .text-input-row { display:flex; gap:8px; margin-top:10px; }
+  .text-input-row input { flex:1; padding:12px 16px; background:var(--surface); border:2px solid var(--surface); border-radius:14px; color:var(--text); font-size:18px; font-weight:700; font-family:'Nunito',sans-serif; outline:none; transition:border-color .2s; }
+  .text-input-row input:focus { border-color:var(--accent2); }
+  .text-input-row button { padding:12px 18px; border-radius:14px; border:none; background:var(--accent2); color:var(--bg); font-size:14px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; white-space:nowrap; }
+  .hidden-input { position:absolute; opacity:0; pointer-events:none; width:1px; height:1px; }
+  #writing-canvas { width:100%; height:110px; background:var(--surface); border-radius:14px; cursor:crosshair; touch-action:none; display:block; }
+  .canvas-actions { display:flex; gap:8px; margin-top:8px; }
+  .canvas-btn { flex:1; padding:10px; border-radius:12px; border:none; font-size:13px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; }
+  .canvas-btn.clear { background:var(--surface); color:var(--text-muted); }
+  .canvas-btn.submit { background:var(--accent2); color:var(--bg); }
+  .spellout-display { display:none; text-align:center; padding:10px; background:rgba(6,214,160,.08); border-radius:12px; border:1px solid rgba(6,214,160,.2); }
+  .spellout-display.visible { display:block; }
+  .spellout-text { font-size:18px; font-weight:800; color:var(--accent3); letter-spacing:4px; }
+  .spellout-label { font-size:11px; color:var(--text-muted); margin-top:2px; font-family:'Noto Sans JP',sans-serif; }
+  .feedback-area { min-height:36px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:15px; font-weight:700; font-family:'Noto Sans JP',sans-serif; }
+  .feedback-area.correct { color:var(--accent3); }
+  .feedback-area.wrong { color:var(--accent); }
+  .retry-row { display:none; gap:8px; }
+  .retry-row.visible { display:flex; }
+  .retry-input { flex:1; padding:12px 16px; background:var(--surface); border:2px solid var(--accent); border-radius:14px; color:var(--text); font-size:16px; font-weight:700; font-family:'Nunito',sans-serif; }
+  .retry-input:focus { outline:none; }
+  .retry-btn { padding:12px 16px; border-radius:14px; border:none; background:var(--accent); color:white; font-size:13px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; white-space:nowrap; }
+  .action-row { display:flex; gap:10px; }
+  .action-btn { flex:1; padding:14px; border-radius:var(--radius); border:none; font-size:14px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
+  .action-btn:active { transform:scale(.96); }
+  .btn-skip { background:var(--card); color:var(--text-muted); border:2px solid var(--surface); }
+  .btn-next { background:linear-gradient(135deg,var(--accent3),#00b894); color:var(--bg); box-shadow:0 6px 20px rgba(6,214,160,.3); }
+  .btn-reveal { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); box-shadow:0 6px 20px rgba(255,209,102,.3); }
+
+  #result-screen { align-items:center; justify-content:center; gap:28px; padding:40px 24px; }
+  .result-emoji { font-size:72px; animation:bounce .6s ease; }
+  @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .result-title { font-size:28px; font-weight:900; text-align:center; }
+  .result-score-card { background:var(--card); border-radius:var(--radius); padding:28px 32px; text-align:center; width:100%; max-width:320px; }
+  .score-big { font-size:64px; font-weight:900; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+  .score-label { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
+  .score-detail { display:flex; gap:20px; justify-content:center; margin-top:16px; padding-top:16px; border-top:1px solid var(--surface); }
+  .score-item { text-align:center; }
+  .score-num { font-size:22px; font-weight:800; }
+  .score-desc { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .score-item.correct .score-num { color:var(--accent3); }
+  .score-item.wrong .score-num { color:var(--accent); }
+  .score-item.skip .score-num { color:var(--text-muted); }
+  .result-actions { display:flex; flex-direction:column; gap:12px; width:100%; max-width:320px; }
+  .result-btn { width:100%; padding:16px; border-radius:var(--radius); border:none; font-size:16px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
+  .result-btn:active { transform:scale(.97); }
+  .result-btn.primary { background:linear-gradient(135deg,var(--accent),#ff4757); color:white; box-shadow:0 8px 24px rgba(255,107,107,.35); }
+  .result-btn.secondary { background:var(--card); color:var(--text); border:2px solid var(--surface); }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div id="home-screen" class="screen active">
+  <div style="text-align:center;">
+    <span class="logo-icon">✏️</span>
+    <div class="logo-title">家庭学習ナビ</div>
+    <div class="logo-sub">英単語フラッシュカード</div>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
+      <div class="mode-icon">🌱</div>
+      <div style="flex:1;">
+        <div class="mode-name">単語暗記モード</div>
+        <div class="mode-desc">日本語→音声→スペル確認</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="goToSettings()">
+      <div class="mode-icon">⚡</div>
+      <div style="flex:1;">
+        <div class="mode-name">英単語フラッシュ</div>
+        <div class="mode-desc">日本語を見て英語で答える</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="startSentenceMemory()" style="border-color:#f59e0b;">
+      <div class="mode-icon">📖</div>
+      <div style="flex:1;">
+        <div class="mode-name">英文暗記モード</div>
+        <div class="mode-desc">日本語→音声→英文で覚える</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="showScreen('typing-screen')" style="border-color:#a78bfa;">
+      <div class="mode-icon">⌨️</div>
+      <div style="flex:1;">
+        <div class="mode-name">英文タイピング</div>
+        <div class="mode-desc">日本語を見て英文を打つ</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="showScreen('original-screen')" style="border-color:var(--accent3);">
+      <div class="mode-icon">✏️</div>
+      <div style="flex:1;">
+        <div class="mode-name">オリジナル登録</div>
+        <div class="mode-desc" id="orig-home-count">自分の単語を追加する</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+  </div>
+  <div style="color:var(--text-muted);font-size:12px;text-align:center;font-family:'Noto Sans JP',sans-serif;">
+    📚 ミニラボ166語 ／ 英検5級107語 ／ まぶたん343語
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="screen-title">⚡ 設定</div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-label">出題ソース（複数選択可）</div>
+
+    <!-- ミニラボ -->
+    <div class="source-block">
+      <div class="source-header">
+        <input type="checkbox" class="source-checkbox" id="chk-minilabo" checked onchange="updateSourceUI()">
+        <div class="source-name">📘 ミニラボ（教科書）</div>
+        <div class="source-count">166語</div>
+      </div>
+      <div class="unit-grid" id="unit-grid">
+        <button class="unit-btn unit-all-btn" onclick="selectAllUnits()">全選択</button>
+        <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)">Unit1</button>
+        <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)">Unit2</button>
+        <button class="unit-btn active" data-unit="Unit3" onclick="toggleUnit(this)">Unit3</button>
+        <button class="unit-btn active" data-unit="Unit4" onclick="toggleUnit(this)">Unit4</button>
+        <button class="unit-btn active" data-unit="Unit5" onclick="toggleUnit(this)">Unit5</button>
+        <button class="unit-btn active" data-unit="Unit6" onclick="toggleUnit(this)">Unit6</button>
+        <button class="unit-btn active" data-unit="Unit7" onclick="toggleUnit(this)">Unit7</button>
+        <button class="unit-btn active" data-unit="Unit8" onclick="toggleUnit(this)">Unit8</button>
+        <button class="unit-btn active" data-unit="Unit9" onclick="toggleUnit(this)">Unit9</button>
+        <button class="unit-btn active" data-unit="Unit10" onclick="toggleUnit(this)">Unit10</button>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--surface);"></div>
+
+    <!-- 英検5級 -->
+    <div class="source-block">
+      <div class="source-header">
+        <input type="checkbox" class="source-checkbox" id="chk-eiken" checked onchange="updateSourceUI()">
+        <div class="source-name">🏆 英検5級</div>
+        <div class="source-count">107語</div>
+      </div>
+      <div class="unit-grid" id="eiken-grid">
+        <button class="unit-btn unit-all-btn" onclick="selectAllEiken()">全選択</button>
+        <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)">1〜25</button>
+        <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)">26〜50</button>
+        <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)">51〜75</button>
+        <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)">76〜100</button>
+        <button class="unit-btn active" data-eiken="101-125" onclick="toggleEiken(this)">101〜125</button>
+        <button class="unit-btn active" data-eiken="126-150" onclick="toggleEiken(this)">126〜150</button>
+        <button class="unit-btn active" data-eiken="151-175" onclick="toggleEiken(this)">151〜175</button>
+        <button class="unit-btn active" data-eiken="176-200" onclick="toggleEiken(this)">176〜200</button>
+        <button class="unit-btn active" data-eiken="201-225" onclick="toggleEiken(this)">201〜225</button>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--surface);"></div>
+
+    <!-- まぶたん -->
+    <div class="source-block">
+      <div class="source-header">
+        <input type="checkbox" class="source-checkbox" id="chk-mabutan" onchange="updateSourceUI()">
+        <div class="source-name">📗 まぶたん（中1）</div>
+        <div class="source-count">343語</div>
+      </div>
+      <div class="unit-grid" id="mabutan-grid">
+        <button class="unit-btn unit-all-btn" onclick="selectAllMabutan()">全選択</button>
+        <button class="unit-btn" data-mabutan="1-16" onclick="toggleMabutan(this)">1〜16</button>
+        <button class="unit-btn" data-mabutan="17-32" onclick="toggleMabutan(this)">17〜32</button>
+        <button class="unit-btn" data-mabutan="33-48" onclick="toggleMabutan(this)">33〜48</button>
+        <button class="unit-btn" data-mabutan="49-64" onclick="toggleMabutan(this)">49〜64</button>
+        <button class="unit-btn" data-mabutan="65-80" onclick="toggleMabutan(this)">65〜80</button>
+        <button class="unit-btn" data-mabutan="81-96" onclick="toggleMabutan(this)">81〜96</button>
+        <button class="unit-btn" data-mabutan="97-112" onclick="toggleMabutan(this)">97〜112</button>
+        <button class="unit-btn" data-mabutan="113-128" onclick="toggleMabutan(this)">113〜128</button>
+        <button class="unit-btn" data-mabutan="129-144" onclick="toggleMabutan(this)">129〜144</button>
+        <button class="unit-btn" data-mabutan="145-160" onclick="toggleMabutan(this)">145〜160</button>
+        <button class="unit-btn" data-mabutan="161-176" onclick="toggleMabutan(this)">161〜176</button>
+        <button class="unit-btn" data-mabutan="177-192" onclick="toggleMabutan(this)">177〜192</button>
+        <button class="unit-btn" data-mabutan="193-208" onclick="toggleMabutan(this)">193〜208</button>
+        <button class="unit-btn" data-mabutan="209-224" onclick="toggleMabutan(this)">209〜224</button>
+        <button class="unit-btn" data-mabutan="225-240" onclick="toggleMabutan(this)">225〜240</button>
+        <button class="unit-btn" data-mabutan="241-256" onclick="toggleMabutan(this)">241〜256</button>
+        <button class="unit-btn" data-mabutan="257-272" onclick="toggleMabutan(this)">257〜272</button>
+        <button class="unit-btn" data-mabutan="273-288" onclick="toggleMabutan(this)">273〜288</button>
+        <button class="unit-btn" data-mabutan="289-304" onclick="toggleMabutan(this)">289〜304</button>
+        <button class="unit-btn" data-mabutan="305-320" onclick="toggleMabutan(this)">305〜320</button>
+        <button class="unit-btn" data-mabutan="321-336" onclick="toggleMabutan(this)">321〜336</button>
+        <button class="unit-btn" data-mabutan="337-343" onclick="toggleMabutan(this)">337〜343</button>
+      </div>
+    </div>
+
+    <!-- オリジナル -->
+    <div class="source-block">
+      <div class="source-header">
+        <input type="checkbox" class="source-checkbox" id="chk-original" onchange="updateSourceUI()">
+        <div class="source-name">✏️ オリジナル</div>
+        <div class="source-count" id="original-count-label">0語</div>
+      </div>
+    </div>
+    <div class="selected-count" id="selected-count">0語が選択されています</div>
+  </div>
+
+  <!-- TIMER -->
+  <div class="settings-section">
+    <div class="settings-label">タイマー</div>
+    <div class="timer-toggle">
+      <div class="toggle-info">
+        <div class="toggle-name">制限時間</div>
+        <div class="toggle-desc">1問ずつ時間制限をつける</div>
+      </div>
+      <button class="toggle-switch" id="timer-toggle" onclick="toggleTimer()"></button>
+    </div>
+    <div id="timer-options" style="display:none;">
+      <div class="timer-seconds">
+        <button class="timer-btn" data-sec="5" onclick="selectTimer(this)">5秒</button>
+        <button class="timer-btn" data-sec="10" onclick="selectTimer(this)">10秒</button>
+        <button class="timer-btn active" data-sec="15" onclick="selectTimer(this)">15秒</button>
+        <button class="timer-btn" data-sec="30" onclick="selectTimer(this)">30秒</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT MODE -->
+  <div class="settings-section">
+    <div class="settings-label">入力方式</div>
+    <div class="priority-btns">
+      <button class="priority-btn active-all" data-input="keyboard" onclick="selectInput(this)">⌨️ キーボード</button>
+      <button class="priority-btn" data-input="canvas" onclick="selectInput(this)">✏️ 手書き</button>
+    </div>
+  </div>
+
+  <!-- SPELLOUT -->
+  <div class="settings-section">
+    <div class="settings-label">スペルアウト音声</div>
+    <div class="timer-toggle">
+      <div class="toggle-info">
+        <div class="toggle-name">スペルアウト</div>
+        <div class="toggle-desc">正解後に1文字ずつ読み上げる</div>
+      </div>
+      <button class="toggle-switch on" id="spellout-toggle" onclick="toggleSpellout()"></button>
+    </div>
+    <div id="spellout-options">
+      <div class="timer-seconds">
+        <button class="timer-btn active" data-speed="slow" onclick="selectSpeed(this)">🐢 ゆっくり</button>
+        <button class="timer-btn" data-speed="normal" onclick="selectSpeed(this)">🐇 ふつう</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startFlash()">スタート →</button>
+  <button onclick="testVoice()" style="width:100%;padding:12px;border-radius:14px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">🔊 音声テスト（hello）</button>
+  <div id="voice-debug" style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;padding:8px;background:var(--card);border-radius:12px;white-space:pre-wrap;"></div>
+</div>
+
+<!-- FLASH SCREEN -->
+<div id="flash-screen" class="screen">
+  <div class="flash-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progress-text">0/0</div>
+  </div>
+  <div class="timer-display" id="timer-display"></div>
+  <div class="timer-bar" id="timer-bar" style="display:none;">
+    <div class="timer-fill" id="timer-fill"></div>
+  </div>
+  <div class="card-area">
+    <div class="flashcard">
+      <div class="priority-dot" id="priority-dot"></div>
+      <div class="card-source-badge" id="card-source"></div>
+      <div class="card-meaning-main" id="card-meaning-main">...</div>
+      <div class="pos-badge" id="pos-badge"></div>
+      <div class="card-answer-wrap" id="card-answer-wrap">
+        <div class="card-word-answer" id="card-word-answer"></div>
+        <div class="card-phonetic" id="card-phonetic"></div>
+      </div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div class="input-mode-tabs">
+      <button class="input-tab active" id="tab-keyboard" onclick="switchInputTab('keyboard')">⌨️ キーボード</button>
+      <button class="input-tab" id="tab-canvas" onclick="switchInputTab('canvas')">✏️ 手書き</button>
+    </div>
+    <div id="keyboard-panel">
+      <div class="letter-boxes" id="letter-boxes"></div>
+      <div class="text-input-row" id="text-input-row">
+        <input type="text" id="main-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="ここに入力してEnter">
+        <button onclick="checkAnswer()">確認</button>
+      </div>
+    </div>
+    <div id="canvas-panel" style="display:none;">
+      <canvas id="writing-canvas"></canvas>
+      <div class="canvas-actions">
+        <button class="canvas-btn clear" onclick="clearCanvas()">消す</button>
+        <button class="canvas-btn submit" onclick="revealCanvas()">判定</button>
+      </div>
+      <div id="canvas-judge" style="display:none;">
+        <div style="font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif;">答えと見比べて判定してね</div>
+        <div style="display:flex;gap:8px;">
+          <button class="canvas-btn" onclick="judgeCanvas(true)" style="background:rgba(6,214,160,.2);color:var(--accent3);border:2px solid var(--accent3);flex:1;font-size:16px;">⭕ 正解</button>
+          <button class="canvas-btn" onclick="judgeCanvas(false)" style="background:rgba(255,107,107,.2);color:var(--accent);border:2px solid var(--accent);flex:1;font-size:16px;">✗ まちがい</button>
+        </div>
+      </div>
+    </div>
+    <div class="spellout-display" id="spellout-display">
+      <div class="spellout-text" id="spellout-text"></div>
+      <div class="spellout-label">スペル</div>
+    </div>
+    <div class="feedback-area" id="feedback-area"></div>
+  </div>
+  <div style="display:flex;justify-content:center;margin-top:-4px;">
+    <button id="replay-btn" onclick="replaySpellOut()" style="display:none;padding:8px 20px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">🔊 もう一度聞く</button>
+  </div>
+  <div class="action-row">
+    <button class="action-btn btn-skip" onclick="skipCard()">スキップ</button>
+    <button class="action-btn btn-next" id="next-btn" onclick="nextCard()" style="display:none;">次へ →</button>
+    <button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" class="screen">
+  <div class="result-emoji" id="result-emoji">🎉</div>
+  <div class="result-title" id="result-title">おつかれさま！</div>
+  <div class="result-score-card">
+    <div class="score-big" id="score-pct">0%</div>
+    <div class="score-label">正答率</div>
+    <div class="score-detail">
+      <div class="score-item correct"><div class="score-num" id="correct-count">0</div><div class="score-desc">正解</div></div>
+      <div class="score-item wrong"><div class="score-num" id="wrong-count">0</div><div class="score-desc">まちがい</div></div>
+      <div class="score-item skip"><div class="score-num" id="skip-count">0</div><div class="score-desc">スキップ</div></div>
+    </div>
+  </div>
+  <div class="result-actions">
+    <button class="result-btn primary" onclick="retryWrong()">まちがえた問題をもう一度</button>
+    <button class="result-btn secondary" onclick="showScreen('settings-screen')">設定に戻る</button>
+    <button class="result-btn secondary" onclick="showScreen('home-screen')">トップに戻る</button>
+  </div>
+</div>
+
+
+
+<!-- LEARN MODE SCREEN -->
+<div id="learn-screen" class="screen">
+  <div class="flash-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="learn-progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="learn-progress-text">0/0</div>
+  </div>
+  <div class="card-area">
+    <div class="flashcard">
+      <div class="card-source-badge" id="learn-card-source"></div>
+      <div class="card-meaning-main" id="learn-meaning" style="font-size:36px;">...</div>
+      <div class="pos-badge" id="learn-pos-badge"></div>
+      <div style="margin-top:8px;min-height:52px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;" id="learn-letter-boxes"></div>
+      <div id="learn-word-display" style="display:none;font-size:32px;font-weight:900;color:var(--text);margin-top:4px;font-family:'Nunito',sans-serif;"></div>
+    </div>
+  </div>
+  <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+    <div id="learn-status" style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;height:20px;"></div>
+    <div style="display:flex;gap:10px;width:100%;" id="learn-action-row" style="display:none;">
+      <button class="action-btn" onclick="learnAgain()" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">🔄 もう一度</button>
+      <button class="action-btn btn-next" onclick="learnNext()" style="flex:1;display:none;" id="learn-next-btn">覚えた！✅</button>
+    </div>
+    <button id="learn-replay-btn" onclick="replayLearnSpellOut()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">🔊 もう一度聞く</button>
+  </div>
+</div>
+
+
+
+<!-- SENTENCE MEMORY SCREEN -->
+<div id="sentence-memory-screen" class="screen">
+  <div style="max-width:600px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;">
+    <div class="flash-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="smem-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="smem-progress-text">0/0</div>
+    </div>
+
+    <!-- ユニット選択 -->
+    <div id="smem-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
+      <div class="settings-label">ユニットを選ぶ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="unit-btn unit-all-btn" onclick="selectAllSmemUnits()">全Unit</button>
+        <button class="unit-btn active" data-smem-unit="1" onclick="toggleSmemUnit(this)">Unit1</button>
+        <button class="unit-btn active" data-smem-unit="2" onclick="toggleSmemUnit(this)">Unit2</button>
+        <button class="unit-btn active" data-smem-unit="3" onclick="toggleSmemUnit(this)">Unit3</button>
+        <button class="unit-btn active" data-smem-unit="4" onclick="toggleSmemUnit(this)">Unit4</button>
+        <button class="unit-btn active" data-smem-unit="5" onclick="toggleSmemUnit(this)">Unit5</button>
+        <button class="unit-btn active" data-smem-unit="6" onclick="toggleSmemUnit(this)">Unit6</button>
+        <button class="unit-btn active" data-smem-unit="7" onclick="toggleSmemUnit(this)">Unit7</button>
+        <button class="unit-btn active" data-smem-unit="8" onclick="toggleSmemUnit(this)">Unit8</button>
+        <button class="unit-btn active" data-smem-unit="9" onclick="toggleSmemUnit(this)">Unit9</button>
+        <button class="unit-btn active" data-smem-unit="10" onclick="toggleSmemUnit(this)">Unit10</button>
+      </div>
+      <div class="selected-count" id="smem-sentence-count">329文が選択されています</div>
+      <button onclick="startSmemMode()" style="width:100%;padding:16px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:var(--radius);color:white;font-size:17px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(245,158,11,.35);">スタート →</button>
+    </div>
+
+    <!-- 暗記問題エリア -->
+    <div id="smem-quiz-area" style="display:none;flex-direction:column;gap:14px;">
+      <div class="flashcard" style="min-height:160px;gap:16px;">
+        <div class="card-source-badge" id="smem-unit-badge"></div>
+        <div style="font-size:22px;font-weight:800;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;line-height:1.5;text-align:center;" id="smem-ja-text">...</div>
+        <div id="smem-en-display" style="display:none;font-size:18px;font-weight:700;color:var(--text);font-family:'Nunito',sans-serif;line-height:1.6;text-align:center;padding:12px;background:rgba(6,214,160,.08);border-radius:14px;border:1px solid rgba(6,214,160,.2);"></div>
+        <div id="smem-status" style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">音声を聞いてね</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+        <button id="smem-replay-btn" onclick="smemReplay()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">🔊 もう一度聞く</button>
+        <div style="display:flex;gap:10px;width:100%;" id="smem-action-row" style="display:none;">
+          <button onclick="smemAgain()" class="action-btn" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">🔄 もう一度</button>
+          <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;">覚えた！✅</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TYPING MODE SCREEN -->
+<div id="typing-screen" class="screen">
+  <div style="max-width:600px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;">
+    <div class="flash-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="typing-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="typing-progress-text">0/0</div>
+    </div>
+
+    <!-- ユニット選択 -->
+    <div id="typing-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
+      <div class="settings-label">ユニットを選ぶ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="unit-btn unit-all-btn" onclick="selectAllTypingUnits()">全Unit</button>
+        <button class="unit-btn active" data-typing-unit="1" onclick="toggleTypingUnit(this)">Unit1</button>
+        <button class="unit-btn active" data-typing-unit="2" onclick="toggleTypingUnit(this)">Unit2</button>
+        <button class="unit-btn active" data-typing-unit="3" onclick="toggleTypingUnit(this)">Unit3</button>
+        <button class="unit-btn active" data-typing-unit="4" onclick="toggleTypingUnit(this)">Unit4</button>
+        <button class="unit-btn active" data-typing-unit="5" onclick="toggleTypingUnit(this)">Unit5</button>
+        <button class="unit-btn active" data-typing-unit="6" onclick="toggleTypingUnit(this)">Unit6</button>
+        <button class="unit-btn active" data-typing-unit="7" onclick="toggleTypingUnit(this)">Unit7</button>
+        <button class="unit-btn active" data-typing-unit="8" onclick="toggleTypingUnit(this)">Unit8</button>
+        <button class="unit-btn active" data-typing-unit="9" onclick="toggleTypingUnit(this)">Unit9</button>
+        <button class="unit-btn active" data-typing-unit="10" onclick="toggleTypingUnit(this)">Unit10</button>
+      </div>
+      <div class="selected-count" id="typing-sentence-count">329文が選択されています</div>
+      <button onclick="startTypingMode()" style="width:100%;padding:16px;background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;border-radius:var(--radius);color:white;font-size:17px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,.35);">スタート →</button>
+    </div>
+
+    <!-- タイピング問題エリア -->
+    <div id="typing-quiz-area" style="display:none;flex-direction:column;gap:14px;">
+      <div class="flashcard" style="min-height:120px;">
+        <div class="card-source-badge" id="typing-unit-badge"></div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;line-height:1.5;text-align:center;" id="typing-ja-text">...</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <textarea id="typing-input" rows="2" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="off" placeholder="英文を入力してEnterで確認" style="width:100%;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-family:'Nunito',sans-serif;padding:12px 16px;resize:none;outline:none;transition:border-color .2s;line-height:1.5;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'"></textarea>
+        <button onclick="checkTypingAnswer()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">確認 →</button>
+        <div id="typing-feedback" style="min-height:28px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;"></div>
+        <div id="typing-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-family:'Noto Sans JP',sans-serif;">正解</div>
+          <div id="typing-correct-text" style="font-size:15px;font-weight:700;color:var(--accent3);font-family:'Nunito',sans-serif;line-height:1.5;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="typingSkip()" class="action-btn btn-skip">スキップ</button>
+        <button onclick="typingNext()" id="typing-next-btn" class="action-btn btn-next" style="display:none;">次へ →</button>
+        <button onclick="typingReveal()" id="typing-reveal-btn" class="action-btn btn-reveal">答えを見る</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORIGINAL REGISTER SCREEN -->
+<div id="original-screen" class="screen">
+  <div style="gap:16px;max-width:440px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:16px;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">✏️ オリジナル登録</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">登録済み単語 <span id="orig-registered-count" style="color:var(--accent2)">0語</span></div>
+      <div id="orig-word-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;"></div>
+      <div id="orig-empty" style="text-align:center;color:var(--text-muted);font-size:13px;font-family:'Noto Sans JP',sans-serif;padding:12px;">まだ登録されていません</div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button onclick="downloadOriginalCSV()" style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">📥 CSVダウンロード</button>
+        <button onclick="clearAllOriginal()" style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">🗑️ 全削除</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">📋 テキストから一括登録</div>
+      <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;line-height:1.7;">
+        Googleレンズでテキストをコピーして貼り付けてね！<br>
+        <span style="color:var(--accent2);">英語（スペース）日本語</span> の形で1行ずつ
+      </div>
+      <textarea id="orig-paste-area" placeholder="例：&#10;apple リンゴ&#10;dog イヌ&#10;cat ネコ" style="width:100%;height:120px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:14px;font-family:'Nunito',sans-serif;padding:12px;resize:none;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'"></textarea>
+      <button onclick="parseAndPreview()" style="width:100%;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent2),#ffb300);color:var(--bg);font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">🔍 読み取って確認する</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">✍️ 1件ずつ登録</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" id="orig-word-input" placeholder="英単語 (例: apple)" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" style="padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-weight:700;font-family:'Nunito',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
+        <input type="text" id="orig-meaning-input" placeholder="意味 (例: リンゴ)" style="padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-family:'Noto Sans JP',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
+        <button onclick="toggleOrigOptions()" id="orig-options-toggle" style="text-align:left;padding:8px 4px;background:none;border:none;color:var(--text-muted);font-size:12px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;">＋ 詳細を追加（品詞・優先度）</button>
+        <div id="orig-options" style="display:none;flex-direction:column;gap:8px;">
+          <select id="orig-pos-select" style="padding:10px 14px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;">
+            <option value="">品詞（省略可）</option>
+            <option value="動">動詞</option><option value="名">名詞</option>
+            <option value="形">形容詞</option><option value="副">副詞</option>
+            <option value="前">前置詞</option><option value="接">接続詞</option>
+            <option value="代">代名詞</option>
+          </select>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">優先度：</span>
+            <button class="orig-prio-btn active" data-prio="🔴" onclick="selectOrigPrio(this)" style="padding:6px 14px;border-radius:10px;border:2px solid var(--accent);background:rgba(255,107,107,.2);color:var(--accent);font-size:14px;cursor:pointer;">🔴</button>
+            <button class="orig-prio-btn" data-prio="🟡" onclick="selectOrigPrio(this)" style="padding:6px 14px;border-radius:10px;border:2px solid var(--surface);background:var(--surface);color:var(--text-muted);font-size:14px;cursor:pointer;">🟡</button>
+            <button class="orig-prio-btn" data-prio="🟢" onclick="selectOrigPrio(this)" style="padding:6px 14px;border-radius:10px;border:2px solid var(--surface);background:var(--surface);color:var(--text-muted);font-size:14px;cursor:pointer;">🟢</button>
+          </div>
+        </div>
+        <button id="add-one-btn" onclick="addOneOriginal()" style="width:100%;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent3),#00b894);color:var(--bg);font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">＋ 登録する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW SCREEN -->
+<div id="preview-screen" class="screen">
+  <div style="max-width:440px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:16px;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('original-screen')">‹</button>
+      <div class="screen-title">🔍 確認・修正</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">読み取り結果 <span style="color:var(--text-muted);font-weight:400;font-size:10px;">修正できるよ</span></div>
+      <div id="preview-list" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;"></div>
+    </div>
+    <button onclick="registerPreview()" style="width:100%;padding:18px;background:linear-gradient(135deg,var(--accent3),#00b894);border:none;border-radius:var(--radius);color:var(--bg);font-size:18px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(6,214,160,.3);">✅ これで登録する！</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ===== MINILABO & EIKEN DATA =====
+const MINILABO_CSV = `単語,意味,品詞,出典_ミニラボ,優先度,発音記号
+call,呼ぶ・電話をかける,動,Unit1,🟡,kɔːl
+love,愛する,動,Unit1,🟡,lʌv
+fan,ファン,名,Unit1,🟢,fæn
+often,しばしば・よく,副,Unit1,🟢,ɔːfn
+with,〜といっしょに,前,Unit1,🟡,wɪð
+but,しかし,接,Unit1,🟡,bʌt
+draw,引く・描く,動,Unit1,🟢,drɔː
+so,それで・では,接,Unit1,🟡,soʊ
+about,〜について,前,Unit1,🟡,əbáʊt
+lesson,授業・レッスン,名,Unit1,🟢,lésn
+class,学級・授業,名,Unit2,🟡,klæs
+our,私たちの,代,Unit2,🟡,áʊər
+cannot,canの否定形,否,Unit2,🟡,kǽnɑt
+some,いくつかの,形,Unit2,🟡,sʌm
+parent,親,名,Unit2,🟢,péərənt
+excuse,許す,動,Unit2,🟢,ɪkskjúːz
+here,さあ・ここに,副,Unit2,🟡,hɪər
+welcome,歓迎されて,形,Unit2,🟡,wélkəm
+symbol,象徴・記号,名,Unit3,🟢,símbl
+interesting,興味深い,形,Unit3,🟡,íntərəstɪŋ
+favorite,好きな,形,Unit3,🔴,féɪvərɪt
+character,登場人物,名,Unit3,🟢,kærɪktər
+also,〜もまた,副,Unit3,🔴,ɔːlsoʊ
+around,〜のまわりに,前,Unit3,🟢,əráʊnd
+after,〜のあとに,前,Unit3,🟡,æftər
+online,オンラインで,副,Unit3,🟢,ánlàɪn
+luck,幸運,名,Unit3,🟢,lʌk
+near,〜の近くに,前,Unit3,🟡,nɪər
+puppy,子犬,名,Unit4,🟢,pʌpi
+someday,いつの日か,副,Unit4,🟢,sʌmdèɪ
+they,彼らは,代,Unit4,🟡,ðeɪ
+noon,正午,名,Unit4,🟢,nuːn
+last,最後の・この前の,形,Unit4,🟡,læst
+like,〜のような,前,Unit4,🔴,láɪk
+nervous,緊張して,形,Unit4,🟢,nɑːrvəs
+worry,心配する,動,Unit4,🟡,wɑːri
+sheep,羊,名,Unit4,🟢,ʃiːp
+right,正しい,形,Unit4,🟡,ráɪt
+as,〜として,前,Unit5,🟡,æz
+tour,遠征・観光,名,Unit5,🟢,túər
+guide,案内人,名,Unit5,🟢,gáɪd
+write,書く,動,Unit5,🔴,ráɪt
+blog,ブログ,名,Unit5,🟢,blɑg
+local,地元の,形,Unit5,🟢,lóʊkl
+beautiful,美しい,形,Unit5,🔴,bjúːtəfl
+spot,地点・場所,名,Unit5,🟢,spɑt
+his,彼の,代,Unit5,🟡,híz
+any,何か・何も,形,Unit5,🟡,éni
+does,doの3人称単数,助,Unit5,🟡,dʌz
+has,haveの3人称単数,動,Unit5,🟡,hæz
+there,そこに,副,Unit5,🟡,ðéər
+surf,波乗りする,動,Unit5,🟢,sɜːrf
+life,生活・人生,名,Unit5,🟡,láɪf
+popular,人気のある,形,Unit5,🔴,pʌpjələr
+know,知っている,動,Unit5,🔴,nóʊ
+wonderful,すばらしい,形,Unit5,🟡,wʌndərfl
+him,彼を,代,Unit6,🟡,hɪm
+say,言う,動,Unit6,🟡,séɪ
+everything,すべてのもの,代,Unit6,🟡,évriθɪŋ
+show,ショー,名,Unit6,🟡,ʃoʊ
+her,彼女を,代,Unit6,🟡,hɑːr
+together,いっしょに,副,Unit6,🔴,təgéðər
+minute,分,名,Unit6,🟡,mínɪt
+wait,待つ,動,Unit6,🟡,wéɪt
+whose,だれの,代,Unit6,🟡,húːz
+maybe,もしかすると,副,Unit6,🟡,méɪbiː
+careful,注意深い,形,Unit6,🟡,kéərfl
+history,歴史,名,Unit6,🟢,hɪstəri
+still,今もまだ,副,Unit6,🟡,stɪl
+different,ちがった,形,Unit6,🟡,dɪfərənt
+use,使う,動,Unit6,🔴,júːz
+only,ただ〜だけ,副,Unit6,🔴,óʊnli
+which,どちらの,形,Unit6,🟡,hwɪtʃ
+large,大きい,形,Unit6,🔴,lɑːrdʒ
+collection,収集,名,Unit6,🟢,kəlékʃn
+open,開ける,動,Unit6,🟡,óʊpn
+close,閉める,動,Unit6,🟡,klóʊz
+window,窓,名,Unit6,🔴,wíndoʊ
+sure,確かに,副,Unit6,🔴,ʃúər
+problem,問題,名,Unit6,🟡,prɑbləm
+dark,暗い,形,Unit6,🟡,dɑːrk
+light,明かり,名,Unit6,🟡,láɪt
+borrow,借りる,動,Unit6,🟢,bárou
+tomorrow,明日,副,Unit7,🟡,təmɑroʊ
+plan,計画,名,Unit7,🟡,plæn
+free,空いている,形,Unit7,🟡,friː
+mean,意味する,動,Unit7,🟡,miːn
+forward,前へ,副,Unit7,🟢,fɔːrwərd
+market,市場,名,Unit7,🟢,mɑːrkɪt
+souvenir,お土産,名,Unit7,🟢,sùːvəníər
+place,場所,名,Unit7,🟡,pléɪs
+appear,現れる,動,Unit7,🟢,əpɪər
+those,あれらの,形,Unit7,🟡,ðóʊz
+dad,お父さん,名,Unit7,🟡,dæd
+travel,旅行する,動,Unit7,🟡,trǽvl
+angry,怒った,形,Unit7,🟢,ǽŋgri
+palace,宮殿,名,Unit7,🟢,pælis
+exciting,わくわくさせる,形,Unit7,🟡,ɪksáɪtɪŋ
+late,遅れた,形,Unit7,🔴,léɪt
+pardon,許す,動,Unit7,🟢,pɑːrdn
+along,〜に沿って,前,Unit7,🟢,əlɔːŋ
+street,通り,名,Unit7,🟡,striːt
+straight,まっすぐに,副,Unit7,🟢,stréɪt
+factory,工場,名,Unit7,🟢,fǽktəri
+ethnic,民族の,形,Unit8,🟢,éθnɪk
+volunteer,ボランティア,名,Unit8,🟢,vɑləntíər
+need,必要,名,Unit8,🔴,niːd
+teach,教える,動,Unit8,🔴,tiːtʃ
+try,試す,動,Unit8,🟡,tráɪ
+best,最善,名,Unit8,🟡,bést
+respect,尊敬する,動,Unit8,🟡,rɪspékt
+become,〜になる,動,Unit8,🟡,bɪkʌm
+reduce,減らす,動,Unit8,🟢,rɪdjúːs
+waste,無駄・ごみ,名,Unit8,🟡,wéɪst
+plastic,プラスチックの,形,Unit8,🟡,plǽstɪk
+paper,紙,名,Unit8,🟡,péɪpər
+original,元の・独自の,形,Unit8,🟡,ərídʒənl
+reusable,再利用できる,形,Unit8,🟢,riːjúːzəbl
+village,村,名,Unit8,🟡,vílidʒ
+collect,集める,動,Unit8,🟡,kəlékt
+far,遠い,形,Unit8,🟡,fɑːr
+group,集団,名,Unit8,🟡,grúːp
+build,建てる,動,Unit8,🟡,bɪld
+money,お金,名,Unit8,🟡,mʌni
+would,willの過去形,助,Unit8,🟡,wʊd
+anything,何か,代,Unit8,🟡,énɪθɪŋ
+full,いっぱいの,形,Unit8,🟡,fʊl
+voice,声,名,Unit8,🟢,vɔɪs
+concert,演奏会,名,Unit8,🟢,kɑnsərt
+stage,舞台,名,Unit8,🟢,stéɪdʒ
+performance,演技・公演,名,Unit8,🟢,pərfɔːrməns
+again,もう一度,副,Unit8,🟡,əgén
+back,戻って,副,Unit9,🟡,bæk
+during,〜の間,前,Unit9,🟡,djúərɪŋ
+stay,滞在する,動,Unit9,🟡,stéɪ
+relax,くつろぐ,動,Unit9,🟢,rɪlǽks
+traditional,伝統的な,形,Unit9,🟡,trədɪʃənl
+special,特別な,形,Unit9,🟡,spéʃl
+grandparent,祖父母,名,Unit9,🟡,grǽndpèərənt
+spend,費やす,動,Unit9,🟡,spénd
+dear,親愛なる,形,Unit9,🟡,díər
+ski,スキーをする,動,Unit9,🟢,skiː
+snow,雪,名,Unit9,🟡,snóʊ
+outside,外側で,副,Unit9,🟡,àʊtsáɪd
+miss,〜がいないのを寂しく思う,動,Unit9,🟢,mɪs
+care,注意・世話,名,Unit9,🟡,kéər
+remember,思い出す,動,Unit10,🟡,rɪmémbər
+bored,退屈した,形,Unit10,🟢,bɔːrd
+realize,悟る,動,Unit10,🟢,ríːələɪz
+mistake,まちがい,名,Unit10,🟡,mɪstéɪk
+anyone,だれでも,代,Unit10,🟡,énɪwʌn
+anyway,とにかく,副,Unit10,🟢,énɪweɪ
+bring,持ってくる,動,Unit10,🟡,brɪŋ
+heart,心臓・心,名,Unit10,🟡,hɑːrt
+beat,打つ,動,Unit10,🟢,biːt
+way,道・方法,名,Unit10,🟡,wéɪ
+each,それぞれの,形,Unit10,🟡,iːtʃ
+trip,旅行,名,Unit10,🟡,trɪp
+hot spring,温泉,名,Unit10,🟢,hɑt sprɪŋ
+wrong,まちがった,形,Unit10,🟡,rɔːŋ
+stomachache,腹痛,名,Unit10,🟢,stʌməkèɪk
+before,〜の前に,前,Unit10,🟡,bɪfɔːr
+medicine,薬,名,Unit10,🟡,médəsn
+rest,休息,名,Unit10,🟡,rést
+headache,頭痛,名,Unit10,🟢,hédèɪk
+fever,熱,名,Unit10,🟢,fíːvər`;
+
+const EIKEN_CSV = `単語,意味,品詞,出典_英検5級,優先度,発音記号
+teacher,先生,名,No.1-25,🔴,tíːtʃər
+brother,兄弟,名,No.1-25,🔴,brʌðər
+father,お父さん,名,No.1-25,🔴,fɑːðər
+animal,動物,名,No.1-25,🔴,ǽnɪml
+classroom,教室,名,No.1-25,🔴,klǽsruːm
+chair,椅子,名,No.1-25,🔴,tʃéər
+flower,花,名,No.1-25,🔴,fláʊər
+bird,鳥,名,No.1-25,🔴,bɜːrd
+friend,友達,名,No.1-25,🔴,frénd
+children,子どもたち,名,No.1-25,🔴,tʃɪldrən
+station,駅,名,No.26-50,🔴,stéɪʃn
+train,電車,名,No.26-50,🔴,tréɪn
+spring,春,名,No.26-50,🔴,sprɪŋ
+park,公園,名,No.26-50,🔴,pɑːrk
+room,部屋,名,No.26-50,🔴,ruːm
+math,数学,名,No.26-50,🔴,mæθ
+baseball,野球,名,No.26-50,🔴,béɪsbɔːl
+picture,絵・写真,名,No.26-50,🔴,píktʃər
+school,学校,名,No.26-50,🔴,skuːl
+girl,女の子,名,No.1-50,🔴,gɜːrl
+car,車,名,No.1-50,🔴,kɑːr
+family,家族,名,No.1-50,🔴,fǽməli
+movie,映画,名,No.1-50,🔴,múːvi
+textbook,教科書,名,No.1-50,🔴,tékstbʊk
+sister,姉妹,名,No.1-50,🔴,sɪstər
+mother,お母さん,名,No.1-50,🔴,mʌðər
+color,色,名,No.51-75,🔴,kʌlər
+buy,買う,動,No.51-75,🔴,báɪ
+birthday,誕生日,名,No.51-75,🔴,bɜːrθdèɪ
+come,来る,動,No.51-75,🔴,kʌm
+breakfast,朝食,名,No.51-75,🔴,brékfəst
+time,時間,名,No.51-75,🔴,táɪm
+cry,泣く,動,No.51-75,🔴,kráɪ
+cut,切る,動,No.51-75,🔴,kʌt
+begin,始める,動,No.51-75,🔴,bɪgín
+ask,尋ねる,動,No.51-75,🔴,æsk
+live,住む,動,No.76-100,🔴,lɪv
+eat,食べる,動,No.76-100,🔴,iːt
+hear,聞く,動,No.76-100,🔴,hɪər
+give,与える,動,No.76-100,🔴,gɪv
+find,見つける,動,No.76-100,🔴,fáɪnd
+enjoy,楽しむ,動,No.76-100,🔴,ɪndʒɔɪ
+have,持っている,動,No.76-100,🔴,hæv
+do,する,動,No.76-100,🔴,duː
+help,助ける,動,No.51-100,🔴,hélp
+get,得る,動,No.51-100,🔴,gét
+month,月,名,No.51-100,🔴,mʌnθ
+make,作る,動,No.51-100,🔴,méɪk
+music,音楽,名,No.51-100,🔴,mjúːzɪk
+listen,聞く,動,No.51-100,🔴,lísn
+meet,会う,動,No.51-100,🔴,míːt
+year,年,名,No.51-100,🔴,jɪər
+sing,歌う,動,No.101-125,🔴,sɪŋ
+read,読む,動,No.101-125,🔴,riːd
+think,考える,動,No.101-125,🔴,θɪŋk
+walk,歩く,動,No.101-125,🔴,wɔːk
+speak,話す,動,No.101-125,🔴,spíːk
+run,走る,動,No.101-125,🔴,rʌn
+study,勉強する,動,No.101-125,🔴,stʌdi
+see,見る,動,No.101-125,🔴,siː
+stand,立つ,動,No.101-125,🔴,stænd
+Chinese,中国の,形,No.126-150,🔴,tʃàɪníːz
+watch,見る,動,No.126-150,🔴,wɑtʃ
+easy,簡単な,形,No.126-150,🔴,íːzi
+famous,有名な,形,No.126-150,🔴,féɪməs
+cloudy,くもりの,形,No.126-150,🔴,kláʊdi
+cute,かわいい,形,No.126-150,🔴,kjúːt
+work,働く,動,No.126-150,🔴,wɜːrk
+wash,洗う,動,No.101-150,🔴,wɑʃ
+put,置く,動,No.101-150,🔴,pʊt
+take,取る,動,No.101-150,🔴,téɪk
+talk,話す,動,No.101-150,🔴,tɔːk
+want,〜したい,動,No.101-150,🔴,wɑnt
+cold,寒い,形,No.101-150,🔴,kóʊld
+all,すべての,形,No.101-150,🔴,ɔːl
+every,毎〜,形,No.101-150,🔴,évri
+delicious,おいしい,形,No.101-150,🔴,dɪlíʃəs
+many,たくさんの,形,No.151-175,🔴,méni
+high,高い,形,No.151-175,🔴,háɪ
+old,古い,形,No.151-175,🔴,óʊld
+Japanese,日本の,形,No.151-175,🔴,dʒæpəníːz
+new,新しい,形,No.151-175,🔴,njúː
+next,次の,形,No.151-175,🔴,nékst
+slow,遅い,形,No.176-200,🔴,slóʊ
+soft,柔らかい,形,No.176-200,🔴,sɔːft
+sad,悲しい,形,No.176-200,🔴,sæd
+tall,背が高い,形,No.176-200,🔴,tɔːl
+sick,病気の,形,No.176-200,🔴,sɪk
+tired,疲れた,形,No.176-200,🔴,táɪərd
+young,若い,形,No.176-200,🔴,jʌŋ
+always,いつも,副,No.176-200,🔴,ɔːlweɪz
+smart,賢い,形,No.176-200,🔴,smɑːrt
+little,少しの,形,No.151-200,🔴,lítl
+long,長い,形,No.151-200,🔴,lɔːŋ
+hungry,お腹がすいた,形,No.151-200,🔴,hʌŋgri
+pretty,きれいな,形,No.151-200,🔴,príti
+short,短い,形,No.151-200,🔴,ʃɔːrt
+sunny,晴れの,形,No.151-200,🔴,sʌni
+rainy,雨の,形,No.151-200,🔴,réɪni
+windy,風の強い,形,No.151-200,🔴,wíndi
+warm,暖かい,形,No.151-200,🔴,wɔːrm
+today,今日,副,No.201-225,🔴,tədéɪ
+please,どうか,副,No.201-225,🔴,plíːz
+well,よく,副,No.201-225,🔴,wél
+yesterday,昨日,副,No.201-225,🔴,jéstərdeɪ
+tonight,今夜,副,No.201-225,🔴,tənáɪt
+sure,確かに,副,No.201-225,🔴,ʃúər
+together,いっしょに,副,No.201-225,🔴,təgéðər`;
+
+const MABUTAN_CSV = `単語,意味,品詞,出典_まぶたん,優先度
+boy,少年・男の子,名,No.1,🟡
+girl,少女・女の子,名,No.2,🟡
+man,男性・男の人,名,No.3,🟡
+woman,女性・女の人,名,No.4,🟡
+child,子ども,名,No.5,🟡
+friend,友だち・友人,名,No.6,🟡
+have,持っている・食べる,動,No.7,🔴
+play,（スポーツを）する・遊ぶ,動,No.8,🔴
+read,読む,動,No.9,🔴
+teach,教える,動,No.10,🔴
+study,勉強する,動,No.11,🔴
+try,試みる・試す,動,No.12,🟡
+make,作る,動,No.13,🔴
+use,使う,動,No.14,🔴
+cook,料理する,動,No.15,🟡
+English,英語,名,No.16,🔴
+math,数学,名,No.17,🔴
+school,学校,名,No.18,🔴
+class,クラス・授業,名,No.19,🔴
+subject,科目・教科,名,No.20,🟡
+page,ページ,名,No.21,🟢
+work,働く・仕事,動,No.22,🟡
+get,得る・なる,動,No.23,🔴
+stay,とどまる・滞在する,動,No.24,🟡
+buy,買う,動,No.25,🔴
+dance,踊る・ダンスをする,動,No.26,🟡
+see,見える・会う・わかる,動,No.27,🔴
+look,見る・…に見える,動,No.28,🔴
+wish,願う・望む,動,No.29,🟡
+begin,始まる・始める,動,No.30,🟡
+let's,...しよう,動,No.31,🟡
+eat,食べる,動,No.32,🔴
+start,始まる・始める,動,No.33,🟡
+animal,動物,名,No.34,🔴
+pet,ペット・愛玩動物,名,No.35,🟡
+dog,イヌ,名,No.36,🟡
+cat,ネコ,名,No.37,🟡
+rabbit,ウサギ,名,No.38,🟢
+bird,鳥,名,No.39,🟡
+pig,ブタ,名,No.40,🟢
+fish,魚,名,No.41,🟡
+lion,ライオン,名,No.42,🟢
+cow,ウシ・雌牛,名,No.43,🟢
+fox,キツネ,名,No.44,🟢
+good,よい・じょうずな,形,No.45,🔴
+bad,悪い・不快な,形,No.46,🔴
+nice,よい・すてきな,形,No.47,🟡
+interesting,おもしろい・興味深い,形,No.48,🔴
+great,大きい・すばらしい,形,No.49,🔴
+right,正しい・右の,形,No.50,🔴
+new,新しい,形,No.51,🔴
+young,若い,形,No.52,🟡
+old,年をとった・古い,形,No.53,🟡
+ready,用意ができた,形,No.54,🟡
+easy,簡単な,形,No.55,🔴
+music,音楽,名,No.56,🔴
+word,単語・語,名,No.57,🟡
+homework,宿題,名,No.58,🟡
+classroom,教室,名,No.59,🔴
+question,質問,名,No.60,🟡
+student,学生・生徒,名,No.61,🔴
+take,持っていく・取る,動,No.62,🔴
+wash,洗う,動,No.63,🔴
+clean,そうじする,動,No.64,🟡
+help,手伝う・助ける,動,No.65,🔴
+meet,会う,動,No.66,🔴
+cut,切る,動,No.67,🔴
+practice,練習する,動,No.68,🟡
+write,書く,動,No.69,🔴
+sing,歌う,動,No.70,🔴
+watch,見る,動,No.71,🔴
+drink,飲む,動,No.72,🟡
+call,呼ぶ・電話をかける,動,No.73,🔴
+hear,聞こえる・聞く,動,No.74,🔴
+listen,聞く,動,No.75,🔴
+stop,やめる・止める,動,No.76,🟡
+know,知っている,動,No.77,🔴
+welcome,ようこそ,間,No.78,🟡
+then,そのとき・それから,副,No.79,🟡
+always,いつも・常に,副,No.80,🔴
+often,よく・しばしば,副,No.81,🔴
+usually,ふつうは・いつもは,副,No.82,🟡
+sometimes,ときどき,副,No.83,🟡
+fast,速く,副,No.84,🟡
+early,早く,副,No.85,🟡
+sport,スポーツ,名,No.86,🔴
+game,ゲーム・試合,名,No.87,🔴
+swimming,水泳,名,No.88,🟡
+ball,ボール・球,名,No.89,🟡
+baseball,野球,名,No.90,🔴
+basketball,バスケットボール,名,No.91,🟡
+volleyball,バレーボール,名,No.92,🟡
+soccer,サッカー,名,No.93,🟡
+tennis,テニス,名,No.94,🟡
+bat,バット・コウモリ,名,No.95,🟢
+racket,ラケット,名,No.96,🟢
+open,開ける・開く,動,No.97,🟡
+run,走る,動,No.98,🔴
+walk,歩く・散歩する,動,No.99,🔴
+do,する・行う,動,No.100,🔴
+sleep,眠る,動,No.101,🟡
+sit,すわる,動,No.102,🟡
+put,置く,動,No.103,🔴
+say,言う,動,No.104,🔴
+cry,泣く・叫ぶ,動,No.105,🔴
+flute,フルート,名,No.106,🟢
+violin,バイオリン,名,No.107,🟢
+piano,ピアノ,名,No.108,🟡
+guitar,ギター,名,No.109,🟡
+nurse,看護師,名,No.110,🟡
+dancer,踊り手・ダンサー,名,No.111,🟢
+singer,歌手,名,No.112,🟢
+teacher,先生・教師,名,No.113,🔴
+driver,運転手,名,No.114,🟢
+doctor,医者,名,No.115,🟡
+pilot,パイロット,名,No.116,🟢
+pianist,ピアニスト,名,No.117,🟢
+everyone,だれでも・みんな,代,No.118,🟡
+cold,寒い・冷たい,形,No.119,🔴
+dark,暗い,形,No.120,🟡
+cool,涼しい,形,No.121,🟡
+warm,暖かい・温かい,形,No.122,🟡
+hot,熱い・暑い,形,No.123,🔴
+windy,風の強い,形,No.124,🔴
+rainy,雨降りの,形,No.125,🔴
+sunny,晴れた,形,No.126,🔴
+snowy,雪の降る,形,No.127,🟡
+stand,立つ,動,No.128,🟡
+close,閉じる,動,No.129,🟡
+speak,話す,動,No.130,🔴
+talk,話す,動,No.131,🔴
+thank,感謝する,動,No.132,🟡
+after,…の後,前,No.133,🟡
+before,（時間が）…より前に,前,No.134,🟡
+with,…と（いっしょに）,前,No.135,🔴
+to,...へ（に）,前,No.136,🔴
+near,...の近くに,前,No.137,🟡
+by,...によって・そばに,前,No.138,🟡
+time,時刻・時間,名,No.139,🔴
+morning,朝・午前,名,No.140,🟡
+afternoon,午後,名,No.141,🟡
+evening,晩・夕方,名,No.142,🟡
+hour,1時間,名,No.143,🟡
+day,日・1日,名,No.144,🔴
+night,夜,名,No.145,🟡
+week,週・1週間,名,No.146,🟡
+month,月,名,No.147,🔴
+noon,正午,名,No.148,🟢
+o'clock,（ちょうど）…時,副,No.149,🟡
+ago,（今から）…前に,副,No.150,🟡
+year,年・1年,名,No.151,🔴
+now,今・現在,副,No.152,🟡
+today,きょう,副,No.153,🔴
+date,日付・日時,名,No.154,🟡
+lot,たくさん,名,No.155,🟡
+die,死ぬ,動,No.156,🟢
+ski,スキーをする,動,No.157,🟢
+swim,泳ぐ,動,No.158,🟡
+rain,雨が降る,動,No.159,🟡
+snow,雪が降る,動,No.160,🟡
+can,...することができる,助,No.161,🔴
+hard,熱心に・一生懸命に,副,No.162,🟡
+please,どうぞ・どうか,副,No.163,🔴
+well,じょうずに・うまく,副,No.164,🔴
+too,...もまた・あまりに,副,No.165,🔴
+who,だれ,代,No.166,🔴
+what,何・どんな,代,No.167,🔴
+when,いつ,副,No.168,🔴
+where,どこに（で）,副,No.169,🔴
+whose,だれの,代,No.170,🟡
+which,どの・どちらの,代,No.171,🟡
+food,食べ物,名,No.172,🔴
+banana,バナナ,名,No.173,🟡
+orange,オレンジ,名,No.174,🟡
+cake,ケーキ,名,No.175,🟡
+apple,リンゴ,名,No.176,🟡
+egg,たまご,名,No.177,🟡
+dish,皿・料理,名,No.178,🟡
+milk,牛乳,名,No.179,🟡
+tomato,トマト,名,No.180,🟡
+potato,じゃがいも,名,No.181,🟡
+breakfast,朝食,名,No.182,🔴
+lunch,昼食・ランチ,名,No.183,🟡
+dinner,食事・夕食,名,No.184,🟡
+big,大きい,形,No.185,🔴
+little,小さい・かわいい,形,No.186,🔴
+large,大きい・広い,形,No.187,🔴
+small,小さい,形,No.188,🔴
+tall,高い・背の高い,形,No.189,🔴
+long,長い,形,No.190,🔴
+short,短い・背の低い,形,No.191,🔴
+high,高い,形,No.192,🔴
+many,多数の・たくさんの,形,No.193,🔴
+home,家へ（に）・家,副,No.194,🟡
+here,ここへ（に・で）,副,No.195,🔴
+there,そこへ（に・で）,副,No.196,🔴
+up,上へ（に・で）,副,No.197,🟡
+down,下へ（に）,副,No.198,🟡
+out,外へ（に）,副,No.199,🟡
+camera,カメラ,名,No.200,🟡
+watch,腕時計,名,No.201,🟡
+clock,時計,名,No.202,🟡
+pencil,えんぴつ,名,No.203,🟡
+pen,ペン,名,No.204,🟡
+radio,ラジオ,名,No.205,🟢
+cup,カップ・茶わん,名,No.206,🟡
+eraser,消しゴム,名,No.207,🟡
+glass,ガラス・コップ,名,No.208,🟡
+pocket,ポケット,名,No.209,🟢
+color,色,名,No.210,🔴
+red,赤い,形,No.211,🟡
+white,白い,形,No.212,🟡
+blue,青い,形,No.213,🟡
+black,黒い,形,No.214,🟡
+green,緑の,形,No.215,🟡
+yellow,黄色い,形,No.216,🟡
+name,名前,名,No.217,🔴
+king,王,名,No.218,🟢
+fan,ファン・愛好者,名,No.219,🟡
+speaker,話す人・話し手,名,No.220,🟢
+runner,走者・ランナー,名,No.221,🟢
+player,選手・演奏者,名,No.222,🟡
+family,家族,名,No.223,🔴
+Japan,日本,名,No.224,🔴
+America,アメリカ合衆国,名,No.225,🟡
+China,中国,名,No.226,🟡
+France,フランス,名,No.227,🟢
+Japanese,日本の・日本人の,形,No.228,🔴
+American,アメリカ（人）の,形,No.229,🟡
+Chinese,中国の・中国人の,形,No.230,🟡
+French,フランスの・フランス人の,形,No.231,🟢
+season,季節,名,No.232,🟡
+spring,春,名,No.233,🔴
+summer,夏,名,No.234,🔴
+fall,秋,名,No.235,🔴
+winter,冬,名,No.236,🔴
+sea,海,名,No.237,🟡
+river,川,名,No.238,🟡
+lake,湖,名,No.239,🟢
+tree,木,名,No.240,🟡
+sun,太陽,名,No.241,🟡
+moon,（天体の）月,名,No.242,🟡
+water,水,名,No.243,🔴
+flower,花,名,No.244,🔴
+rose,バラ（の花）,名,No.245,🟢
+rain,雨,名,No.246,🟡
+snow,雪,名,No.247,🟡
+sky,空,名,No.248,🟡
+in,...の中に（で・の）,前,No.249,🔴
+on,...の上に・…に,前,No.250,🔴
+at,...に・…で,前,No.251,🔴
+from,...から・…出身で,前,No.252,🔴
+for,...のために,前,No.253,🔴
+of,...の,前,No.254,🔴
+over,...の上に・…を越えて,前,No.255,🟡
+under,...の下に,前,No.256,🟡
+father,父,名,No.257,🔴
+mother,母,名,No.258,🔴
+brother,兄・弟・兄弟,名,No.259,🔴
+sister,姉・妹・姉妹,名,No.260,🔴
+uncle,おじ,名,No.261,🟢
+aunt,おば,名,No.262,🟢
+baby,赤ん坊・赤ちゃん,名,No.263,🟡
+head,頭,名,No.264,🟡
+hand,手,名,No.265,🟡
+face,顔,名,No.266,🟡
+nose,鼻,名,No.267,🟡
+eye,目,名,No.268,🟡
+mouth,口,名,No.269,🟡
+ear,耳,名,No.270,🟡
+hair,髪,名,No.271,🟡
+foot,足,名,No.272,🟡
+need,必要とする,動,No.273,🔴
+like,好きである,動,No.274,🔴
+live,住んでいる・生きる,動,No.275,🔴
+love,愛する・大好きである,動,No.276,🔴
+want,ほしい・望む,動,No.277,🔴
+kind,親切な・優しい,形,No.278,🟡
+fine,元気な・快調な,形,No.279,🟡
+happy,幸せな・うれしい,形,No.280,🔴
+sorry,申し訳なく思って,形,No.281,🟡
+busy,忙しい,形,No.282,🟡
+pretty,かわいらしい・かなり,形,No.283,🟡
+bed,ベッド,名,No.284,🟡
+bike,自転車,名,No.285,🟡
+table,テーブル,名,No.286,🟡
+desk,机,名,No.287,🟡
+chair,いす,名,No.288,🔴
+door,ドア,名,No.289,🟡
+TV,テレビ,名,No.290,🟡
+garden,庭,名,No.291,🟡
+town,町,名,No.292,🟡
+country,国・いなか,名,No.293,🟡
+city,都市・市,名,No.294,🟡
+these,これらの・これら,代,No.295,🟡
+those,あれら（それら）の,代,No.296,🟡
+some,いくつかの,形,No.297,🟡
+any,（疑問文で）いくらかの,形,No.298,🟡
+all,すべての,形,No.299,🔴
+every,どの…も・毎…,形,No.300,🔴
+go,行く,動,No.301,🔴
+come,来る,動,No.302,🔴
+leave,出発する・去る,動,No.303,🟡
+drive,運転する,動,No.304,🟡
+visit,訪問する,動,No.305,🟡
+ride,（乗り物に）乗る,動,No.306,🟡
+fly,飛ぶ,動,No.307,🟡
+card,カード・トランプ札,名,No.308,🟡
+picture,写真・絵,名,No.309,🔴
+book,本,名,No.310,🔴
+notebook,ノート,名,No.311,🟡
+textbook,教科書,名,No.312,🔴
+album,アルバム,名,No.313,🟢
+map,地図,名,No.314,🟡
+stamp,切手・スタンプ,名,No.315,🟢
+letter,手紙・文字,名,No.316,🟡
+dictionary,辞書,名,No.317,🟡
+much,多量の・たくさんの,形,No.318,🔴
+about,およそ・約…,副,No.319,🟡
+how,どうやって・どれくらい,副,No.320,🔴
+really,本当に,副,No.321,🟡
+very,とても・たいへん,副,No.322,🔴
+shoe,靴,名,No.323,🟡
+bag,袋・バッグ・かばん,名,No.324,🟡
+doll,人形,名,No.325,🟢
+cap,（縁のない）帽子,名,No.326,🟢
+hat,（縁のある）帽子,名,No.327,🟢
+box,箱,名,No.328,🟡
+plane,飛行機,名,No.329,🟡
+train,列車・電車,名,No.330,🔴
+ship,船,名,No.331,🟡
+car,車・自動車,名,No.332,🔴
+bus,バス,名,No.333,🟡
+and,...と〜・そして,接,No.334,🔴
+or,...かまたは〜,接,No.335,🔴
+but,しかし・でも,接,No.336,🔴
+house,家,名,No.337,🟡
+park,公園,名,No.338,🔴
+hotel,ホテル,名,No.339,🟡
+wall,壁,名,No.340,🟡
+room,部屋,名,No.341,🔴
+station,駅・署・局,名,No.342,🔴
+zoo,動物園,名,No.343,🟢`;
+
+function parseCSV(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const vals = line.split(',');
+    const obj = {};
+    headers.forEach((h,i) => obj[h.trim()] = (vals[i]||'').trim());
+    return obj;
+  });
+}
+
+const MINILABO = parseCSV(MINILABO_CSV);
+const EIKEN = parseCSV(EIKEN_CSV);
+const MABUTAN = parseCSV(MABUTAN_CSV);
+
+function getMabutanNum(w) {
+  const s = w['出典_まぶたん'] || '';
+  const m = s.match(/No\.(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+function mabutanInGroup(w, group) {
+  const num = getMabutanNum(w);
+  const [lo, hi] = group.split('-').map(Number);
+  return num >= lo && num <= hi;
+}
+function eikenInGroup(w, group) {
+  const s = w['出典_英検5級'] || '';
+  const m = s.match(/No\.(\d+)/);
+  if (!m) return false;
+  const num = parseInt(m[1]);
+  const [lo, hi] = group.split('-').map(Number);
+  return num >= lo && num <= hi;
+}
+
+let state = {
+  inputMode: 'keyboard', timerEnabled: false, timerSec: 15,
+  deck: [], current: 0, answered: false,
+  correct: 0, wrong: 0, skipped: 0, wrongWords: [],
+  timerInterval: null, timerLeft: 0, currentTyped: '',
+};
+
+updateSelectedCount();
+
+// ===== SOURCE UI =====
+function updateSourceUI() {
+  const minilaboOn = document.getElementById('chk-minilabo').checked;
+  const eikenOn = document.getElementById('chk-eiken').checked;
+  const mabutanOn = document.getElementById('chk-mabutan').checked;
+  document.getElementById('unit-grid').style.display = minilaboOn ? 'flex' : 'none';
+  document.getElementById('eiken-grid').style.display = eikenOn ? 'flex' : 'none';
+  document.getElementById('mabutan-grid').style.display = mabutanOn ? 'flex' : 'none';
+  updateOriginalCountLabel();
+  updateSelectedCount();
+}
+// 初期表示時に実行
+updateSourceUI();
+
+function toggleUnit(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
+function toggleEiken(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
+function toggleMabutan(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
+
+function selectAllUnits() {
+  const btns = document.querySelectorAll('#unit-grid button[data-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSelectedCount();
+}
+function selectAllEiken() {
+  const btns = document.querySelectorAll('#eiken-grid button[data-eiken]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSelectedCount();
+}
+function selectAllMabutan() {
+  const btns = document.querySelectorAll('#mabutan-grid button[data-mabutan]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSelectedCount();
+}
+
+function buildDeck() {
+  const minilaboOn = document.getElementById('chk-minilabo').checked;
+  const eikenOn = document.getElementById('chk-eiken').checked;
+  const mabutanOn = document.getElementById('chk-mabutan').checked;
+  const selectedUnits = Array.from(document.querySelectorAll('#unit-grid button.active')).map(b => b.dataset.unit);
+  const selectedEikenGroups = Array.from(document.querySelectorAll('#eiken-grid button.active')).map(b => b.dataset.eiken);
+  const selectedMabutanGroups = Array.from(document.querySelectorAll('#mabutan-grid button.active')).map(b => b.dataset.mabutan);
+  const result = [];
+  if (minilaboOn) MINILABO.filter(w => selectedUnits.includes(w['出典_ミニラボ'])).forEach(w => result.push({...w, _source: 'ミニラボ'}));
+  if (eikenOn) EIKEN.filter(w => selectedEikenGroups.some(g => eikenInGroup(w, g))).forEach(w => result.push({...w, _source: '英検5級'}));
+  if (mabutanOn) MABUTAN.filter(w => selectedMabutanGroups.some(g => mabutanInGroup(w, g))).forEach(w => result.push({...w, _source: 'まぶたん'}));
+  const origEl = document.getElementById('chk-original');
+  if (origEl && origEl.checked) {
+    loadOriginalWords().forEach(w => result.push({...w, _source: 'オリジナル'}));
+  }
+  return result.sort(() => Math.random() - 0.5);
+}
+
+function updateSelectedCount() {
+  const deck = buildDeck();
+  document.getElementById('selected-count').textContent = `${deck.length}語が選択されています`;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  stopTimer();
+}
+function goToSettings() { showScreen('settings-screen'); }
+
+function selectInput(btn) {
+  document.querySelectorAll('[data-input]').forEach(b => b.className = 'priority-btn');
+  btn.classList.add('active-all');
+  state.inputMode = btn.dataset.input;
+}
+function toggleTimer() {
+  state.timerEnabled = !state.timerEnabled;
+  document.getElementById('timer-toggle').classList.toggle('on', state.timerEnabled);
+  document.getElementById('timer-options').style.display = state.timerEnabled ? 'block' : 'none';
+}
+function selectTimer(btn) {
+  document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.timerSec = parseInt(btn.dataset.sec);
+}
+
+function startFlash() {
+  state.deck = buildDeck();
+  if (!state.deck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
+  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = [];
+  showScreen('flash-screen');
+  loadCard();
+  switchInputTab(state.inputMode);
+}
+
+function posLabel(pos) {
+  const m = {'動':'動詞','名':'名詞','形':'形容詞','副':'副詞','前':'前置詞','接':'接続詞','代':'代名詞','助':'助動詞','否':'否定形','間':'感嘆詞','句':'熟語'};
+  return m[pos] || pos;
+}
+
+function loadCard() {
+  if (state.current >= state.deck.length) { showResult(); return; }
+  const word = state.deck[state.current];
+  state.answered = false; state.currentTyped = '';
+  const dot = document.getElementById('priority-dot');
+  dot.className = 'priority-dot';
+  if (word['優先度'] === '🔴') dot.classList.add('high');
+  else if (word['優先度'] === '🟡') dot.classList.add('mid');
+  else dot.classList.add('low');
+  document.getElementById('card-source').textContent = word._source || '';
+  document.getElementById('card-meaning-main').textContent = word['意味'];
+  document.getElementById('pos-badge').textContent = posLabel(word['品詞']);
+  document.getElementById('card-answer-wrap').classList.remove('visible');
+  document.getElementById('card-word-answer').textContent = word['単語'];
+  document.getElementById('card-phonetic').textContent = word['発音記号'] ? `[${word['発音記号']}]` : '';
+  mainInput.value = '';
+  mainInput.disabled = false;
+  renderEmptyBoxes();
+  document.getElementById('spellout-display').classList.remove('visible');
+  document.getElementById('feedback-area').className = 'feedback-area';
+  document.getElementById('feedback-area').textContent = '';
+  clearCanvas();
+  document.getElementById('canvas-judge').style.display = 'none';
+  const ca = document.querySelector('#canvas-panel .canvas-actions');
+  if (ca) ca.style.display = 'flex';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('reveal-btn').style.display = 'block';
+  const replayBtn = document.getElementById('replay-btn'); if(replayBtn) replayBtn.style.display='none';
+  const pct = (state.current / state.deck.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${state.current+1}/${state.deck.length}`;
+  if (state.timerEnabled) startTimer();
+  if (state.inputMode === 'keyboard') setTimeout(() => mainInput.focus(), 150);
+}
+
+const mainInput = document.getElementById('main-input');
+mainInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+
+function focusInput() { if (!state.answered) mainInput.focus(); }
+
+function renderLetterBoxes(typed, correct) {
+  const boxes = document.getElementById('letter-boxes');
+  boxes.innerHTML = '';
+  const maxLen = Math.max(typed.length, correct.length);
+  for (let i = 0; i < maxLen; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box';
+    const tc = (typed[i] || '').toLowerCase();
+    const cc = (correct[i] || '').toLowerCase();
+    if (!typed[i]) {
+      box.textContent = correct[i]; box.classList.add('wrong');
+    } else if (!correct[i]) {
+      box.textContent = typed[i]; box.classList.add('wrong');
+    } else if (tc === cc) {
+      box.textContent = typed[i]; box.classList.add('correct');
+    } else {
+      box.textContent = typed[i]; box.classList.add('wrong');
+    }
+    boxes.appendChild(box);
+  }
+}
+
+function renderEmptyBoxes() {
+  const word = state.deck[state.current] ? state.deck[state.current]['単語'] : '';
+  const boxes = document.getElementById('letter-boxes');
+  boxes.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box empty';
+    box.textContent = '_';
+    boxes.appendChild(box);
+  }
+}
+
+function checkAnswer() {
+  if (state.answered) return;
+  const typed = mainInput.value.trim();
+  if (!typed) return;
+  const word = state.deck[state.current];
+  const correct = word['単語'].toLowerCase();
+  stopTimer(); state.answered = true;
+  mainInput.disabled = true;
+  renderLetterBoxes(typed.toLowerCase(), correct);
+  document.getElementById('card-answer-wrap').classList.add('visible');
+  const fb = document.getElementById('feedback-area');
+  if (typed.toLowerCase() === correct) {
+    state.correct++;
+    fb.className = 'feedback-area correct'; fb.textContent = '✓ 正解！';
+  } else {
+    state.wrong++; state.wrongWords.push(word);
+    fb.className = 'feedback-area wrong'; fb.textContent = '✗ まちがい！';
+  }
+  doSpellOut(word['単語']);
+  const rb = document.getElementById('replay-btn'); if(rb) rb.style.display='inline-block';
+  document.getElementById('next-btn').style.display = 'block';
+  document.getElementById('reveal-btn').style.display = 'none';
+}
+
+// ===== 音声テスト（詳細デバッグ版）=====
+function testVoice() {
+  const debug = document.getElementById('voice-debug');
+  if (!('speechSynthesis' in window)) {
+    debug.textContent = '❌ speechSynthesis 非対応';
+    return;
+  }
+  // まずvoicesを取得
+  let voices = window.speechSynthesis.getVoices();
+  const enVoices = voices.filter(v => v.lang.startsWith('en'));
+  debug.textContent = `voices総数: ${voices.length}\nen系: ${enVoices.map(v=>v.name+'('+v.lang+')').join(', ') || 'なし'}`;
+
+  // voiceschangedを待ってから再試行（Android対策）
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      voices = window.speechSynthesis.getVoices();
+      const ev = voices.filter(v => v.lang.startsWith('en'));
+      debug.textContent = `[onvoiceschanged後]\nvoices総数: ${voices.length}\nen系: ${ev.map(v=>v.name+'('+v.lang+')').join(', ') || 'なし'}`;
+      speakTest(debug, voices);
+    };
+  } else {
+    speakTest(debug, voices);
+  }
+}
+
+function speakTest(debug, voices) {
+  const u = new SpeechSynthesisUtterance('hello');
+  u.lang = 'en-US';
+  u.rate = 0.8;
+  u.volume = 1.0;
+  // en-USの音声があれば明示的に指定
+  const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) {
+    u.voice = enVoice;
+    debug.textContent += `\n→ 使用音声: ${enVoice.name}`;
+  }
+  u.onstart = () => { debug.textContent += '\n→ 再生開始 ✅'; };
+  u.onend = () => { debug.textContent += '\n→ 完了 ✅'; };
+  u.onerror = (e) => { debug.textContent += `\n→ エラー: ${e.error} ❌`; };
+  window.speechSynthesis.speak(u);
+}
+
+let spelloutEnabled = true;
+let spelloutSpeed = 'slow';
+
+function toggleSpellout() {
+  spelloutEnabled = !spelloutEnabled;
+  document.getElementById('spellout-toggle').classList.toggle('on', spelloutEnabled);
+  document.getElementById('spellout-options').style.display = spelloutEnabled ? 'block' : 'none';
+}
+
+function selectSpeed(btn) {
+  document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  spelloutSpeed = btn.dataset.speed;
+}
+
+// ===== 修正版 doSpellOut: onendチェーン方式（Android/iOS両対応）=====
+function doSpellOut(word) {
+  // スペル表示は常にする
+  const letters = word.toUpperCase().split('').join(' - ');
+  document.getElementById('spellout-text').textContent = letters;
+  document.getElementById('spellout-display').classList.add('visible');
+
+  if (!spelloutEnabled) return;
+  if (!('speechSynthesis' in window)) return;
+
+  const rate = spelloutSpeed === 'slow' ? 0.7 : 1.0;
+  const letterRate = spelloutSpeed === 'slow' ? 0.55 : 0.85;
+
+  // voicesを取得（Androidは遅延あり）
+  function getEnVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.lang === 'en-US') ||
+           voices.find(v => v.lang.startsWith('en-')) ||
+           voices.find(v => v.lang.startsWith('en')) ||
+           null;
+  }
+
+  // onendチェーンで順番に読む
+  function speakChain(items, idx) {
+    if (idx >= items.length) return;
+    const u = new SpeechSynthesisUtterance(items[idx].text);
+    u.lang = 'en-US';
+    u.rate = items[idx].rate;
+    u.volume = 1.0;
+    const v = getEnVoice();
+    if (v) u.voice = v;
+    u.onend = () => speakChain(items, idx + 1);
+    u.onerror = () => speakChain(items, idx + 1); // エラーでもスキップして次へ
+    window.speechSynthesis.speak(u);
+  }
+
+  function startSpeak() {
+    // 単語全体 + 各文字のチェーン
+    const items = [
+      { text: word, rate: rate },
+      ...word.split('').map(ch => ({ text: ch, rate: letterRate }))
+    ];
+    speakChain(items, 0);
+  }
+
+  // voices未ロードならonvoiceschangedを待つ（Android対策）
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      startSpeak();
+    };
+  } else {
+    startSpeak();
+  }
+}
+
+function revealAnswer() {
+  stopTimer(); state.answered = true;
+  document.getElementById('card-answer-wrap').classList.add('visible');
+  renderLetterBoxes('', state.deck[state.current]['単語'].toLowerCase());
+  doSpellOut(state.deck[state.current]['単語']);
+  state.wrong++; state.wrongWords.push(state.deck[state.current]);
+  document.getElementById('feedback-area').className = 'feedback-area wrong';
+  document.getElementById('feedback-area').textContent = '答えを確認して書き直してみよう';
+  const rb2 = document.getElementById('replay-btn'); if(rb2) rb2.style.display='inline-block';
+  document.getElementById('next-btn').style.display = 'block';
+  document.getElementById('reveal-btn').style.display = 'none';
+}
+
+function revealCanvas() {
+  stopTimer();
+  document.getElementById('card-answer-wrap').classList.add('visible');
+  doSpellOut(state.deck[state.current]['単語']);
+  document.getElementById('canvas-judge').style.display = 'block';
+  document.querySelector('#canvas-panel .canvas-actions').style.display = 'none';
+}
+
+function judgeCanvas(isCorrect) {
+  if (state.answered) return;
+  state.answered = true;
+  const word = state.deck[state.current];
+  const fb = document.getElementById('feedback-area');
+  document.getElementById('canvas-judge').style.display = 'none';
+  if (isCorrect) {
+    state.correct++;
+    fb.className = 'feedback-area correct'; fb.textContent = '✓ 正解！';
+  } else {
+    state.wrong++; state.wrongWords.push(word);
+    fb.className = 'feedback-area wrong'; fb.textContent = '✗ まちがい！';
+  }
+  doSpellOut(word['単語']);
+  const rb3 = document.getElementById('replay-btn'); if(rb3) rb3.style.display='inline-block';
+  document.getElementById('next-btn').style.display = 'block';
+  document.getElementById('reveal-btn').style.display = 'none';
+}
+
+function skipCard() { stopTimer(); state.skipped++; state.current++; loadCard(); }
+function nextCard() { stopTimer(); state.current++; loadCard(); }
+
+function startTimer() {
+  stopTimer(); state.timerLeft = state.timerSec;
+  const bar = document.getElementById('timer-bar');
+  const fill = document.getElementById('timer-fill');
+  bar.style.display = 'block'; fill.style.width = '100%'; fill.className = 'timer-fill';
+  state.timerInterval = setInterval(() => {
+    state.timerLeft -= 0.1;
+    const pct = (state.timerLeft / state.timerSec) * 100;
+    fill.style.width = Math.max(0, pct) + '%';
+    if (pct < 30) fill.className = 'timer-fill danger';
+    else if (pct < 60) fill.className = 'timer-fill warning';
+    document.getElementById('timer-display').textContent = `⏱ ${Math.ceil(state.timerLeft)}秒`;
+    if (state.timerLeft <= 0) { stopTimer(); if (!state.answered) revealAnswer(); }
+  }, 100);
+}
+
+function stopTimer() {
+  if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
+  document.getElementById('timer-bar').style.display = 'none';
+  document.getElementById('timer-display').textContent = '';
+}
+
+function switchInputTab(mode) {
+  state.inputMode = mode;
+  document.getElementById('tab-keyboard').classList.toggle('active', mode === 'keyboard');
+  document.getElementById('tab-canvas').classList.toggle('active', mode === 'canvas');
+  document.getElementById('keyboard-panel').style.display = mode === 'keyboard' ? 'block' : 'none';
+  document.getElementById('canvas-panel').style.display = mode === 'canvas' ? 'block' : 'none';
+  if (mode === 'keyboard') setTimeout(() => focusInput(), 100);
+}
+
+const canvas = document.getElementById('writing-canvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, lastX = 0, lastY = 0;
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = rect.height * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.strokeStyle = '#fffffe'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+}
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+function getPos(e) { const r = canvas.getBoundingClientRect(); const t = e.touches ? e.touches[0] : e; return {x: t.clientX-r.left, y: t.clientY-r.top}; }
+canvas.addEventListener('mousedown', e => { drawing=true; const p=getPos(e); lastX=p.x; lastY=p.y; });
+canvas.addEventListener('mousemove', e => { if(!drawing) return; const p=getPos(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; });
+canvas.addEventListener('mouseup', () => drawing=false);
+canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing=true; const p=getPos(e); lastX=p.x; lastY=p.y; }, {passive:false});
+canvas.addEventListener('touchmove', e => { e.preventDefault(); if(!drawing) return; const p=getPos(e); ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke(); lastX=p.x; lastY=p.y; }, {passive:false});
+canvas.addEventListener('touchend', () => drawing=false);
+function clearCanvas() { const r=canvas.getBoundingClientRect(); ctx.clearRect(0,0,r.width,r.height); }
+
+function showResult() {
+  const pct = (state.correct+state.wrong) > 0 ? Math.round((state.correct/(state.correct+state.wrong))*100) : 0;
+  document.getElementById('score-pct').textContent = (state.correct+state.wrong) > 0 ? pct+'%' : '-';
+  document.getElementById('correct-count').textContent = state.correct;
+  document.getElementById('wrong-count').textContent = state.wrong;
+  document.getElementById('skip-count').textContent = state.skipped;
+  let emoji='😊', title='おつかれさま！';
+  if (pct>=90){emoji='🏆';title='完璧！すごい！';}
+  else if (pct>=70){emoji='⭐';title='よくできました！';}
+  else if (pct>=50){emoji='💪';title='もう少し！';}
+  else {emoji='📚';title='もう一度チャレンジ！';}
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  showScreen('result-screen');
+}
+
+function retryWrong() {
+  if (!state.wrongWords.length) { showScreen('settings-screen'); return; }
+  state.deck = [...state.wrongWords].sort(() => Math.random()-.5);
+  state.current=0; state.correct=0; state.wrong=0; state.skipped=0; state.wrongWords=[];
+  showScreen('flash-screen'); loadCard(); switchInputTab(state.inputMode);
+}
+
+
+
+// ===== 覚えるモード =====
+let learnDeck = [];
+let learnCurrent = 0;
+let learnCurrentWord = null;
+let learnSpellTimeout = null;
+
+function goToLearnSettings() {
+  // 設定はフラッシュモードと共用、デッキを作ってlearnモード開始
+  showScreen('settings-screen');
+  // スタートボタンを一時的に「覚えるモードで開始」に変える
+  const startBtn = document.querySelector('.start-btn');
+  if (startBtn) {
+    startBtn.textContent = '🌱 覚えるモードで開始 →';
+    startBtn.onclick = startLearnMode;
+    startBtn.style.background = 'linear-gradient(135deg,var(--accent3),#00b894)';
+    startBtn.style.boxShadow = '0 8px 24px rgba(6,214,160,.4)';
+  }
+}
+
+function startLearnMode() {
+  learnDeck = buildDeck();
+  if (!learnDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
+  learnCurrent = 0;
+  // スタートボタンを元に戻す
+  const startBtn = document.querySelector('.start-btn');
+  if (startBtn) {
+    startBtn.textContent = 'スタート →';
+    startBtn.onclick = startFlash;
+    startBtn.style.background = 'linear-gradient(135deg,var(--accent),#ff4757)';
+    startBtn.style.boxShadow = '0 8px 24px rgba(255,107,107,.4)';
+  }
+  showScreen('learn-screen');
+  loadLearnCard();
+}
+
+function loadLearnCard() {
+  if (learnCurrent >= learnDeck.length) {
+    // 完了
+    alert('全部おわったよ！🎉');
+    showScreen('home-screen');
+    return;
+  }
+  learnCurrentWord = learnDeck[learnCurrent];
+
+  // 進捗
+  const pct = (learnCurrent / learnDeck.length) * 100;
+  document.getElementById('learn-progress-fill').style.width = pct + '%';
+  document.getElementById('learn-progress-text').textContent = (learnCurrent+1) + '/' + learnDeck.length;
+
+  // カード表示
+  document.getElementById('learn-meaning').textContent = learnCurrentWord['意味'];
+  document.getElementById('learn-pos-badge').textContent = posLabel(learnCurrentWord['品詞']);
+  document.getElementById('learn-card-source').textContent = learnCurrentWord._source || '';
+  document.getElementById('learn-word-display').style.display = 'none';
+  document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
+  document.getElementById('learn-replay-btn').style.display = 'none';
+
+  // アクションボタン
+  document.getElementById('learn-action-row').style.display = 'none';
+  document.getElementById('learn-next-btn').style.display = 'none';
+
+  // 空ボックスを表示
+  renderLearnEmptyBoxes();
+
+  // 音声→スペルアウトアニメ開始
+  setTimeout(() => startLearnSpellOut(), 600);
+}
+
+function renderLearnEmptyBoxes() {
+  const word = learnCurrentWord ? learnCurrentWord['単語'] : '';
+  const boxes = document.getElementById('learn-letter-boxes');
+  boxes.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box empty';
+    box.id = 'learn-box-' + i;
+    box.textContent = '_';
+    boxes.appendChild(box);
+  }
+}
+
+function startLearnSpellOut() {
+  const word = learnCurrentWord['単語'];
+  const rate = spelloutSpeed === 'slow' ? 0.7 : 1.0;
+  const letterRate = spelloutSpeed === 'slow' ? 0.55 : 0.85;
+  const letterDelay = spelloutSpeed === 'slow' ? 700 : 500;
+
+  function getEnVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+  }
+
+  function speakAndReveal(items, idx) {
+    if (idx >= items.length) {
+      // 全部終わったらボタン表示
+      document.getElementById('learn-word-display').textContent = word;
+      document.getElementById('learn-word-display').style.display = 'block';
+      document.getElementById('learn-action-row').style.display = 'flex';
+      document.getElementById('learn-next-btn').style.display = 'block';
+      document.getElementById('learn-replay-btn').style.display = 'inline-block';
+      document.getElementById('learn-status').textContent = '覚えた？';
+      return;
+    }
+    const item = items[idx];
+    // ボックスを埋める
+    if (item.boxIdx >= 0) {
+      const box = document.getElementById('learn-box-' + item.boxIdx);
+      if (box) {
+        box.textContent = item.letter.toUpperCase();
+        box.classList.remove('empty');
+        box.classList.add('correct');
+      }
+    }
+    // 音声
+    if ('speechSynthesis' in window && spelloutEnabled) {
+      const u = new SpeechSynthesisUtterance(item.text);
+      u.lang = 'en-US';
+      u.rate = item.rate;
+      u.volume = 1.0;
+      const v = getEnVoice();
+      if (v) u.voice = v;
+      u.onend = () => setTimeout(() => speakAndReveal(items, idx + 1), 80);
+      u.onerror = () => setTimeout(() => speakAndReveal(items, idx + 1), letterDelay);
+      window.speechSynthesis.speak(u);
+    } else {
+      // 音声なしでもアニメだけ動かす
+      setTimeout(() => speakAndReveal(items, idx + 1), letterDelay);
+    }
+  }
+
+  // アイテムリスト: 単語全体 + 各文字
+  const items = [
+    { text: word, rate: rate, boxIdx: -1, letter: '' },
+    ...word.split('').map((ch, i) => ({ text: ch, rate: letterRate, boxIdx: i, letter: ch }))
+  ];
+
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0 && 'speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null;
+      speakAndReveal(items, 0);
+    };
+  } else {
+    speakAndReveal(items, 0);
+  }
+}
+
+function replayLearnSpellOut() {
+  renderLearnEmptyBoxes();
+  document.getElementById('learn-word-display').style.display = 'none';
+  document.getElementById('learn-action-row').style.display = 'none';
+  document.getElementById('learn-replay-btn').style.display = 'none';
+  document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
+  setTimeout(() => startLearnSpellOut(), 300);
+}
+
+function learnAgain() {
+  // 同じ単語をもう一度
+  replayLearnSpellOut();
+}
+
+function learnNext() {
+  learnCurrent++;
+  loadLearnCard();
+}
+
+// フラッシュモードの「もう一度発音」
+function replaySpellOut() {
+  if (state.deck[state.current]) doSpellOut(state.deck[state.current]['単語']);
+}
+
+
+
+// ===== 英文タイピングモード =====
+const SENTENCE_DATA = [
+  {ja: "5分後にかけ直してもいい？―いいよ。", en: "Can I call back in five minutes? — Sure.", unit: 1},
+  {ja: "南アフリカにはいつか行ってみたいです。", en: "I want to visit South Africa someday.", unit: 1},
+  {ja: "ゆで卵大好き。", en: "I love boiled eggs.", unit: 1},
+  {ja: "ぼくはロバート。ボブって呼んで。", en: "I'm Robert. Just call me Bob.", unit: 1},
+  {ja: "コンビニの隣に住みたい。", en: "I want to live next to a convenience store.", unit: 1},
+  {ja: "シイタケは好きではないのじゃ。", en: "I'm not a fan of shiitake.", unit: 1},
+  {ja: "うちの兄はよくトイレでミニラボを読んでいます。", en: "My brother often reads Minilab in the bathroom.", unit: 1},
+  {ja: "友達とサッカーしてくる。", en: "I'm going to play soccer with my friends.", unit: 1},
+  {ja: "勉強はきらいじゃないけど数学は苦手。", en: "I don't hate studying, but I'm not good at math.", unit: 1},
+  {ja: "あ、それ開けちゃだめ！―なんで？", en: "Oh, don't open that! — Why?", unit: 1},
+  {ja: "ねー、ここに直吉さんの絵描いて。", en: "Hey, can you draw Naokichi here, please?", unit: 1},
+  {ja: "傘持ってる？", en: "Do you have an umbrella?", unit: 1},
+  {ja: "このアニメの主題歌がめっちゃ好き。", en: "I love the main theme song of this anime.", unit: 1},
+  {ja: "ってことは、私たち同い年？", en: "So, are we the same age?", unit: 1},
+  {ja: "さあ、今日は原始人について学びましょう。", en: "Alright, today let's learn about early humans.", unit: 1},
+  {ja: "え、サックス習ってるの？すごいね！", en: "Oh, you take sax lessons? That's cool!", unit: 1},
+  {ja: "ぼくは1C。きみは？", en: "I'm in 1-C. How about you?", unit: 1},
+  {ja: "明日は7時間も授業ある。あー。", en: "We have seven classes tomorrow. Gah.", unit: 2},
+  {ja: "私たちの学校は8時15分に始まります。", en: "Our school starts at 8:15.", unit: 2},
+  {ja: "カナダのどこ出身ですか？", en: "Where in Canada are you from?", unit: 2},
+  {ja: "アメリカでは、公衆トイレのドアが小さめです。", en: "In America, public restroom doors are small.", unit: 2},
+  {ja: "わ、ラクダの絵描くの上手。", en: "Oh, you are good at drawing camels.", unit: 2},
+  {ja: "森田先生はどちらですか？―今日はお休みですよ。", en: "Where's Mr. Morita? — He's off today.", unit: 2},
+  {ja: "ユイも誘ったんだけど、忙しいって。", en: "I invited Yui, but she's busy.", unit: 2},
+  {ja: "今日は中華料理の気分です。", en: "I'm in the mood for Chinese food today.", unit: 2},
+  {ja: "警告：このサイトにはただいまアクセスできません。", en: "Warning: You cannot access this site right now.", unit: 2},
+  {ja: "ケチャップいる？", en: "Do you want some ketchup?", unit: 2},
+  {ja: "うちの両親は共働きです。", en: "My parents both work.", unit: 2},
+  {ja: "中国では食べ物を少し残すのが礼儀です。", en: "In China, leaving a little food is polite.", unit: 2},
+  {ja: "ここ引っぱるんだよ。―ああ、なるほどね。", en: "Just pull it here. — Oh, I see.", unit: 2},
+  {ja: "ちょっと！それ私のアイス！", en: "Hey! That's my ice cream!", unit: 2},
+  {ja: "いやいやいやいや、人前では歌えないって。", en: "No, no, no, no, I can't sing in front of people.", unit: 2},
+  {ja: "字が汚くてごめんなさい。", en: "Please excuse my bad handwriting.", unit: 2},
+  {ja: "おっと、スマホ踏んじゃうところだった。", en: "Oops, I almost stepped on my phone.", unit: 2},
+  {ja: "充電器はどこじゃ？―ここだよ。", en: "Where's my charger? — Here it is.", unit: 3},
+  {ja: "おもしろいアイデアはいつでも大歓迎です。", en: "Funny ideas are always welcome.", unit: 3},
+  {ja: "すみませんが、ここはどこでしょうか？", en: "Excuse me, but where am I?", unit: 3},
+  {ja: "リモコンとって。―はいよ。", en: "Pass me the remote. — Here you are.", unit: 3},
+  {ja: "だれかわからないけど、ありがとう！", en: "Thank you, stranger!", unit: 3},
+  {ja: "どうもありがとう。―どういたしまして。", en: "Thanks a lot. — You're welcome.", unit: 3},
+  {ja: "わー優しい。ありがとう。", en: "Wow, you're so kind. Thank you.", unit: 3},
+  {ja: "気をつけて。熱いよ。", en: "Be careful. It's hot.", unit: 3},
+  {ja: "今、発音記号を読むのにはまってるのよ。", en: "I'm into reading phonetic symbols right now.", unit: 3},
+  {ja: "「切ない」にあたる英語は何ですか？", en: "What's the English word for 'setsunai'?", unit: 3},
+  {ja: "実に面白い。", en: "It's really interesting.", unit: 3},
+  {ja: "好きな食べ物は桃の缶詰めです。", en: "My favorite food is canned peaches.", unit: 3},
+  {ja: "主人公は3人のおじさんです。", en: "The main characters are three old men.", unit: 3},
+  {ja: "ぼくは漫画が好きで、絵を描くのも好きです。", en: "I like manga, and I also like drawing.", unit: 3},
+  {ja: "コーラって何が入ってるの？", en: "What's in cola?", unit: 3},
+  {ja: "この右側の人だれ？―ヨガ友達じゃ。", en: "Who's this on the right? — A yoga friend.", unit: 3},
+  {ja: "みなさん、ピアノのまわりに集まって。", en: "Everyone, gather around the piano.", unit: 3},
+  {ja: "発信音のあとにメッセージをどうぞ。", en: "Please leave your message after the beep.", unit: 3},
+  {ja: "このサッカーボールはネットで買ったのじゃ。", en: "I bought this soccer ball online.", unit: 3},
+  {ja: "放課後はほとんど毎日テニスを練習しています。", en: "I practice tennis almost every day after school.", unit: 3},
+  {ja: "今日ろうかで転んじゃって。ついてない日だ。", en: "I fell down in the hallway today. It's not my day.", unit: 4},
+  {ja: "次は絶対勝ちたい。", en: "I really want to win next time.", unit: 4},
+  {ja: "試合いつ？―次の日曜日。", en: "When's the game? — Next Sunday.", unit: 4},
+  {ja: "今日で運ぜんぶ使い果たしちゃった。", en: "I used up all my luck today.", unit: 4},
+  {ja: "この近くにコインランドリーはありますか？", en: "Are there any laundromats near here?", unit: 4},
+  {ja: "がんばって！―ありがと、がんばる！", en: "Good luck! — Thanks, I'll do my best!", unit: 4},
+  {ja: "誕生日いつ？―6月15日。", en: "When's your birthday? — June 15.", unit: 4},
+  {ja: "缶切りはどこじゃ？", en: "Where's the can opener?", unit: 4},
+  {ja: "ニュージーランドでは人間1人に対してヒツジが6頭います。", en: "In New Zealand, there are 6 sheep per person.", unit: 4},
+  {ja: "わ〜、あの子犬めっちゃかわいい！", en: "Oh my gosh, that puppy is super cute!", unit: 4},
+  {ja: "鶏肉ってニワトリのお肉だよね？", en: "Chicken is the meat of a chicken, isn't it?", unit: 4},
+  {ja: "いつかどこかで、また会おう。", en: "Let's meet again someday and somewhere.", unit: 4},
+  {ja: "日本では6月に雨がたくさん降ります。", en: "It rains a lot in June in Japan.", unit: 4},
+  {ja: "これってきみのハサミ？―そうだよ。", en: "Are these your scissors? — Yes, they are.", unit: 4},
+  {ja: "そのギター、弦が1本切れてるのよ。", en: "One of the guitar strings is broken.", unit: 4},
+  {ja: "日本では6月に雨が多いです。", en: "We have a lot of rain in June in Japan.", unit: 5},
+  {ja: "腕立て伏せ何回できる？", en: "How many push-ups can you do?", unit: 5},
+  {ja: "それ何？―オクラじゃ。", en: "What are those? — They're okra.", unit: 5},
+  {ja: "おはよう。もうお昼だけど。", en: "Good morning. Even though it's already noon.", unit: 5},
+  {ja: "ああ。最後のシーンがつらすぎた。", en: "Aww. The last scene was too heartbreaking.", unit: 5},
+  {ja: "なんかキュウリみたいな味がする。", en: "It tastes kind of like cucumber.", unit: 5},
+  {ja: "8時に予約した者です。", en: "I have a reservation for 8 o'clock.", unit: 5},
+  {ja: "おやつ食べよう。―いいね。", en: "Let's have a snack. — Sounds nice.", unit: 5},
+  {ja: "前から3列目にいるよ。早く来て。", en: "I'm in the third row from the front. Come quick.", unit: 5},
+  {ja: "レギュラーになりたいな。", en: "I want to be a regular member.", unit: 5},
+  {ja: "飛行機に乗るの初めてなんだ。緊張する。", en: "This is my first flight. I'm nervous.", unit: 5},
+  {ja: "心配しないで。元気出して。大丈夫だよ。", en: "Don't worry. Be happy. You'll be fine.", unit: 5},
+  {ja: "手ぶらで来てね。", en: "Just bring yourself.", unit: 5},
+  {ja: "眠れないの？―うん。羊数えよっと。", en: "Can't you sleep? — No. I'll count sheep.", unit: 5},
+  {ja: "キーウィは飛びません、歩きます。", en: "Kiwis don't fly, they walk.", unit: 5},
+  {ja: "あの時計合ってる？", en: "Is that clock right?", unit: 5},
+  {ja: "試合、楽しむんじゃぞ！", en: "Have fun and enjoy yourself at the game!", unit: 5},
+  {ja: "はーい、黒板見てー。", en: "Okay, look at the blackboard.", unit: 5},
+  {ja: "友達として好きなの？それとも友達以上？", en: "Do you like her as a friend, or more than a friend?", unit: 5},
+  {ja: "ツアーに参加したの？それともひとりで？", en: "Did you join a tour or go by yourself?", unit: 5},
+  {ja: "わしが案内しよう。", en: "I'll be your guide.", unit: 5},
+  {ja: "プリントにはいつも名前を書きなさい。", en: "Always write your name on your handouts.", unit: 5},
+  {ja: "うちの副校長先生のブログあるの、知ってる？", en: "Do you know our vice principal has a blog?", unit: 5},
+  {ja: "俺は地元の高校に行くつもり。", en: "I'm going to go to the local high school.", unit: 5},
+  {ja: "空きれいだな。", en: "The sky is so beautiful.", unit: 5},
+  {ja: "ここがわしの秘密の昼寝場所じゃ。", en: "This is my secret nap spot.", unit: 5},
+  {ja: "あいつめっちゃ上手いな。あいつの才能がほしい。", en: "He is so good. I want to have his talent.", unit: 5},
+  {ja: "わが野球部は設立30年です。", en: "Our baseball team is 30 years old.", unit: 5},
+  {ja: "ミニラボを読むことを楽しんでもらえたらうれしいです。", en: "I hope you enjoy reading your Minilab.", unit: 5},
+  {ja: "今日は宿題も予定もなーんにもない。", en: "I don't have any homework or any plans today.", unit: 5},
+  {ja: "直吉さん、双葉さんってチョコ好き？", en: "Naokichi, does Futaba like chocolate?", unit: 6},
+  {ja: "自転車の鍵がない。黄色のキーホルダーがついたやつ。", en: "My bike key is missing. It has a yellow key chain.", unit: 6},
+  {ja: "いいなー。俺もそこに行きたかったなー。", en: "I'm jealous. I wanted to go there, too.", unit: 6},
+  {ja: "今日は5時間もネットサーフィンしてしまった。", en: "Today I surfed the internet for five hours.", unit: 6},
+  {ja: "人生に模範解答なんてありません。", en: "There is no model answer in life.", unit: 6},
+  {ja: "この杏仁豆腐、あんまり味がしない。", en: "This almond jelly doesn't have much taste.", unit: 6},
+  {ja: "このカフェ前からあったっけ？", en: "Was this cafe here before?", unit: 6},
+  {ja: "ウェブで予約をした者ですが。", en: "I made a reservation through your website.", unit: 6},
+  {ja: "今はどんな歌が人気なのじゃ？", en: "What songs are popular right now?", unit: 6},
+  {ja: "このノートの持ち主を探そうぜ。", en: "Let's find the owner of this notebook.", unit: 6},
+  {ja: "直吉さんの名字知ってる？", en: "Do you know Naokichi's family name?", unit: 6},
+  {ja: "パティが本格的じゃ。", en: "The hamburger patty is authentic.", unit: 6},
+  {ja: "生徒たちは給食の唐揚げが大好きです。", en: "The students love the fried chicken at lunch.", unit: 6},
+  {ja: "缶切りはいちばん上の引き出しじゃ。", en: "The can opener is in the top drawer.", unit: 6},
+  {ja: "日本の文房具はすばらしいですよ。", en: "Japanese stationery is wonderful.", unit: 6},
+  {ja: "目玉焼きって何かける？", en: "What do you put on your fried egg?", unit: 6},
+  {ja: "麺の上に卵を置いて。", en: "Put the egg on top of the noodles.", unit: 6},
+  {ja: "これ、彼に渡して。―彼って？", en: "Give this to him. — Who's 'him'?", unit: 6},
+  {ja: "英語で「しょっぱ！」ってどう言うの？", en: "How do you say 'Shoppa!' in English?", unit: 6},
+  {ja: "今日は何もかもうまくいかない。―そんなこともあるさ。", en: "Everything is going wrong today. — It happens.", unit: 6},
+  {ja: "ショーは続かなければならない。", en: "The show must go on.", unit: 6},
+  {ja: "今日、初めてあの子と話した。", en: "Today, I talked to her for the first time.", unit: 6},
+  {ja: "ミッキーマウスのパフォーマーになりたい。", en: "I want to be a performer as Mickey Mouse.", unit: 6},
+  {ja: "イギリスの中には4つの国があります。", en: "There are four countries in the U.K.", unit: 6},
+  {ja: "今日いっしょに帰ろ。―うん。", en: "Let's walk home together today. — Yeah.", unit: 6},
+  {ja: "チーズケーキ半分こしない？", en: "Why don't we share a cheesecake?", unit: 6},
+  {ja: "外はどう？―どしゃぶり。", en: "How's it outside? — It's raining cats and dogs.", unit: 6},
+  {ja: "お湯を入れて3分待ってください。", en: "Add some hot water and wait for three minutes.", unit: 6},
+  {ja: "待って、それは金魚のエサだよ。", en: "Wait, that's feed for the goldfish.", unit: 6},
+  {ja: "だれの番？―俺じゃないよ。", en: "Whose turn is it? — Not mine.", unit: 6},
+  {ja: "このミニラボきみの？くつ箱の上にあったよ。", en: "Is this Minilab yours? It was on the shoe locker.", unit: 6},
+  {ja: "こちらはチキンサラダです。―あ、それ私のです。", en: "Here is your chicken salad. — Oh, that's mine.", unit: 6},
+  {ja: "もしかしたらあの人のこと好きかも。", en: "Maybe I like him.", unit: 6},
+  {ja: "床が濡れてすべりやすいよ。気をつけて。", en: "The floor is wet and slippery. Be careful.", unit: 6},
+  {ja: "うわめっちゃ混んでる！でも並ぶか。", en: "Wow, it's super crowded! But we'll wait in line.", unit: 7},
+  {ja: "検索履歴ってどうやって削除するの？", en: "How can I delete my search history?", unit: 7},
+  {ja: "いっぱい寝たのにまだ眠い。", en: "I slept a lot, but I'm still sleepy.", unit: 7},
+  {ja: "またボールがフェンスを越えてしまった。", en: "Our ball went over the fence again.", unit: 7},
+  {ja: "直吉さんの家にはいい感じの縁側があります。", en: "Naokichi's house has a nice porch.", unit: 7},
+  {ja: "そのスニーカーいいね。―ありがと。", en: "I like your sneakers. — Thanks.", unit: 7},
+  {ja: "フライパンに気をつけて。", en: "Be careful with the hot pan.", unit: 7},
+  {ja: "この牛乳どれくらい古い？", en: "How old is this milk?", unit: 7},
+  {ja: "ミニラボはクッションの下にありました。", en: "My Minilab was under the cushion.", unit: 7},
+  {ja: "ピラフってチャーハンとどうちがうの？", en: "How is pilaf different from fried rice?", unit: 7},
+  {ja: "何の役やるの？―通行人B。", en: "What role are you playing? — Passerby B.", unit: 7},
+  {ja: "「a」とか「the」ってどんなときに使うの？", en: "When do you use 'a' or 'the'?", unit: 7},
+  {ja: "今のところ「いいね」は2つだけ。", en: "I only have 2 Likes at the moment.", unit: 7},
+  {ja: "これは動画撮影用の小道具じゃ。", en: "These are props for filming.", unit: 7},
+  {ja: "どっちが塩でどっちが胡椒？", en: "Which one is salt and which one is pepper?", unit: 7},
+  {ja: "「はい」か「いいえ」のどちらかを丸で囲んでください。", en: "Circle yes or no.", unit: 7},
+  {ja: "時として、恋は何気ない出会いから始まります。", en: "Sometimes, love begins from a casual meeting.", unit: 7},
+  {ja: "LサイズのスプライトをふたつおねがいSします。", en: "Two large Sprites, please.", unit: 7},
+  {ja: "次の段ボール収集日はいつじゃ？", en: "When is the next cardboard collection day?", unit: 7},
+  {ja: "あのハンバーガー屋さんは10時開店です。", en: "That burger shop opens at 10 a.m.", unit: 7},
+  {ja: "ドア閉めて、蚊が入ってくるのよ。", en: "Close the door, or mosquitoes will come in.", unit: 7},
+  {ja: "よいしょ、この窓めっちゃ重い。", en: "Hup, this window is really heavy to open.", unit: 7},
+  {ja: "入れて。―いいよ。", en: "Can I join? — Sure.", unit: 7},
+  {ja: "数学のテストはなんとか大丈夫だった。問題は英語だよ。", en: "The math test was okay. The problem is English.", unit: 7},
+  {ja: "ラグビーわかる？―うん、少しなら。", en: "Do you know about rugby? — Yes, I know a little.", unit: 7},
+  {ja: "暗い映画、きらいじゃないよ。むしろ好きかも。", en: "I don't mind dark movies. In fact, I prefer them.", unit: 7},
+  {ja: "職員室はまだ電気がついてるね。", en: "The lights are still on in the teachers' room.", unit: 7},
+  {ja: "ただお湯入れるだけだよ。", en: "Just add some hot water.", unit: 7},
+  {ja: "明日って何曜日？―木曜日。", en: "What day is it tomorrow? — Thursday.", unit: 7},
+  {ja: "見て、勉強計画作ってみた。どうよ。", en: "Look, I made a study plan. What do you think?", unit: 7},
+  {ja: "この席あいてますか？―はい、どうぞ。", en: "Is this seat free? — Yes, go ahead.", unit: 8},
+  {ja: "人生は玉ねぎみたいなものじゃ。―どういう意味？", en: "Life is like an onion. — What do you mean?", unit: 8},
+  {ja: "机を少し前に動かしてもいい？", en: "Can we move the desk forward a little?", unit: 8},
+  {ja: "どしたの？―コンタクト落とした。", en: "What's up? — I dropped my contact lens.", unit: 8},
+  {ja: "キリンの鳴き声は「モー」です。", en: "A giraffe's cry sounds like a 'moo.'", unit: 8},
+  {ja: "海に行くの楽しみだなぁ。", en: "I'm looking forward to going to the beach.", unit: 8},
+  {ja: "市場でカキとハマグリを買ってきた。", en: "We bought some oysters and clams at the market.", unit: 8},
+  {ja: "何か自分にもおみやげ買おうかなー。", en: "I think I'll buy some souvenirs for myself.", unit: 8},
+  {ja: "タマ、そんなとこに隠れてたの？", en: "Tama, you were hiding in such a place?", unit: 8},
+  {ja: "またエラーメッセージが出てきた。", en: "The error message appeared again.", unit: 8},
+  {ja: "あの人たちだれ？―わかんない。", en: "Who are those people? — I don't know.", unit: 8},
+  {ja: "わが校の文化祭へようこそ！", en: "Welcome to our school festival!", unit: 8},
+  {ja: "お母さん、バス停まで送ってー。", en: "Mom, can you drive me to the bus stop?", unit: 8},
+  {ja: "お父さん、マヨネーズどこー？", en: "Dad, where's the mayo?", unit: 8},
+  {ja: "一人旅ですか？", en: "Are you traveling solo?", unit: 8},
+  {ja: "まだ怒ってる？―ううん、怒ってないよ。", en: "Are you still angry? — No, I'm not.", unit: 8},
+  {ja: "赤坂離宮はベルサイユ宮殿みたいです。", en: "The Akasaka Palace is like the Palace of Versailles.", unit: 8},
+  {ja: "ポテチの袋を開けるのってわくわくする。", en: "Opening a new bag of chips is exciting.", unit: 8},
+  {ja: "ごめん遅れちゃった。", en: "Sorry I'm late.", unit: 8},
+  {ja: "それ私のペンだよ。―あ、ごめん。", en: "That's my pen. — Oh, I'm sorry.", unit: 8},
+  {ja: "先生の車にボールをぶつけてしまいました。ごめんなさい。", en: "Our ball hit your car. We're sorry.", unit: 8},
+  {ja: "わしの笑える英語を許してちょうだい。", en: "Please pardon my funny English.", unit: 8},
+  {ja: "もー、ちゃんと点線に沿って切ってよー。", en: "Hey, cut along the dotted line carefully.", unit: 8},
+  {ja: "クレープ屋さんは道のあっち側だわ。渡ろう。", en: "The crepe shop is across the street. Let's cross.", unit: 8},
+  {ja: "来る途中、すべての信号にひっかかりました。", en: "I stopped at every traffic light on the way.", unit: 8},
+  {ja: "あら、まっすぐに切れなかった。まいっか。", en: "Oh, I didn't cut it straight. Never mind.", unit: 8},
+  {ja: "『チャーリーとチョコレート工場』見たことある？", en: "Have you seen Charlie and the Chocolate Factory?", unit: 8},
+  {ja: "このビルなんか不気味じゃない？", en: "Isn't this building kind of spooky?", unit: 8},
+  {ja: "寒っ。薪探してくるね。", en: "It's so cold. I'm going to look for firewood.", unit: 8},
+  {ja: "ここだれか座ってますか？―えっ、何ですか？", en: "Is anyone sitting here? — Pardon me?", unit: 8},
+  {ja: "体育って何時間目だっけ？―えっとね。5時間目。", en: "What period is P.E.? — Let's see. The fifth period.", unit: 8},
+  {ja: "この道をひたすら10分くらい進んでください。", en: "Just go along this street for about 10 minutes.", unit: 9},
+  {ja: "駅の近くにエスニック料理屋さんができています。", en: "There's a new ethnic restaurant near the station.", unit: 9},
+  {ja: "なぜかわからないけどアフリカに魅かれます。", en: "I don't know why, but Africa attracts me.", unit: 9},
+  {ja: "ケニアはキャッシュレス社会です。", en: "Kenya is a cashless society.", unit: 9},
+  {ja: "うちの草抜きのボランティアを募集中じゃ。", en: "I'm looking for volunteers to help pull weeds.", unit: 9},
+  {ja: "急ぐ必要はないよ。ゆっくりで。", en: "There's no need to hurry. Take your time.", unit: 9},
+  {ja: "3番の解き方教えて。", en: "Can you teach me how to solve number 3?", unit: 9},
+  {ja: "バンジージャンプってやってみたい？", en: "Do you want to try bungee jumping?", unit: 9},
+  {ja: "私の中ではこのドラマは今季一番です。", en: "For me, this drama is the best of the season.", unit: 9},
+  {ja: "きみの素直なところ、ほんとに尊敬する。", en: "I truly respect your honesty.", unit: 9},
+  {ja: "サッカーもっとうまくなりたいな。", en: "I want to become better at soccer.", unit: 9},
+  {ja: "困ったときの友こそ真の友です。", en: "A friend in need is a friend indeed.", unit: 9},
+  {ja: "俺らはベストを尽くすのみだ。", en: "We can only do our best.", unit: 9},
+  {ja: "アフリカの色使いはとてもおしゃれです。", en: "The African color palette is so stylish.", unit: 9},
+  {ja: "おなかの肉を減らしたい。", en: "I want to reduce my belly fat.", unit: 9},
+  {ja: "あー、時間の無駄だった。", en: "Ah, that was a waste of time.", unit: 9},
+  {ja: "うわっ、ビニール袋に穴あいてる。", en: "Ugh, there's a hole in the plastic bag.", unit: 9},
+  {ja: "紙袋を2枚いただけますか？", en: "Could I have two paper bags?", unit: 9},
+  {ja: "タピオカがストローで吸えんのじゃ。", en: "I can't suck up the tapioca with this straw.", unit: 9},
+  {ja: "元の写真とぜんぜんちがうやん！", en: "It looks totally different from the original photo!", unit: 9},
+  {ja: "このカイロはくり返し使えます。", en: "This hand warmer is reusable.", unit: 9},
+  {ja: "楽ちんコースがいい？それとも難関コース？", en: "Do you like an easy course or a difficult course?", unit: 9},
+  {ja: "今ミニラボ持ってる？―もちろん。", en: "Do you have your Minilab right now? — Of course.", unit: 9},
+  {ja: "これって井戸？", en: "Is this a well?", unit: 9},
+  {ja: "このロープのあっちの端っこ持って。", en: "Hold the other end of this rope.", unit: 9},
+  {ja: "この村にはガソリンスタンドがありません。", en: "This village doesn't have a gas station.", unit: 9},
+  {ja: "はーい、終わりでーす。テスト用紙を回収しまーす。", en: "Okay, time's up. I'll collect the test papers now.", unit: 9},
+  {ja: "遠すぎでしょ。歩けないって。", en: "It's too far. We can't walk.", unit: 9},
+  {ja: "ではみなさん、3〜4人ずつのグループになってください。", en: "Hey guys, get in groups of three or four.", unit: 9},
+  {ja: "カルシウムは大事よ。骨を作ってくれるから。", en: "Calcium is important. It builds bones.", unit: 9},
+  {ja: "これだれのイヤフォン？―あ、俺の。", en: "Whose earphones are these? — Oh, they're mine.", unit: 9},
+  {ja: "お金で幸せは買えません。", en: "Money can't buy happiness.", unit: 9},
+  {ja: "一方で、この考えには長所もあります。", en: "On the other hand, this idea has a good point.", unit: 9},
+  {ja: "昨日は長い間停電していました。", en: "The power was out for a long time yesterday.", unit: 9},
+  {ja: "あの接客係の人めっちゃ姿勢いいね。", en: "That server has such good posture.", unit: 9},
+  {ja: "一口食べる？", en: "Would you like a bite?", unit: 9},
+  {ja: "今日はなんにもしたくない。", en: "I don't want to do anything today.", unit: 9},
+  {ja: "ほかには何かいかがですか？―いいえ、とりあえず以上です。", en: "Anything else? — No, that's all for now.", unit: 9},
+  {ja: "おなかいっぱい、歩けない。", en: "I'm so full, I can't walk.", unit: 9},
+  {ja: "すみません、お水をいただきたいのですが。", en: "Excuse me, I would like a glass of water.", unit: 9},
+  {ja: "どちらまで？―ここに行きたいんです。", en: "Where to? — We would like to go here.", unit: 9},
+  {ja: "おかわりはいかがですか？―いえ、でもありがとうございます。", en: "Would you like a refill? — No, thank you.", unit: 9},
+  {ja: "もしもし、宅配ピザを注文したいのですが。", en: "Hello, I'd like to order pizza for delivery.", unit: 9},
+  {ja: "早く戻ってきて！", en: "Come back soon!", unit: 9},
+  {ja: "試験中おしゃべりしてはいけません。", en: "Do not talk during the exam.", unit: 9},
+  {ja: "サウナには20秒しか入っていられません。", en: "I can stay in a sauna for only 20 seconds.", unit: 9},
+  {ja: "明日スノボ行こうぜ。", en: "Let's go snowboarding tomorrow.", unit: 9},
+  {ja: "クリスマスの日にインフルエンザになっちゃった。", en: "I got the flu on Christmas Day.", unit: 9},
+  {ja: "リラックスして。息吸って。", en: "Please relax. Just breathe.", unit: 9},
+  {ja: "昨日、久しぶりに双葉さんに会ったよ。", en: "I met Futaba yesterday after a long time.", unit: 9},
+  {ja: "アイスホッケーのゴールって結構ちっちゃいんだね。", en: "Ice hockey goals are quite small.", unit: 9},
+  {ja: "教室に戻ろ。―うん。", en: "Let's go back to the classroom. — Yeah.", unit: 9},
+  {ja: "今、家にいる？―いるよ。どしたの？", en: "Are you at home right now? — I am. What's up?", unit: 9},
+  {ja: "美術の教科書が見つからない。どこ行った？", en: "I can't find my art textbook. Where did it go?", unit: 9},
+  {ja: "納豆は日本の伝統食です。", en: "Natto is a traditional Japanese food.", unit: 9},
+  {ja: "楽しいクリスマスと良いお年を！", en: "Merry Christmas and a Happy New Year!", unit: 10},
+  {ja: "このプリンは特別な卵を使用しています。", en: "This pudding uses special eggs.", unit: 10},
+  {ja: "祖父母が鹿児島に住んでまして。", en: "My grandparents live in Kagoshima.", unit: 10},
+  {ja: "うわっ、まちがって「dog」を「bog」って書いちゃった。", en: "Whoa, I wrote 'bog' instead of 'dog' by mistake.", unit: 10},
+  {ja: "このお餅めーっちゃ伸びる。", en: "This rice cake stretches so much.", unit: 10},
+  {ja: "英語の点数ちょっと上がった！―やったじゃん！", en: "My English score went up a bit! — Good for you!", unit: 10},
+  {ja: "今日テストあるの？知らなかったぜ。", en: "Do we have a test today? I didn't know that.", unit: 10},
+  {ja: "UFOキャッチャーにいくら使ったの？", en: "How much did you spend on the claw machine?", unit: 10},
+  {ja: "あー、今月お金使いすぎた。", en: "Oh, I spent too much money this month.", unit: 10},
+  {ja: "あ、いいところに来た。手伝ってよ。", en: "Oh, you came at the right time. Please help us.", unit: 10},
+  {ja: "1個買ったらもう1個ただでもらえた。", en: "I bought one and got another one for free.", unit: 10},
+  {ja: "このおみくじ何もいいこと書いてないわ。", en: "This fortune slip says nothing good.", unit: 10},
+  {ja: "例文を一気に全部読んじゃった。", en: "I read all the example sentences in one sitting.", unit: 10},
+  {ja: "あいつ辛いのは苦手だって言ってた。", en: "He said he's not good with spicy food.", unit: 10},
+  {ja: "このお守りご利益あった！イェイ！", en: "This charm brought me good luck. Yay!", unit: 10},
+  {ja: "5分くらい前に帰ってきたところじゃ。", en: "I just got home about five minutes ago.", unit: 10},
+  {ja: "え、木製バット使ってんの？", en: "Oh, do you use a wooden bat?", unit: 10},
+  {ja: "これは俺の願いごとリスト。見ないでね。", en: "This is my wish list. Please don't look.", unit: 10},
+  {ja: "言っておくが、ボードゲームは得意じゃぞ。", en: "Just so you know, I'm good at board games.", unit: 10},
+  {ja: "冬休み楽しかった？", en: "Did you have a great time on your winter vacation?", unit: 10},
+  {ja: "「親愛なる」は正式なお手紙の中で使います。", en: "You use 'dear' in a formal letter.", unit: 10},
+  {ja: "双葉さんってきみのばあちゃんだったのか！", en: "Futaba is your grandma!", unit: 10},
+  {ja: "直吉さんってきみのじいちゃんだったのか！", en: "Naokichi is your grandpa!", unit: 10},
+  {ja: "スキーとかスノボとかできる？", en: "Can you ski or snowboard?", unit: 10},
+  {ja: "かばんから何か落ちたよ。―あ、ありがと。", en: "Something fell from your bag. — Oh, thanks.", unit: 10},
+  {ja: "あ、富士山みえた！", en: "Oh, I can see Mt. Fuji!", unit: 10},
+  {ja: "あ、雨が雪に変わった。", en: "Oh, the rain turned into snow.", unit: 10},
+  {ja: "外はパリパリ、中はふわふわ。", en: "It's crunchy outside and fluffy inside.", unit: 10},
+  {ja: "すでにごはんとお味噌汁が恋しいです。", en: "I miss rice and miso soup already.", unit: 10},
+  {ja: "漂白剤は使用せず、注意してお手入れください。", en: "Do not bleach, handle with care.", unit: 10},
+  {ja: "昨日、吉田先生と釣りに行きましてね。", en: "I went fishing with Mr. Yoshida yesterday.", unit: 10},
+  {ja: "人生で初めて海ぶどう食べた。", en: "I ate sea grapes for the first time in my life.", unit: 10},
+  {ja: "七転び八起きじゃ。", en: "Fall down seven times, get up eight.", unit: 10},
+  {ja: "くれぐれも体には気をつけてね。", en: "Make sure to take care of yourself.", unit: 10},
+  {ja: "あの人の名字が思い出せんのじゃ。", en: "I can't remember his family name.", unit: 10},
+  {ja: "飽きちゃった。これつまんない。", en: "I'm bored. This is boring.", unit: 10},
+  {ja: "今日は空も海も真っ青だったな。", en: "The sky and the sea were both a deep blue today.", unit: 10},
+  {ja: "知らないことがたくさんあるってことがわかりました。", en: "I realized I don't know many things.", unit: 10},
+  {ja: "おにぎり作った。いる？", en: "I made some rice balls. Do you want one?", unit: 10},
+  {ja: "わ、まちがって砂糖入れちゃった。", en: "Oops, I put in sugar by mistake.", unit: 10},
+  {ja: "だれかエイゴラボもう1冊持ってない？", en: "Does anyone have another copy of Eigolab?", unit: 10},
+  {ja: "どっちが勝った？―スコットランド！", en: "Who won? — Scotland!", unit: 10},
+  {ja: "すごく眠かったけど、とにかくエイゴラボはやりました。", en: "I was so sleepy, but I did Eigolab anyway.", unit: 10},
+  {ja: "最初は全然意味がわからなかった。", en: "I didn't understand it at all at first.", unit: 10},
+  {ja: "私は休みの日に二度寝するのが好きです。", en: "I like going back to sleep on my days off.", unit: 10},
+  {ja: "昨日までは勉強になんて興味なかったんだけどさー。", en: "I wasn't interested in studying until yesterday.", unit: 10},
+  {ja: "おい、ベースから離れすぎだ！", en: "Hey, you're too far away from the base!", unit: 10},
+  {ja: "ここからは俺がやるよ。休憩して。", en: "I'll take over from here. You take a break.", unit: 10},
+  {ja: "ごめん、あのとき半分寝てた。", en: "Sorry, I was half asleep then.", unit: 10},
+  {ja: "ミニラボ持って帰ってくるのまた忘れた。", en: "I forgot to bring my Minilab again.", unit: 10},
+  {ja: "ちょっと心が軽くなった。ありがと。", en: "My heart feels a bit lighter now. Thanks.", unit: 10},
+  {ja: "大丈夫？―だめ、心臓がバクバクしてる。", en: "Are you OK? — No, my heart is beating too fast.", unit: 10},
+  {ja: "玉ねぎはいろんな方法で食べることができます。", en: "You can eat onions in many ways.", unit: 10},
+  {ja: "お手洗いは各階にございます。", en: "There is a restroom on each floor.", unit: 10},
+  {ja: "時間は取り戻せないのじゃ。", en: "You can't bring back time.", unit: 10},
+  {ja: "帰りにマヨネーズ買ってきてくれる？", en: "Can you buy mayonnaise on your way home?", unit: 10},
+  {ja: "修学旅行ってどこに行くんだっけ？", en: "Where are we going on our school trip?", unit: 10},
+  {ja: "当キャンプ場にシャワーはございません。", en: "This campground doesn't have showers.", unit: 10},
+  {ja: "カピバラは温泉が大好きです。", en: "Capybaras love hot springs.", unit: 10},
+  {ja: "ヘイSiri、タイマーを3分にセットして。", en: "Hey Siri, please set the timer for three minutes.", unit: 10},
+  {ja: "太陽はあっという間に沈みました。", en: "The sun set so quickly.", unit: 10},
+  {ja: "テント張っただけでもう疲れちゃった。", en: "I'm already tired just from pitching the tent.", unit: 10},
+  {ja: "「ディナー」とは、その日のメインの食事のことです。", en: "Dinner is the main meal of the day.", unit: 10},
+  {ja: "ああ、キャンプファイアーやりたかったなー。", en: "Ah, I really wanted to have a campfire.", unit: 10},
+  {ja: "トイレが1つしかないからめっちゃ並んでる。", en: "There is only one toilet, so there's a long line.", unit: 10},
+  {ja: "だれかプロジェクターのセッティングできる？", en: "Can anybody set up the projector?", unit: 10},
+  {ja: "近くにハチがいるよ。気をつけて。", en: "There's a bee near you. Be careful.", unit: 10},
+  {ja: "これ俺の傘じゃないな。", en: "This isn't my umbrella.", unit: 10},
+  {ja: "私たちは1Aじゃないよ。1C。", en: "We aren't in 1-A. We are in 1-C.", unit: 10},
+  {ja: "あ、ちがう駅で降りちゃった。", en: "Oh, I got off at the wrong station.", unit: 10},
+  {ja: "そんなに食べたらおなか痛くなるぞ。", en: "You'll get a stomachache if you eat that much.", unit: 10},
+  {ja: "寝る前に歯をみがきなさいよ。", en: "Brush your teeth before bed.", unit: 10},
+  {ja: "スープがまろやか。", en: "The soup is mild.", unit: 10},
+  {ja: "この薬ぜんぜん効かない。なんで？", en: "This medicine isn't working at all. Why is that?", unit: 10},
+  {ja: "今夜はあったかいおふろに入ってゆっくり休んで。", en: "Please take a hot bath and get some rest tonight.", unit: 10},
+  {ja: "頭痛いな。お天気のせいだ。", en: "I have a headache. I blame the weather.", unit: 10},
+  {ja: "熱はゆうべ39度まで上がりました。", en: "My fever went up to 39 degrees last night.", unit: 10},
+  {ja: "歯が痛い。虫歯かなぁ？", en: "I have a toothache. Is it a cavity?", unit: 10},
+  {ja: "どしたの？顔色悪いよ。", en: "What's wrong? You look pale.", unit: 10},
+  {ja: "5分だけ休憩しない？", en: "Why don't we take a rest for just five minutes?", unit: 10}
+];
+
+let typingDeck = [];
+let typingCurrent = 0;
+let typingCorrect = 0;
+let typingWrong = 0;
+let typingSkipped = 0;
+
+function toggleTypingUnit(btn) {
+  btn.classList.toggle('active');
+  updateTypingSentenceCount();
+}
+
+function selectAllTypingUnits() {
+  const btns = document.querySelectorAll('[data-typing-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateTypingSentenceCount();
+}
+
+function updateTypingSentenceCount() {
+  const selected = getSelectedTypingUnits();
+  const count = SENTENCE_DATA.filter(s => selected.includes(s.unit)).length;
+  const el = document.getElementById('typing-sentence-count');
+  if (el) el.textContent = count + '文が選択されています';
+}
+
+function getSelectedTypingUnits() {
+  return Array.from(document.querySelectorAll('[data-typing-unit].active')).map(b => parseInt(b.dataset.typingUnit));
+}
+
+function startTypingMode() {
+  const selected = getSelectedTypingUnits();
+  typingDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)).sort(() => Math.random() - 0.5);
+  if (!typingDeck.length) { alert('文が選択されていません'); return; }
+  typingCurrent = 0; typingCorrect = 0; typingWrong = 0; typingSkipped = 0;
+  document.getElementById('typing-unit-select').style.display = 'none';
+  document.getElementById('typing-quiz-area').style.display = 'flex';
+  loadTypingCard();
+}
+
+function loadTypingCard() {
+  if (typingCurrent >= typingDeck.length) {
+    // 結果表示
+    document.getElementById('typing-unit-select').style.display = 'flex';
+    document.getElementById('typing-quiz-area').style.display = 'none';
+    alert('おつかれさま！\n正解: ' + typingCorrect + '  まちがい: ' + typingWrong + '  スキップ: ' + typingSkipped);
+    return;
+  }
+  const s = typingDeck[typingCurrent];
+  const pct = (typingCurrent / typingDeck.length) * 100;
+  document.getElementById('typing-progress-fill').style.width = pct + '%';
+  document.getElementById('typing-progress-text').textContent = (typingCurrent+1) + '/' + typingDeck.length;
+  document.getElementById('typing-ja-text').textContent = s.ja;
+  document.getElementById('typing-unit-badge').textContent = 'Unit' + s.unit;
+  document.getElementById('typing-input').value = '';
+  document.getElementById('typing-input').disabled = false;
+  document.getElementById('typing-feedback').textContent = '';
+  document.getElementById('typing-feedback').style.color = '';
+  document.getElementById('typing-answer-display').style.display = 'none';
+  document.getElementById('typing-next-btn').style.display = 'none';
+  document.getElementById('typing-reveal-btn').style.display = 'block';
+  setTimeout(() => document.getElementById('typing-input').focus(), 100);
+}
+
+function normalizeTyping(str) {
+  return str.trim()
+    .toLowerCase()
+    .replace(/[""]/g, '"')
+    .replace(/['']/g, "'")
+    .replace(/—/g, '-')
+    .replace(/\s+/g, ' ');
+}
+
+function checkTypingAnswer() {
+  const input = document.getElementById('typing-input').value;
+  if (!input.trim()) return;
+  const s = typingDeck[typingCurrent];
+  const typed = normalizeTyping(input);
+  const correct = normalizeTyping(s.en);
+  const fb = document.getElementById('typing-feedback');
+  document.getElementById('typing-input').disabled = true;
+  document.getElementById('typing-correct-text').textContent = s.en;
+  document.getElementById('typing-answer-display').style.display = 'block';
+  document.getElementById('typing-next-btn').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
+  if (typed === correct) {
+    typingCorrect++;
+    fb.textContent = '✓ 正解！'; fb.style.color = 'var(--accent3)';
+  } else {
+    typingWrong++;
+    fb.textContent = '✗ まちがい'; fb.style.color = 'var(--accent)';
+  }
+  speakSentence(s.en);
+}
+
+function typingReveal() {
+  const s = typingDeck[typingCurrent];
+  typingWrong++;
+  document.getElementById('typing-input').disabled = true;
+  document.getElementById('typing-correct-text').textContent = s.en;
+  document.getElementById('typing-answer-display').style.display = 'block';
+  document.getElementById('typing-feedback').textContent = '答えを確認しよう';
+  document.getElementById('typing-feedback').style.color = 'var(--text-muted)';
+  document.getElementById('typing-next-btn').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
+  speakSentence(s.en);
+}
+
+function typingNext() { typingCurrent++; loadTypingCard(); }
+function typingSkip() { typingSkipped++; typingCurrent++; loadTypingCard(); }
+
+// Enterキーで確認
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('typing-input');
+  if (ta) {
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        checkTypingAnswer();
+      }
+    });
+  }
+});
+
+
+
+// ===== 英文暗記モード =====
+let smemDeck = [];
+let smemCurrent = 0;
+
+function toggleSmemUnit(btn) {
+  btn.classList.toggle('active');
+  updateSmemCount();
+}
+function selectAllSmemUnits() {
+  const btns = document.querySelectorAll('[data-smem-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSmemCount();
+}
+function updateSmemCount() {
+  const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
+  const count = SENTENCE_DATA.filter(s => selected.includes(s.unit)).length;
+  const el = document.getElementById('smem-sentence-count');
+  if (el) el.textContent = count + '文が選択されています';
+}
+function startSmemMode() {
+  const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
+  smemDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)).sort(() => Math.random() - 0.5);
+  if (!smemDeck.length) { alert('文が選択されていません'); return; }
+  smemCurrent = 0;
+  document.getElementById('smem-unit-select').style.display = 'none';
+  document.getElementById('smem-quiz-area').style.display = 'flex';
+  loadSmemCard();
+}
+function startSentenceMemory() {
+  showScreen('sentence-memory-screen');
+}
+function loadSmemCard() {
+  if (smemCurrent >= smemDeck.length) {
+    alert('全部おわったよ！🎉');
+    document.getElementById('smem-unit-select').style.display = 'flex';
+    document.getElementById('smem-quiz-area').style.display = 'none';
+    showScreen('home-screen');
+    return;
+  }
+  const s = smemDeck[smemCurrent];
+  const pct = (smemCurrent / smemDeck.length) * 100;
+  document.getElementById('smem-progress-fill').style.width = pct + '%';
+  document.getElementById('smem-progress-text').textContent = (smemCurrent+1) + '/' + smemDeck.length;
+  document.getElementById('smem-unit-badge').textContent = 'Unit' + s.unit;
+  document.getElementById('smem-ja-text').textContent = s.ja;
+  document.getElementById('smem-en-display').style.display = 'none';
+  document.getElementById('smem-en-display').textContent = s.en;
+  document.getElementById('smem-status').textContent = '音声を聞いてね';
+  document.getElementById('smem-replay-btn').style.display = 'none';
+  document.getElementById('smem-action-row').style.display = 'none';
+  // 少し待ってから自動再生
+  setTimeout(() => {
+    speakSentence(s.en, () => {
+      document.getElementById('smem-en-display').style.display = 'block';
+      document.getElementById('smem-status').textContent = '英文を確認しよう';
+      document.getElementById('smem-replay-btn').style.display = 'inline-block';
+      document.getElementById('smem-action-row').style.display = 'flex';
+    });
+  }, 500);
+}
+function smemReplay() {
+  const s = smemDeck[smemCurrent];
+  speakSentence(s.en);
+}
+function smemAgain() {
+  document.getElementById('smem-en-display').style.display = 'none';
+  document.getElementById('smem-replay-btn').style.display = 'none';
+  document.getElementById('smem-action-row').style.display = 'none';
+  document.getElementById('smem-status').textContent = '音声を聞いてね';
+  setTimeout(() => {
+    const s = smemDeck[smemCurrent];
+    speakSentence(s.en, () => {
+      document.getElementById('smem-en-display').style.display = 'block';
+      document.getElementById('smem-status').textContent = '英文を確認しよう';
+      document.getElementById('smem-replay-btn').style.display = 'inline-block';
+      document.getElementById('smem-action-row').style.display = 'flex';
+    });
+  }, 200);
+}
+function smemNext() { smemCurrent++; loadSmemCard(); }
+
+// 英文読み上げ共通関数
+function speakSentence(text, onDone) {
+  if (!('speechSynthesis' in window)) { if(onDone) onDone(); return; }
+  function getEnVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+  }
+  function doSpeak() {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85; u.volume = 1.0;
+    const v = getEnVoice(); if(v) u.voice = v;
+    u.onend = () => { if(onDone) onDone(); };
+    u.onerror = () => { if(onDone) onDone(); };
+    window.speechSynthesis.speak(u);
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null; doSpeak();
+    };
+  } else { doSpeak(); }
+}
+
+// ===== オリジナル単語機能 =====
+const ORIG_KEY = 'vocab_original_words';
+
+function loadOriginalWords() {
+  try { return JSON.parse(localStorage.getItem(ORIG_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveOriginalWords(words) {
+  localStorage.setItem(ORIG_KEY, JSON.stringify(words));
+  updateOriginalCountLabel();
+  renderOrigWordList();
+}
+function updateOriginalCountLabel() {
+  const words = loadOriginalWords();
+  const n = words.length;
+  const el = document.getElementById('original-count-label');
+  if (el) el.textContent = n + '語';
+  const el2 = document.getElementById('orig-registered-count');
+  if (el2) el2.textContent = n + '語';
+  const el3 = document.getElementById('orig-home-count');
+  if (el3) el3.textContent = n > 0 ? n + '語登録済み' : '自分の単語を追加する';
+}
+function renderOrigWordList() {
+  const words = loadOriginalWords();
+  const list = document.getElementById('orig-word-list');
+  const empty = document.getElementById('orig-empty');
+  if (!list) return;
+  if (words.length === 0) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = words.map((w, i) => `
+    <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:12px;padding:10px 12px;">
+      <span style="font-size:12px;color:var(--text-muted);min-width:18px;">${i+1}</span>
+      <span style="font-size:15px;font-weight:800;flex:1;font-family:'Nunito',sans-serif;">${w['単語']}</span>
+      <span style="font-size:13px;color:var(--text-muted);flex:1;font-family:'Noto Sans JP',sans-serif;">${w['意味']}</span>
+      <span style="font-size:12px;">${w['優先度']||'🟡'}</span>
+      <button onclick="deleteOrigWord(${i})" style="background:none;border:none;color:var(--accent);font-size:16px;cursor:pointer;padding:0 4px;">×</button>
+    </div>
+  `).join('');
+}
+function deleteOrigWord(idx) {
+  const words = loadOriginalWords();
+  words.splice(idx, 1);
+  saveOriginalWords(words);
+}
+function clearAllOriginal() {
+  if (!confirm('登録済みの単語を全部削除しますか？')) return;
+  saveOriginalWords([]);
+}
+
+// テキスト貼り付け→整形→プレビュー
+let previewWords = [];
+function parseAndPreview() {
+  const text = document.getElementById('orig-paste-area').value.trim();
+  if (!text) { alert('テキストを貼り付けてね！'); return; }
+  const lines = text.split(/\n/).map(l => l.trim()).filter(l => l);
+  previewWords = [];
+  lines.forEach(line => {
+    // タブ・全角スペース・半角スペース複数で分割
+    const parts = line.split(/\t|\u3000|\s{2,}|(?<=[a-zA-Z'\-\.])\s+(?=[^a-zA-Z])/).map(p => p.trim()).filter(p => p);
+    if (parts.length >= 2) {
+      const en = parts[0]; const ja = parts.slice(1).join(' ');
+      if (/^[a-zA-Z\s'\-\.]+$/.test(en)) {
+        previewWords.push({'単語': en.trim().toLowerCase(), '意味': ja, '品詞': '', '優先度': '🟡', '発音記号': ''});
+      }
+    } else if (parts.length === 1 && /^[a-zA-Z'\-\.]+$/.test(parts[0])) {
+      previewWords.push({'単語': parts[0].toLowerCase(), '意味': '', '品詞': '', '優先度': '🟡', '発音記号': ''});
+    }
+  });
+  if (previewWords.length === 0) { alert('読み取れる単語がありませんでした。\n「英語 日本語」の形式で貼り付けてね！'); return; }
+  renderPreview();
+  showScreen('preview-screen');
+}
+function renderPreview() {
+  const list = document.getElementById('preview-list');
+  list.innerHTML = previewWords.map((w, i) => `
+    <div style="background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:var(--text-muted);min-width:20px;">${i+1}</span>
+        <input value="${w['単語']}" onchange="previewWords[${i}]['単語']=this.value.toLowerCase()" style="flex:1;background:var(--card);border:2px solid var(--surface);border-radius:10px;padding:8px 10px;color:var(--text);font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'" placeholder="英単語">
+        <input value="${w['意味']}" onchange="previewWords[${i}]['意味']=this.value" style="flex:1;background:var(--card);border:2px solid var(--surface);border-radius:10px;padding:8px 10px;color:var(--text);font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'" placeholder="意味">
+        <button onclick="removePreviewWord(${i})" style="background:none;border:none;color:var(--accent);font-size:18px;cursor:pointer;flex-shrink:0;">×</button>
+      </div>
+      <div style="display:flex;gap:6px;padding-left:28px;">
+        ${['🔴','🟡','🟢'].map(p => `<button onclick="previewWords[${i}]['優先度']='${p}';renderPreview()" style="padding:4px 10px;border-radius:8px;border:2px solid ${w['優先度']===p?'var(--accent2)':'var(--surface)'};background:${w['優先度']===p?'rgba(255,209,102,.15)':'var(--surface)'};color:${w['優先度']===p?'var(--accent2)':'var(--text-muted)'};font-size:13px;cursor:pointer;">${p}</button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+function removePreviewWord(idx) {
+  previewWords.splice(idx, 1);
+  renderPreview();
+}
+function registerPreview() {
+  const valid = previewWords.filter(w => w['単語'] && w['意味']);
+  if (valid.length === 0) { alert('単語と意味が両方入ってるものがありません！'); return; }
+  const merged = [...loadOriginalWords(), ...valid];
+  saveOriginalWords(merged);
+  document.getElementById('orig-paste-area').value = '';
+  previewWords = [];
+  alert(valid.length + '語を登録しました！');
+  showScreen('original-screen');
+}
+
+// 1件登録
+let selectedOrigPrio = '🔴';
+function selectOrigPrio(btn) {
+  selectedOrigPrio = btn.dataset.prio;
+  document.querySelectorAll('.orig-prio-btn').forEach(b => {
+    const on = b.dataset.prio === selectedOrigPrio;
+    b.style.borderColor = on ? 'var(--accent2)' : 'var(--surface)';
+    b.style.background = on ? 'rgba(255,209,102,.15)' : 'var(--surface)';
+    b.style.color = on ? 'var(--accent2)' : 'var(--text-muted)';
+  });
+}
+function toggleOrigOptions() {
+  const opts = document.getElementById('orig-options');
+  const toggle = document.getElementById('orig-options-toggle');
+  const isOpen = opts.style.display !== 'none';
+  opts.style.display = isOpen ? 'none' : 'flex';
+  toggle.textContent = isOpen ? '＋ 詳細を追加（品詞・優先度）' : '－ 詳細を閉じる';
+}
+function addOneOriginal() {
+  const word = document.getElementById('orig-word-input').value.trim().toLowerCase();
+  const meaning = document.getElementById('orig-meaning-input').value.trim();
+  if (!word || !meaning) { alert('単語と意味を両方入力してね！'); return; }
+  const pos = document.getElementById('orig-pos-select').value;
+  loadOriginalWords().concat([{'単語': word, '意味': meaning, '品詞': pos, '優先度': selectedOrigPrio, '発音記号': ''}]);
+  const words = loadOriginalWords();
+  words.push({'単語': word, '意味': meaning, '品詞': pos, '優先度': selectedOrigPrio, '発音記号': ''});
+  saveOriginalWords(words);
+  document.getElementById('orig-word-input').value = '';
+  document.getElementById('orig-meaning-input').value = '';
+  const btn = document.getElementById('add-one-btn');
+  if (btn) { btn.textContent = '✅ 登録しました！'; setTimeout(() => { btn.textContent = '＋ 登録する'; }, 1500); }
+}
+function downloadOriginalCSV() {
+  const words = loadOriginalWords();
+  if (!words.length) { alert('登録されている単語がありません'); return; }
+  const csv = ['単語,意味,品詞,優先度', ...words.map(w => w['単語']+','+w['意味']+','+(w['品詞']||'')+','+(w['優先度']||'🟡'))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8;'}));
+  a.download = 'original_words.csv';
+  a.click();
+}
+
+// original-screen表示時に更新
+const origScreenEl = document.getElementById('original-screen');
+if (origScreenEl) {
+  new MutationObserver(() => {
+    if (origScreenEl.classList.contains('active')) {
+      renderOrigWordList(); updateOriginalCountLabel();
+    }
+  }).observe(origScreenEl, {attributes: true, attributeFilter: ['class']});
+}
+updateOriginalCountLabel();
+
+</script>
+</body>
+</html>
