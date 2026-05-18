@@ -375,37 +375,6 @@
     </div>
   </div>
 
-  <!-- TIMER -->
-  <div class="settings-section">
-    <div class="settings-label">タイマー</div>
-    <div class="timer-toggle">
-      <div class="toggle-info">
-        <div class="toggle-name">制限時間</div>
-        <div class="toggle-desc">1問ずつ時間制限をつける</div>
-      </div>
-      <button class="toggle-switch" id="timer-toggle" onclick="toggleTimer()"></button>
-    </div>
-    <div id="timer-options" style="display:none;">
-      <div class="timer-seconds">
-        <button class="timer-btn" data-sec="5" onclick="selectTimer(this)">5秒</button>
-        <button class="timer-btn" data-sec="10" onclick="selectTimer(this)">10秒</button>
-        <button class="timer-btn active" data-sec="15" onclick="selectTimer(this)">15秒</button>
-        <button class="timer-btn" data-sec="30" onclick="selectTimer(this)">30秒</button>
-      </div>
-    </div>
-    <!-- 説明トグル -->
-    <div class="setting-row">
-      <div class="setting-row-header" onclick="toggleSettingDesc('desc-timer')">
-        <span style="font-size:11px;color:var(--text-muted);">説明を見る</span>
-        <span class="setting-desc-toggle" id="toggle-desc-timer">＋</span>
-      </div>
-      <div class="setting-desc-body" id="desc-timer">
-        1問ごとに制限時間を設定します。時間内に答えられないと自動で「答えを見る」状態になります。<br>
-        タイマーOFFの場合は時間無制限で取り組めます。
-      </div>
-    </div>
-  </div>
-
   <button class="start-btn" onclick="startFlash()">スタート →</button>
   <button onclick="testVoice()" style="width:100%;padding:12px;border-radius:14px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">🔊 音声テスト（hello）</button>
   <div id="voice-debug" style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;padding:8px;background:var(--card);border-radius:12px;white-space:pre-wrap;"></div>
@@ -419,10 +388,6 @@
       <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
     </div>
     <div class="progress-text" id="progress-text">0/0</div>
-  </div>
-  <div class="timer-display" id="timer-display"></div>
-  <div class="timer-bar" id="timer-bar" style="display:none;">
-    <div class="timer-fill" id="timer-fill"></div>
   </div>
   <div class="card-area">
     <div class="flashcard">
@@ -1442,16 +1407,8 @@ function selectInput(btn) {
   btn.classList.add('active-all');
   state.inputMode = btn.dataset.input;
 }
-function toggleTimer() {
-  state.timerEnabled = !state.timerEnabled;
-  document.getElementById('timer-toggle').classList.toggle('on', state.timerEnabled);
-  document.getElementById('timer-options').style.display = state.timerEnabled ? 'block' : 'none';
-}
-function selectTimer(btn) {
-  document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  state.timerSec = parseInt(btn.dataset.sec);
-}
+function toggleTimer() {}
+function selectTimer(btn) {}
 
 function startFlash() {
   state.deck = buildDeck();
@@ -1665,26 +1622,8 @@ function judgeCanvas(isCorrect) {
 function skipCard() { stopTimer(); state.skipped++; state.current++; loadCard(); }
 function nextCard() { stopTimer(); state.current++; loadCard(); }
 
-function startTimer() {
-  stopTimer(); state.timerLeft = state.timerSec;
-  const bar = document.getElementById('timer-bar');
-  const fill = document.getElementById('timer-fill');
-  bar.style.display = 'block'; fill.style.width = '100%'; fill.className = 'timer-fill';
-  state.timerInterval = setInterval(() => {
-    state.timerLeft -= 0.1;
-    const pct = (state.timerLeft / state.timerSec) * 100;
-    fill.style.width = Math.max(0, pct) + '%';
-    if (pct < 30) fill.className = 'timer-fill danger';
-    else if (pct < 60) fill.className = 'timer-fill warning';
-    document.getElementById('timer-display').textContent = `⏱ ${Math.ceil(state.timerLeft)}秒`;
-    if (state.timerLeft <= 0) { stopTimer(); if (!state.answered) revealAnswer(); }
-  }, 100);
-}
-function stopTimer() {
-  if (state.timerInterval) { clearInterval(state.timerInterval); state.timerInterval = null; }
-  document.getElementById('timer-bar').style.display = 'none';
-  document.getElementById('timer-display').textContent = '';
-}
+function startTimer() {}
+function stopTimer() {}
 
 function switchInputTab(mode) {
   state.inputMode = mode;
@@ -1946,4 +1885,42 @@ const SENTENCE_DATA = [
   {ja:"ここがわしの秘密の昼寝場所じゃ。",en:"This is my secret nap spot.",unit:5},
   {ja:"あいつめっちゃ上手いな。あいつの才能がほしい。",en:"He is so good. I want to have his talent.",unit:5},
   {ja:"わが野球部は設立30年です。",en:"Our baseball team is 30 years old.",unit:5},
-  {ja:"ミニラボを読むことを楽し
+  {ja:"ミニラボを読むことを楽しんでもらえたらうれしいです。",en:"I hope you enjoy reading your Minilab.",unit:5},
+  {ja:"今日は宿題も予定もなーんにもない。",en:"I don't have any homework or any plans today.",unit:5},
+  {ja:"直吉さん、双葉さんってチョコ好き？",en:"Naokichi, does Futaba like chocolate?",unit:6},
+  {ja:"自転車の鍵がない。黄色のキーホルダーがついたやつ。",en:"My bike key is missing. It has a yellow key chain.",unit:6},
+  {ja:"いいなー。俺もそこに行きたかったなー。",en:"I'm jealous. I wanted to go there, too.",unit:6},
+  {ja:"今日は5時間もネットサーフィンしてしまった。",en:"Today I surfed the internet for five hours.",unit:6},
+  {ja:"人生に模範解答なんてありません。",en:"There is no model answer in life.",unit:6},
+  {ja:"この杏仁豆腐、あんまり味がしない。",en:"This almond jelly doesn't have much taste.",unit:6},
+  {ja:"このカフェ前からあったっけ？",en:"Was this cafe here before?",unit:6},
+  {ja:"ウェブで予約をした者ですが。",en:"I made a reservation through your website.",unit:6},
+  {ja:"今はどんな歌が人気なのじゃ？",en:"What songs are popular right now?",unit:6},
+  {ja:"このノートの持ち主を探そうぜ。",en:"Let's find the owner of this notebook.",unit:6},
+  {ja:"直吉さんの名字知ってる？",en:"Do you know Naokichi's family name?",unit:6},
+  {ja:"パティが本格的じゃ。",en:"The hamburger patty is authentic.",unit:6},
+  {ja:"生徒たちは給食の唐揚げが大好きです。",en:"The students love the fried chicken at lunch.",unit:6},
+  {ja:"缶切りはいちばん上の引き出しじゃ。",en:"The can opener is in the top drawer.",unit:6},
+  {ja:"日本の文房具はすばらしいですよ。",en:"Japanese stationery is wonderful.",unit:6},
+  {ja:"目玉焼きって何かける？",en:"What do you put on your fried egg?",unit:6},
+  {ja:"麺の上に卵を置いて。",en:"Put the egg on top of the noodles.",unit:6},
+  {ja:"これ、彼に渡して。―彼って？",en:"Give this to him. — Who's 'him'?",unit:6},
+  {ja:"英語で「しょっぱ！」ってどう言うの？",en:"How do you say 'Shoppa!' in English?",unit:6},
+  {ja:"今日は何もかもうまくいかない。―そんなこともあるさ。",en:"Everything is going wrong today. — It happens.",unit:6},
+  {ja:"ショーは続かなければならない。",en:"The show must go on.",unit:6},
+  {ja:"今日、初めてあの子と話した。",en:"Today, I talked to her for the first time.",unit:6},
+  {ja:"これ、どこで売ってるの？",en:"Where can I buy this?",unit:7},
+  {ja:"明日、空いてる？",en:"Are you free tomorrow?",unit:7},
+  {ja:"一緒に行こうよ。楽しいよ。",en:"Come with me. It'll be fun.",unit:7},
+  {ja:"お市場、どこにあるか知ってる？",en:"Do you know where the market is?",unit:7},
+  {ja:"お土産、何がいい？",en:"What do you want for a souvenir?",unit:7},
+  {ja:"次の角を曲がって。",en:"Turn at the next corner.",unit:7},
+  {ja:"まっすぐ行くと、工場が見える。",en:"Go straight and you'll see the factory.",unit:7},
+  {ja:"宮殿、すごかったな。",en:"The palace was amazing.",unit:7},
+  {ja:"遅れてごめんなさい。",en:"I'm sorry I'm late.",unit:7},
+  {ja:"道に沿って歩いて。",en:"Walk along the road.",unit:7},
+  {ja:"ボランティア、してみたいな。",en:"I want to try volunteering.",unit:8},
+  {ja:"地球を守るために、プラスチックを減らそう。",en:"Let's reduce plastic to protect the earth.",unit:8},
+  {ja:"この村には、再利用できる袋がある。",en:"This village has reusable bags.",unit:8},
+  {ja:"みんなで集めたお金で、橋を建てた。",en:"We built a bridge with the money we collected.",unit:8},
+  {ja:"演奏会、また来たいな。",en:"I want to come to the concert again.
