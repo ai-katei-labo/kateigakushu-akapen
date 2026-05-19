@@ -1944,3 +1944,251 @@ function checkTypingAnswer() {
     fb.textContent = '✗ まちがい！'; fb.style.color = 'var(--accent)';
     document.getElementById('typing-correct-text').textContent = correct;
     document.getElementById('typing-answer-display').style.display = 'block';
+  }
+  speakSentence(correct);
+  document.getElementById('typing-replay-btn').style.display = 'inline-block';
+  document.getElementById('typing-next-btn').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
+}
+
+function typingReveal() {
+  typingAnswered = true;
+  const correct = currentTypingSentence.en;
+  document.getElementById('typing-correct-text').textContent = correct;
+  document.getElementById('typing-answer-display').style.display = 'block';
+  document.getElementById('typing-feedback').textContent = '答えを確認してね';
+  document.getElementById('typing-feedback').style.color = 'var(--text-muted)';
+  speakSentence(correct);
+  document.getElementById('typing-replay-btn').style.display = 'inline-block';
+  document.getElementById('typing-next-btn').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
+}
+function typingNext() { typingCurrent++; loadTypingCard(); }
+function typingSkip() { typingCurrent++; loadTypingCard(); }
+function replayTypingSentence() { if(currentTypingSentence) speakSentence(currentTypingSentence.en); }
+
+// ===== 英文暗記モード =====
+let smemDeck = [], smemCurrent = 0;
+let currentSmemSentence = null;
+
+function selectAllSmemUnits() {
+  const btns = document.querySelectorAll('[data-smem-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSmemCount();
+}
+function toggleSmemUnit(btn) { btn.classList.toggle('active'); updateSmemCount(); }
+function updateSmemCount() {
+  const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
+  const count = SENTENCE_DATA.filter(s => selected.includes(s.unit)).length;
+  document.getElementById('smem-sentence-count').textContent = count + '文が選択されています';
+}
+
+function startSmemMode() {
+  const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
+  smemDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)).sort(() => Math.random() - 0.5);
+  if (!smemDeck.length) { alert('条件に合う文がありません。'); return; }
+  smemCurrent = 0;
+  document.getElementById('smem-unit-select').style.display = 'none';
+  document.getElementById('smem-quiz-area').style.display = 'flex';
+  loadSmemCard();
+}
+
+function loadSmemCard() {
+  if (smemCurrent >= smemDeck.length) {
+    alert('全部おわったよ！🎉');
+    document.getElementById('smem-unit-select').style.display = 'flex';
+    document.getElementById('smem-quiz-area').style.display = 'none';
+    return;
+  }
+  currentSmemSentence = smemDeck[smemCurrent];
+  const pct = (smemCurrent / smemDeck.length) * 100;
+  document.getElementById('smem-progress-fill').style.width = pct + '%';
+  document.getElementById('smem-progress-text').textContent = (smemCurrent+1) + '/' + smemDeck.length;
+  document.getElementById('smem-unit-badge').textContent = 'Unit' + currentSmemSentence.unit;
+  document.getElementById('smem-ja-text').textContent = currentSmemSentence.ja;
+  document.getElementById('smem-en-display').style.display = 'none';
+  document.getElementById('smem-en-display').textContent = '';
+  document.getElementById('smem-status').textContent = '音声を聞いてね';
+  document.getElementById('smem-replay-btn').style.display = 'none';
+  document.getElementById('smem-action-row').style.display = 'none';
+  setTimeout(() => {
+    speakSentence(currentSmemSentence.en, () => {
+      document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
+      document.getElementById('smem-en-display').style.display = 'block';
+      document.getElementById('smem-status').textContent = '覚えた？';
+      document.getElementById('smem-replay-btn').style.display = 'inline-block';
+      document.getElementById('smem-action-row').style.display = 'flex';
+    });
+  }, 400);
+}
+
+function smemReplay() { if(currentSmemSentence) speakSentence(currentSmemSentence.en); }
+function smemNext() { smemCurrent++; loadSmemCard(); }
+function smemAgain() {
+  document.getElementById('smem-en-display').style.display = 'none';
+  document.getElementById('smem-status').textContent = '音声を聞いてね';
+  document.getElementById('smem-replay-btn').style.display = 'none';
+  document.getElementById('smem-action-row').style.display = 'none';
+  setTimeout(() => {
+    speakSentence(currentSmemSentence.en, () => {
+      document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
+      document.getElementById('smem-en-display').style.display = 'block';
+      document.getElementById('smem-status').textContent = '覚えた？';
+      document.getElementById('smem-replay-btn').style.display = 'inline-block';
+      document.getElementById('smem-action-row').style.display = 'flex';
+    });
+  }, 300);
+}
+
+// 文を読み上げる共通関数
+function speakSentence(text, onEndCallback) {
+  if (!('speechSynthesis' in window)) { if(onEndCallback) onEndCallback(); return; }
+  window.speechSynthesis.cancel();
+  function doSpeak() {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85; u.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+    if (v) u.voice = v;
+    u.onend = () => { if(onEndCallback) onEndCallback(); };
+    u.onerror = () => { if(onEndCallback) onEndCallback(); };
+    window.speechSynthesis.speak(u);
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; doSpeak(); };
+  } else { doSpeak(); }
+}
+
+// ===== オリジナル登録 =====
+function loadOriginalWords() {
+  try { return JSON.parse(localStorage.getItem('original_words') || '[]'); } catch { return []; }
+}
+function saveOriginalWords(words) {
+  localStorage.setItem('original_words', JSON.stringify(words));
+}
+function updateOriginalCountLabel() {
+  const words = loadOriginalWords();
+  const el = document.getElementById('original-count-label');
+  if (el) el.textContent = words.length + '語';
+  const home = document.getElementById('orig-home-count');
+  if (home && words.length > 0) home.textContent = `登録済み: ${words.length}語`;
+}
+function renderOriginalList() {
+  const words = loadOriginalWords();
+  const list = document.getElementById('orig-word-list');
+  const empty = document.getElementById('orig-empty');
+  const countEl = document.getElementById('orig-registered-count');
+  if (countEl) countEl.textContent = words.length + '語';
+  if (!words.length) { if(list) list.innerHTML = ''; if(empty) empty.style.display = 'block'; return; }
+  if(empty) empty.style.display = 'none';
+  if (!list) return;
+  list.innerHTML = words.map((w, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--surface);border-radius:12px;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;">${w['単語']}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${w['意味']}</div>
+      </div>
+      <button onclick="deleteOriginal(${i})" style="padding:4px 10px;border-radius:8px;border:none;background:rgba(255,107,107,.2);color:var(--accent);font-size:12px;cursor:pointer;">削除</button>
+    </div>`).join('');
+}
+function deleteOriginal(idx) {
+  const words = loadOriginalWords();
+  words.splice(idx, 1);
+  saveOriginalWords(words);
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+}
+function clearAllOriginal() {
+  if (!confirm('全部削除しますか？')) return;
+  saveOriginalWords([]);
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+}
+
+let origOptionsOpen = false;
+function toggleOrigOptions() {
+  origOptionsOpen = !origOptionsOpen;
+  document.getElementById('orig-options').style.display = origOptionsOpen ? 'flex' : 'none';
+  document.getElementById('orig-options-toggle').textContent = origOptionsOpen ? '－ 詳細を非表示' : '＋ 詳細を追加（品詞・優先度）';
+}
+let selectedOrigPrio = '🔴';
+function selectOrigPrio(btn) {
+  document.querySelectorAll('.orig-prio-btn').forEach(b => {
+    b.style.borderColor = 'var(--surface)'; b.style.background = 'var(--surface)'; b.style.color = 'var(--text-muted)';
+  });
+  btn.style.borderColor = 'var(--accent2)'; btn.style.background = 'rgba(255,209,102,.2)'; btn.style.color = 'var(--accent2)';
+  selectedOrigPrio = btn.dataset.prio;
+}
+function addOneOriginal() {
+  const word = document.getElementById('orig-word-input').value.trim();
+  const meaning = document.getElementById('orig-meaning-input').value.trim();
+  if (!word || !meaning) { alert('単語と意味を入力してね'); return; }
+  const pos = document.getElementById('orig-pos-select').value;
+  const words = loadOriginalWords();
+  words.push({ '単語': word, '意味': meaning, '品詞': pos, '優先度': selectedOrigPrio });
+  saveOriginalWords(words);
+  document.getElementById('orig-word-input').value = '';
+  document.getElementById('orig-meaning-input').value = '';
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+  alert('登録したよ！');
+}
+
+let previewData = [];
+function parseAndPreview() {
+  const text = document.getElementById('orig-paste-area').value;
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  previewData = lines.map(line => {
+    const parts = line.trim().split(/\s+/);
+    const word = parts[0] || '';
+    const meaning = parts.slice(1).join(' ') || '';
+    return { '単語': word, '意味': meaning, '品詞': '', '優先度': '🟡' };
+  }).filter(w => w['単語'] && w['意味']);
+  if (!previewData.length) { alert('読み取れませんでした。形式を確認してね。'); return; }
+  const list = document.getElementById('preview-list');
+  list.innerHTML = previewData.map((w, i) => `
+    <div style="display:flex;gap:8px;align-items:center;padding:8px;background:var(--surface);border-radius:12px;">
+      <input type="text" value="${w['単語']}" onchange="previewData[${i}]['単語']=this.value" style="flex:1;padding:8px;background:var(--bg);border:1px solid var(--surface);border-radius:8px;color:var(--text);font-size:14px;font-family:'Nunito',sans-serif;">
+      <input type="text" value="${w['意味']}" onchange="previewData[${i}]['意味']=this.value" style="flex:1;padding:8px;background:var(--bg);border:1px solid var(--surface);border-radius:8px;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;">
+    </div>`).join('');
+  showScreen('preview-screen');
+}
+function registerPreview() {
+  if (!previewData.length) { alert('データがありません'); return; }
+  const words = loadOriginalWords();
+  previewData.forEach(w => words.push(w));
+  saveOriginalWords(words);
+  showScreen('original-screen');
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+  document.getElementById('orig-paste-area').value = '';
+  alert(`${previewData.length}語を登録したよ！`);
+  previewData = [];
+}
+function downloadOriginalCSV() {
+  const words = loadOriginalWords();
+  if (!words.length) { alert('登録されていません'); return; }
+  const header = '単語,意味,品詞,優先度';
+  const rows = words.map(w => `${w['単語']},${w['意味']},${w['品詞']||''},${w['優先度']||''}`);
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'original_words.csv'; a.click();
+}
+
+// ===== 初期化 =====
+document.addEventListener('DOMContentLoaded', () => {
+  updateSourceUI();
+  updateSelectedCount();
+  renderOriginalList();
+  updateOriginalCountLabel();
+});
+</script>
+</body>
+</html>
