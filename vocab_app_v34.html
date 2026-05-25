@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>家庭学習ナビ｜単語フラッシュ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap');
+  :root {
+    --bg: #0f0e17; --surface: #1a1927; --card: #22203a;
+    --accent: #ff6b6b; --accent2: #ffd166; --accent3: #06d6a0;
+    --text: #fffffe; --text-muted: #a7a9be; --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Nunito','Noto Serif JP',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image: radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.3) 0%,transparent 100%), radial-gradient(1px 1px at 80% 10%,rgba(255,255,255,.2) 0%,transparent 100%), radial-gradient(1px 1px at 50% 70%,rgba(255,255,255,.15) 0%,transparent 100%); pointer-events:none; z-index:0; }
+  #app { position:relative; z-index:1; }
+  .screen { display:none; min-height:100vh; padding:20px; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  #home-screen { align-items:center; justify-content:center; gap:32px; padding:40px 24px; }
+  .logo-icon { font-size:56px; display:block; margin-bottom:8px; animation:float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .logo-title { font-size:28px; font-weight:900; font-family:'Cormorant Garamond','Noto Serif JP',serif; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .logo-sub { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
+  .mode-cards { width:100%; max-width:380px; display:flex; flex-direction:column; gap:14px; }
+  .mode-card { background:var(--card); border-radius:var(--radius); padding:20px 24px; display:flex; align-items:center; gap:16px; cursor:pointer; border:2px solid transparent; transition:all .25s; }
+  .mode-card.flash:hover,.mode-card.flash:active { border-color:var(--accent); }
+  .mode-card:active { transform:scale(.97); }
+  .mode-icon { font-size:36px; flex-shrink:0; }
+  .mode-name { font-size:18px; font-weight:800; margin-bottom:2px; }
+  .mode-desc { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .mode-arrow { font-size:20px; color:var(--text-muted); }
+
+  #settings-screen { gap:16px; max-width:440px; margin:0 auto; width:100%; padding-bottom:40px; }
+  .screen-header { display:flex; align-items:center; gap:12px; padding:8px 0; }
+  .back-btn { width:40px; height:40px; border-radius:12px; background:var(--card); border:none; color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .back-btn:active { background:#2a2845; }
+  .screen-title { font-size:20px; font-weight:800; }
+  .settings-section { background:var(--card); border-radius:var(--radius); padding:18px; display:flex; flex-direction:column; gap:14px; }
+  .settings-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+  .source-block { display:flex; flex-direction:column; gap:10px; }
+  .source-header { display:flex; align-items:center; gap:10px; }
+  .source-checkbox { width:20px; height:20px; accent-color:var(--accent2); cursor:pointer; flex-shrink:0; }
+  .source-name { font-size:15px; font-weight:800; flex:1; }
+  .source-count { font-size:12px; color:var(--text-muted); }
+  .unit-grid { display:flex; flex-wrap:wrap; gap:6px; padding-left:30px; }
+  .unit-btn { padding:6px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .unit-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .unit-btn:disabled { opacity:.3; pointer-events:none; }
+  .unit-btn.unit-all-btn { border-color:var(--accent2); color:var(--accent2); }
+  .unit-btn.unit-all-btn:hover,.unit-btn.unit-all-btn:active { background:rgba(255,209,102,.15); }
+  .selected-count { font-size:13px; color:var(--accent2); font-weight:700; text-align:center; padding:4px; font-family:'Noto Sans JP',sans-serif; }
+  .priority-btns { display:flex; gap:8px; }
+  .priority-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid transparent; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
+  .priority-btn.active-all { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.1); }
+  .timer-toggle { display:flex; align-items:center; justify-content:space-between; }
+  .toggle-info { flex:1; }
+  .toggle-name { font-size:15px; font-weight:700; }
+  .toggle-desc { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .toggle-switch { width:52px; height:28px; background:var(--surface); border-radius:14px; position:relative; cursor:pointer; transition:background .3s; border:none; flex-shrink:0; }
+  .toggle-switch.on { background:var(--accent3); }
+  .toggle-switch::after { content:''; position:absolute; width:22px; height:22px; background:white; border-radius:50%; top:3px; left:3px; transition:left .3s; box-shadow:0 2px 4px rgba(0,0,0,.3); }
+  .toggle-switch.on::after { left:27px; }
+  .timer-seconds { display:flex; gap:8px; }
+  .timer-btn { flex:1; padding:10px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .timer-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .start-btn { width:100%; padding:18px; background:linear-gradient(135deg,var(--accent),#ff4757); border:none; border-radius:var(--radius); color:white; font-size:18px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; box-shadow:0 8px 24px rgba(255,107,107,.4); }
+  .start-btn:active { transform:scale(.97); }
+
+  /* ===== トグル説明文 ===== */
+  .setting-row { display:flex; flex-direction:column; gap:0; }
+  .setting-row-header { display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:4px 0; }
+  .setting-row-header:active { opacity:.7; }
+  .setting-desc-toggle { font-size:11px; color:var(--text-muted); padding:2px 6px; border-radius:6px; border:1px solid var(--surface); background:var(--surface); cursor:pointer; }
+  .setting-desc-body { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; line-height:1.6; padding:8px 0 4px; border-top:1px solid rgba(255,255,255,.06); margin-top:6px; display:none; }
+  .setting-desc-body.open { display:block; }
+
+  /* ===== 速度選択ボタン ===== */
+  .speed-btns { display:flex; gap:8px; }
+  .speed-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:13px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
+  .speed-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.1); }
+
+  #flash-screen { gap:14px; max-width:440px; margin:0 auto; width:100%; }
+  .flash-header { display:flex; align-items:center; gap:12px; }
+  .progress-bar-wrap { flex:1; height:6px; background:var(--card); border-radius:3px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; transition:width .4s ease; }
+  .progress-text { font-size:13px; font-weight:700; color:var(--text-muted); min-width:45px; text-align:right; }
+  .timer-display { text-align:center; font-size:13px; font-weight:700; height:20px; }
+  .timer-bar { width:100%; height:4px; background:var(--card); border-radius:2px; overflow:hidden; }
+  .timer-fill { height:100%; background:var(--accent3); border-radius:2px; transition:width .1s linear,background .3s; }
+  .timer-fill.warning { background:var(--accent2); }
+  .timer-fill.danger { background:var(--accent); }
+  .card-area { flex:1; display:flex; align-items:center; justify-content:center; padding:8px 0; }
+  .flashcard { width:100%; background:var(--card); border-radius:24px; padding:32px 28px; text-align:center; position:relative; min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; box-shadow:0 20px 60px rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.05); }
+  .card-source-badge { position:absolute; top:14px; right:14px; font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; background:var(--surface); color:var(--text-muted); }
+  .priority-dot { position:absolute; top:18px; left:18px; width:10px; height:10px; border-radius:50%; }
+  .priority-dot.high { background:#ff6b6b; box-shadow:0 0 8px #ff6b6b; }
+  .priority-dot.mid { background:var(--accent2); box-shadow:0 0 8px var(--accent2); }
+  .priority-dot.low { background:var(--accent3); box-shadow:0 0 8px var(--accent3); }
+  .card-meaning-main { font-size:42px; font-weight:800; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; line-height:1.2; }
+  .pos-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:rgba(255,209,102,.15); color:var(--accent2); }
+  .card-answer-wrap { display:none; flex-direction:column; align-items:center; gap:6px; animation:fadeIn .3s ease; }
+  .card-answer-wrap.visible { display:flex; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card-word-answer { font-size:38px; font-weight:900; letter-spacing:-.5px; color:var(--text); }
+  .card-phonetic { font-size:13px; color:var(--text-muted); font-style:italic; }
+  .input-area { background:var(--card); border-radius:var(--radius); padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .input-mode-tabs { display:flex; gap:6px; }
+  .input-tab { flex:1; padding:8px; border-radius:10px; border:none; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .input-tab.active { background:var(--accent2); color:var(--bg); }
+  .letter-boxes { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; min-height:52px; align-items:center; }
+  .letter-box { width:36px; height:44px; border-radius:8px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; font-family:'Nunito',sans-serif; border:2px solid var(--surface); transition:all .15s; color:var(--text); }
+  .letter-box.correct { background:rgba(6,214,160,.15); border-color:var(--accent3); color:var(--accent3); }
+  .letter-box.wrong { background:rgba(255,107,107,.15); border-color:var(--accent); color:var(--accent); }
+  .letter-box.empty { color:transparent; }
+  .letter-box.cursor { border-color:var(--accent2); }
+  .text-input-row { display:flex; gap:8px; margin-top:10px; }
+  .text-input-row input { flex:1; padding:12px 16px; background:var(--surface); border:2px solid var(--surface); border-radius:14px; color:var(--text); font-size:18px; font-weight:700; font-family:'Nunito',sans-serif; outline:none; transition:border-color .2s; }
+  .text-input-row input:focus { border-color:var(--accent2); }
+  .text-input-row button { padding:12px 18px; border-radius:14px; border:none; background:var(--accent2); color:var(--bg); font-size:14px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; white-space:nowrap; }
+  .spellout-display { display:none; text-align:center; padding:10px; background:rgba(6,214,160,.08); border-radius:12px; border:1px solid rgba(6,214,160,.2); }
+  .spellout-display.visible { display:block; }
+  .spellout-text { font-size:18px; font-weight:800; color:var(--accent3); letter-spacing:4px; }
+  .spellout-label { font-size:11px; color:var(--text-muted); margin-top:2px; font-family:'Noto Sans JP',sans-serif; }
+  .feedback-area { min-height:36px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:15px; font-weight:700; font-family:'Noto Sans JP',sans-serif; }
+  .feedback-area.correct { color:var(--accent3); }
+  .feedback-area.wrong { color:var(--accent); }
+  .feedback-area.close { color:var(--accent2); }
+  .action-row { display:flex; gap:10px; }
+  .action-btn { flex:1; padding:14px; border-radius:var(--radius); border:none; font-size:14px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
+  .action-btn:active { transform:scale(.96); }
+  .btn-skip { background:var(--card); color:var(--text-muted); border:2px solid var(--surface); }
+  .btn-next { background:linear-gradient(135deg,var(--accent3),#00b894); color:var(--bg); box-shadow:0 6px 20px rgba(6,214,160,.3); }
+  .btn-reveal { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); box-shadow:0 6px 20px rgba(255,209,102,.3); }
+
+  @media (min-width: 768px) {
+    #home-screen { padding: 60px 40px; }
+    .mode-cards { max-width: 680px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .mode-card { padding: 24px 28px; }
+    .mode-name { font-size: 20px; }
+    #settings-screen { max-width: 680px; }
+    #flash-screen { max-width: 680px; }
+    .flashcard { padding: 48px 40px; min-height: 240px; }
+    .card-meaning-main { font-size: 52px; }
+    .card-word-answer { font-size: 48px; }
+    .text-input-row input { font-size: 22px; padding: 16px 20px; }
+  }
+
+  #result-screen { align-items:center; justify-content:center; gap:28px; padding:40px 24px; }
+  .result-emoji { font-size:72px; animation:bounce .6s ease; }
+  @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .result-title { font-size:28px; font-weight:900; text-align:center; }
+  .result-score-card { background:var(--card); border-radius:var(--radius); padding:28px 32px; text-align:center; width:100%; max-width:320px; }
+  .score-big { font-size:64px; font-weight:900; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
+  .score-label { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
+  .score-detail { display:flex; gap:20px; justify-content:center; margin-top:16px; padding-top:16px; border-top:1px solid var(--surface); }
+  .score-item { text-align:center; }
+  .score-num { font-size:22px; font-weight:800; }
+  .score-desc { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .score-item.correct .score-num { color:var(--accent3); }
+  .score-item.wrong .score-num { color:var(--accent); }
+  .score-item.skip .score-num { color:var(--text-muted); }
+  .result-actions { display:flex; flex-direction:column; gap:12px; width:100%; max-width:320px; }
+  .result-btn { width:100%; padding:16px; border-radius:var(--radius); border:none; font-size:16px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
+  .result-btn:active { transform:scale(.97); }
+  .result-btn.primary { background:linear-gradient(135deg,var(--accent),#ff4757); color:white; box-shadow:0 8px 24px rgba(255,107,107,.35); }
+  .result-btn.secondary { background:var(--card); color:var(--text); border:2px solid var(--surface); }
+
+  /* ===== 聞き流しモード ===== */
+  #listen-screen { align-items:center; gap:20px; padding:24px; }
+  .listen-card { width:100%; max-width:440px; background:var(--card); border-radius:24px; padding:36px 28px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:16px; box-shadow:0 20px 60px rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.05); }
+  .listen-phase-badge { font-size:11px; font-weight:700; padding:4px 14px; border-radius:20px; background:var(--surface); color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; }
+  .listen-main-text { font-size:36px; font-weight:800; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; line-height:1.3; }
+  .listen-sub-text { font-size:22px; font-weight:700; color:var(--text); font-family:'Nunito',sans-serif; min-height:32px; }
+  .listen-spell-text { font-size:18px; font-weight:800; color:var(--accent3); letter-spacing:4px; min-height:28px; }
+  .listen-progress { width:100%; max-width:440px; }
+  .listen-controls { display:flex; gap:10px; width:100%; max-width:440px; }
+  .listen-counter { font-size:13px; color:var(--text-muted); font-weight:700; text-align:center; }
+  .listen-interval-btns { display:flex; gap:8px; width:100%; max-width:440px; }
+  .listen-interval-btn { flex:1; padding:10px 4px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
+  .listen-interval-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .pulse-ring { width:60px; height:60px; border-radius:50%; border:3px solid var(--accent3); animation:pulse-anim 1.5s ease-in-out infinite; opacity:0; }
+  .pulse-ring.playing { opacity:1; }
+  @keyframes pulse-anim { 0%{transform:scale(0.8);opacity:0.8} 50%{transform:scale(1.1);opacity:0.3} 100%{transform:scale(0.8);opacity:0.8} }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div id="home-screen" class="screen active">
+  <div style="text-align:center;">
+    <img src="https://ai-katei-labo.github.io/kateigakushu-akapen/logo.png" alt="家庭学習ナビ" style="width:100%;max-width:380px;height:auto;border-radius:16px;margin-bottom:8px;">
+    <div class="logo-sub">英単語フラッシュカード</div>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
+      <div style="flex:1;">
+        <div class="mode-name">単語暗記モード</div>
+        <div class="mode-desc">日本語→音声→スペル確認</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="goToSettings()" style="border-color:var(--accent);">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_flash.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
+      <div style="flex:1;">
+        <div class="mode-name">英単語フラッシュ</div>
+        <div class="mode-desc">日本語を見て英語で答える</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="startSentenceMemory()" style="border-color:#f59e0b;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_reading.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
+      <div style="flex:1;">
+        <div class="mode-name">英文暗記モード</div>
+        <div class="mode-desc">日本語→音声→英文で覚える</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="goToTypingSettings()" style="border-color:#a78bfa;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_typing.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
+      <div style="flex:1;">
+        <div class="mode-name">英文タイピング</div>
+        <div class="mode-desc">日本語を見て英文を打つ</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="showScreen('listen-setup-screen')" style="border-color:#818cf8;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;opacity:0.7;filter:hue-rotate(60deg);"></div>
+      <div style="flex:1;">
+        <div class="mode-name">聞き流しモード</div>
+        <div class="mode-desc">自動再生・BGM感覚で覚える</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="showScreen('original-screen')" style="border-color:var(--accent3);">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_original.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
+      <div style="flex:1;">
+        <div class="mode-name">オリジナル登録</div>
+        <div class="mode-desc" id="orig-home-count">自分の単語を追加する</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+  </div>
+  <div style="color:var(--text-muted);font-size:12px;text-align:center;font-family:'Noto Sans JP',sans-serif;">
+    小学英単語233語
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="screen-title" id="settings-screen-title">設定</div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-label">出題ソース（複数選択可）</div>
+
+    <!-- ミニラボ -->
+    <div class="source-block">
+      <div class="source-header">
+        <input type="checkbox" class="source-checkbox" id="chk-minilabo" checked onchange="updateSourceUI()">
+        <div class="source-name">小学英単語</div>
+        <div class="source-count">233語</div>
+      </div>
+      <div class="unit-grid" id="unit-grid">
+        <button class="unit-btn unit-all-btn" onclick="selectAllUnits()">全選択</button>
+        <button class="unit-btn active" data-unit="あいさつ" onclick="toggleUnit(this)">あいさつ</button>
+        <button class="unit-btn active" data-unit="数・色" onclick="toggleUnit(this)">数・色</button>
+        <button class="unit-btn active" data-unit="動物" onclick="toggleUnit(this)">動物</button>
+        <button class="unit-btn active" data-unit="食べ物" onclick="toggleUnit(this)">食べ物</button>
+        <button class="unit-btn active" data-unit="体・気持ち" onclick="toggleUnit(this)">体・気持ち</button>
+        <button class="unit-btn active" data-unit="家族" onclick="toggleUnit(this)">家族</button>
+        <button class="unit-btn active" data-unit="学校" onclick="toggleUnit(this)">学校</button>
+        <button class="unit-btn active" data-unit="スポーツ" onclick="toggleUnit(this)">スポーツ</button>
+        <button class="unit-btn active" data-unit="天気" onclick="toggleUnit(this)">天気</button>
+        <button class="unit-btn active" data-unit="まち" onclick="toggleUnit(this)">まち</button>
+      </div>
+    </div>
+
+    <!-- オリジナル -->
+    <div class="source-block">
+      <div class="source-header">
+        <input type="checkbox" class="source-checkbox" id="chk-original" onchange="updateSourceUI()">
+        <div class="source-name">オリジナル</div>
+        <div class="source-count" id="original-count-label">0語</div>
+      </div>
+    </div>
+    <div class="selected-count" id="selected-count">0語が選択されています</div>
+  </div>
+
+  <!-- SPELLOUT -->
+  <div class="settings-section">
+    <div class="settings-label">スペルアウト音声</div>
+    <div class="timer-toggle">
+      <div class="toggle-info">
+        <div class="toggle-name">スペルアウト</div>
+        <div class="toggle-desc">正解後に1文字ずつ読み上げる</div>
+      </div>
+      <button class="toggle-switch on" id="spellout-toggle" onclick="toggleSpellout()"></button>
+    </div>
+    <div id="spellout-options">
+      <div class="timer-seconds">
+        <button class="timer-btn active" data-speed="slow" onclick="selectSpeed(this)">ゆっくり</button>
+        <button class="timer-btn" data-speed="normal" onclick="selectSpeed(this)">ふつう</button>
+        <button class="timer-btn" data-speed="fast" onclick="selectSpeed(this)">はやい</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div class="setting-row-header" onclick="toggleSettingDesc('desc-spellout')">
+        <span style="font-size:11px;color:var(--text-muted);">説明を見る</span>
+        <span class="setting-desc-toggle" id="toggle-desc-spellout">＋</span>
+      </div>
+      <div class="setting-desc-body" id="desc-spellout">
+        答えを確認した後、発音→スペルアウト→発音の順に読み上げます。<br>
+        <b>ゆっくり</b>：1文字ずつゆっくり。初心者向け。<br>
+        <b>ふつう</b>：テンポよく読み上げ。慣れてきたらこちら。<br>
+        <b>はやい</b>：速めのテンポ。スラスラ言えるようになったら。
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startFlash()">スタート →</button>
+</div>
+
+<!-- FLASH SCREEN -->
+<div id="flash-screen" class="screen">
+  <div class="flash-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progress-text">0/0</div>
+    <div id="flash-wrong-count" style="font-size:13px;font-weight:700;color:var(--accent);min-width:36px;text-align:right;">✗ 0</div>
+  </div>
+  <div class="card-area">
+    <div class="flashcard">
+      <div class="priority-dot" id="priority-dot"></div>
+      <div class="card-source-badge" id="card-source"></div>
+      <div class="card-meaning-main" id="card-meaning-main">...</div>
+      <div class="pos-badge" id="pos-badge"></div>
+      <div class="card-answer-wrap" id="card-answer-wrap">
+        <div class="card-word-answer" id="card-word-answer"></div>
+        <div class="card-phonetic" id="card-phonetic"></div>
+      </div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div id="keyboard-panel">
+      <div class="letter-boxes" id="letter-boxes"></div>
+      <div class="text-input-row" id="text-input-row">
+        <input type="text" id="main-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="ここに入力してEnter">
+        <button onclick="checkAnswer()">確認</button>
+      </div>
+    </div>
+    <div class="spellout-display" id="spellout-display">
+      <div class="spellout-text" id="spellout-text"></div>
+      <div class="spellout-label">スペル</div>
+    </div>
+    <div class="feedback-area" id="feedback-area"></div>
+  </div>
+  <div style="display:flex;justify-content:center;margin-top:-4px;">
+    <button id="replay-btn" onclick="replaySpellOut()" style="display:none;padding:8px 20px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button>
+  </div>
+  <div class="action-row">
+    <button class="action-btn btn-skip" onclick="skipCard()">スキップ</button>
+    <button class="action-btn btn-next" id="next-btn" onclick="nextCard()" style="display:none;">次へ →</button>
+    <button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" class="screen">
+  <div class="result-emoji" id="result-emoji">🎉</div>
+  <div class="result-title" id="result-title">おつかれさま！</div>
+  <div class="result-score-card">
+    <div class="score-big" id="score-pct">0%</div>
+    <div class="score-label">正答率</div>
+    <div class="score-detail">
+      <div class="score-item correct"><div class="score-num" id="correct-count">0</div><div class="score-desc">正解</div></div>
+      <div class="score-item wrong"><div class="score-num" id="wrong-count">0</div><div class="score-desc">まちがい</div></div>
+      <div class="score-item skip"><div class="score-num" id="skip-count">0</div><div class="score-desc">スキップ</div></div>
+    </div>
+  </div>
+  <div class="result-actions">
+    <button class="result-btn primary" onclick="retryWrong()">まちがえた問題をもう一度</button>
+    <button class="result-btn secondary" onclick="showScreen('settings-screen')">設定に戻る</button>
+    <button class="result-btn secondary" onclick="showScreen('home-screen')">トップに戻る</button>
+  </div>
+</div>
+
+<!-- LEARN MODE SCREEN -->
+<div id="learn-screen" class="screen">
+  <div class="flash-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="learn-progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="learn-progress-text">0/0</div>
+  </div>
+  <div class="card-area">
+    <div class="flashcard">
+      <div class="card-source-badge" id="learn-card-source"></div>
+      <div class="card-meaning-main" id="learn-meaning" style="font-size:36px;">...</div>
+      <div class="pos-badge" id="learn-pos-badge"></div>
+      <div style="margin-top:8px;min-height:52px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;" id="learn-letter-boxes"></div>
+      <div id="learn-word-display" style="display:none;font-size:32px;font-weight:900;color:var(--text);margin-top:4px;font-family:'Nunito',sans-serif;"></div>
+    </div>
+  </div>
+  <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+    <div id="learn-status" style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;height:20px;"></div>
+    <div style="display:flex;gap:10px;width:100%;" id="learn-action-row">
+      <button class="action-btn" onclick="learnAgain()" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
+      <button class="action-btn btn-next" onclick="learnNext()" style="flex:1;display:none;" id="learn-next-btn">覚えた！</button>
+    </div>
+    <button id="learn-replay-btn" onclick="replayLearnSpellOut()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;"></button>
+  </div>
+</div>
+
+<!-- SENTENCE MEMORY SCREEN -->
+<div id="sentence-memory-screen" class="screen">
+  <div style="max-width:600px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;">
+    <div id="smem-settings-header" class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">英文暗記モード設定</div>
+    </div>
+    <div id="smem-quiz-header" class="flash-header" style="display:none;">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="smem-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="smem-progress-text">0/0</div>
+    </div>
+    <div id="smem-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
+      <div class="settings-label">ユニットを選ぶ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="unit-btn unit-all-btn" onclick="selectAllSmemUnits()">全Unit</button>
+        <button class="unit-btn active" data-smem-unit="1" onclick="toggleSmemUnit(this)">あいさつ</button>
+        <button class="unit-btn active" data-smem-unit="2" onclick="toggleSmemUnit(this)">数・色</button>
+        <button class="unit-btn active" data-smem-unit="3" onclick="toggleSmemUnit(this)">動物</button>
+        <button class="unit-btn active" data-smem-unit="4" onclick="toggleSmemUnit(this)">食べ物</button>
+        <button class="unit-btn active" data-smem-unit="5" onclick="toggleSmemUnit(this)">体・気持ち</button>
+        <button class="unit-btn active" data-smem-unit="6" onclick="toggleSmemUnit(this)">家族</button>
+        <button class="unit-btn active" data-smem-unit="7" onclick="toggleSmemUnit(this)">学校</button>
+        <button class="unit-btn active" data-smem-unit="8" onclick="toggleSmemUnit(this)">スポーツ</button>
+        <button class="unit-btn active" data-smem-unit="9" onclick="toggleSmemUnit(this)">天気</button>
+        <button class="unit-btn active" data-smem-unit="10" onclick="toggleSmemUnit(this)">まち</button>
+      </div>
+      <!-- ⑤ 英文暗記モード 速度設定 -->
+      <div class="settings-label" style="margin-top:4px;">読み上げ速度</div>
+      <div class="speed-btns">
+        <button class="speed-btn" data-sentence-speed="slow" onclick="selectSentenceSpeed(this)">ゆっくり</button>
+        <button class="speed-btn active" data-sentence-speed="normal" onclick="selectSentenceSpeed(this)">ふつう</button>
+        <button class="speed-btn" data-sentence-speed="fast" onclick="selectSentenceSpeed(this)">はやい</button>
+      </div>
+      <div class="selected-count" id="smem-sentence-count">329文が選択されています</div>
+      <button onclick="startSmemMode()" style="width:100%;padding:16px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:var(--radius);color:white;font-size:17px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(245,158,11,.35);">スタート →</button>
+    </div>
+    <div id="smem-quiz-area" style="display:none;flex-direction:column;gap:14px;">
+      <div class="flashcard" style="min-height:160px;gap:16px;">
+        <div class="card-source-badge" id="smem-unit-badge"></div>
+        <div style="font-size:22px;font-weight:800;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;line-height:1.5;text-align:center;" id="smem-ja-text">...</div>
+        <div id="smem-en-display" style="display:none;font-size:18px;font-weight:700;color:var(--text);font-family:'Nunito',sans-serif;line-height:1.6;text-align:center;padding:12px;background:rgba(6,214,160,.08);border-radius:14px;border:1px solid rgba(6,214,160,.2);"></div>
+        <div id="smem-status" style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">音声を聞いてね</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
+        <button id="smem-replay-btn" onclick="smemReplay()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button>
+        <div style="display:flex;gap:10px;width:100%;" id="smem-action-row">
+          <button onclick="smemAgain()" class="action-btn" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
+          <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;">覚えた！</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TYPING MODE SCREEN -->
+<div id="typing-screen" class="screen">
+  <div style="max-width:600px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;">
+    <div id="typing-settings-header" class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">英文タイピング設定</div>
+    </div>
+    <div id="typing-quiz-header" class="flash-header" style="display:none;">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="typing-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="typing-progress-text">0/0</div>
+    </div>
+    <div id="typing-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
+      <div class="settings-label">ユニットを選ぶ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="unit-btn unit-all-btn" onclick="selectAllTypingUnits()">全Unit</button>
+        <button class="unit-btn active" data-typing-unit="1" onclick="toggleTypingUnit(this)">あいさつ</button>
+        <button class="unit-btn active" data-typing-unit="2" onclick="toggleTypingUnit(this)">数・色</button>
+        <button class="unit-btn active" data-typing-unit="3" onclick="toggleTypingUnit(this)">動物</button>
+        <button class="unit-btn active" data-typing-unit="4" onclick="toggleTypingUnit(this)">食べ物</button>
+        <button class="unit-btn active" data-typing-unit="5" onclick="toggleTypingUnit(this)">体・気持ち</button>
+        <button class="unit-btn active" data-typing-unit="6" onclick="toggleTypingUnit(this)">家族</button>
+        <button class="unit-btn active" data-typing-unit="7" onclick="toggleTypingUnit(this)">学校</button>
+        <button class="unit-btn active" data-typing-unit="8" onclick="toggleTypingUnit(this)">スポーツ</button>
+        <button class="unit-btn active" data-typing-unit="9" onclick="toggleTypingUnit(this)">天気</button>
+        <button class="unit-btn active" data-typing-unit="10" onclick="toggleTypingUnit(this)">まち</button>
+      </div>
+      <!-- ⑤ タイピングモード 速度設定 -->
+      <div class="settings-label" style="margin-top:4px;">読み上げ速度</div>
+      <div class="speed-btns">
+        <button class="speed-btn" data-typing-speed="slow" onclick="selectTypingSpeed(this)">ゆっくり</button>
+        <button class="speed-btn active" data-typing-speed="normal" onclick="selectTypingSpeed(this)">ふつう</button>
+        <button class="speed-btn" data-typing-speed="fast" onclick="selectTypingSpeed(this)">はやい</button>
+      </div>
+      <div class="selected-count" id="typing-sentence-count">329文が選択されています</div>
+      <button onclick="startTypingMode()" style="width:100%;padding:16px;background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;border-radius:var(--radius);color:white;font-size:17px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,.35);">スタート →</button>
+    </div>
+    <div id="typing-quiz-area" style="display:none;flex-direction:column;gap:14px;">
+      <div class="flashcard" style="min-height:120px;">
+        <div class="card-source-badge" id="typing-unit-badge"></div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;line-height:1.5;text-align:center;" id="typing-ja-text">...</div>
+        <div id="typing-word-underlines" style="display:none;text-align:center;padding:4px 0;line-height:2.2;"></div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <!-- ④ 記号プレビュー表示エリア -->
+        <div id="typing-symbol-hint" style="display:none;font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;text-align:center;padding:6px 12px;background:rgba(255,209,102,.07);border-radius:10px;border:1px solid rgba(255,209,102,.2);">
+          記号ヒント：<span id="typing-symbol-text" style="color:var(--accent2);font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:2px;"></span>
+        </div>
+        <textarea id="typing-input" rows="2" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="off" placeholder="英文を入力してEnterで確認" style="width:100%;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-family:'Nunito',sans-serif;padding:12px 16px;resize:none;outline:none;transition:border-color .2s;line-height:1.5;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'"></textarea>
+        <button onclick="checkTypingAnswer()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">確認 →</button>
+        <div id="typing-feedback" style="min-height:28px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;"></div>
+        <div style="text-align:center;"><button id="typing-replay-btn" onclick="replayTypingSentence()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button></div>
+        <div id="typing-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-family:'Noto Sans JP',sans-serif;">正解</div>
+          <div id="typing-correct-text" style="font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;line-height:1.5;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="typingSkip()" class="action-btn btn-skip">スキップ</button>
+        <button onclick="typingNext()" id="typing-next-btn" class="action-btn btn-next" style="display:none;">次へ →</button>
+        <button onclick="typingReveal()" id="typing-reveal-btn" class="action-btn btn-reveal">答えを見る</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ③ 聞き流しセットアップ画面 -->
+<div id="listen-setup-screen" class="screen">
+  <div style="max-width:440px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:16px;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">聞き流し設定</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">出題ソース・範囲（複数選択可）</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <!-- ミニラボ -->
+        <div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;" onclick="toggleListenSourceGrid('ls-minilabo-grid')">
+            <input type="checkbox" class="source-checkbox" id="ls-chk-minilabo" checked onclick="event.stopPropagation();updateListenCount()">
+            <span style="font-size:15px;font-weight:800;">小学英単語</span>
+            <span style="font-size:12px;color:var(--text-muted);">233語</span>
+          </label>
+          <div id="ls-minilabo-grid" class="unit-grid" style="padding-left:30px;">
+            <button class="unit-btn unit-all-btn" onclick="selectAllLsMinilabo()">全選択</button>
+            <button class="unit-btn active" data-ls-ml="あいさつ" onclick="toggleLsMinilabo(this)">あいさつ</button>
+            <button class="unit-btn active" data-ls-ml="数・色" onclick="toggleLsMinilabo(this)">数・色</button>
+            <button class="unit-btn active" data-ls-ml="動物" onclick="toggleLsMinilabo(this)">動物</button>
+            <button class="unit-btn active" data-ls-ml="食べ物" onclick="toggleLsMinilabo(this)">食べ物</button>
+            <button class="unit-btn active" data-ls-ml="体・気持ち" onclick="toggleLsMinilabo(this)">体・気持ち</button>
+            <button class="unit-btn active" data-ls-ml="家族" onclick="toggleLsMinilabo(this)">家族</button>
+            <button class="unit-btn active" data-ls-ml="学校" onclick="toggleLsMinilabo(this)">学校</button>
+            <button class="unit-btn active" data-ls-ml="スポーツ" onclick="toggleLsMinilabo(this)">スポーツ</button>
+            <button class="unit-btn active" data-ls-ml="天気" onclick="toggleLsMinilabo(this)">天気</button>
+            <button class="unit-btn active" data-ls-ml="まち" onclick="toggleLsMinilabo(this)">まち</button>
+          </div>
+        </div>
+        <div style="height:1px;background:var(--surface);"></div>
+        <!-- オリジナル -->
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" class="source-checkbox" id="ls-chk-original" onchange="updateListenCount()">
+          <span style="font-size:15px;font-weight:800;">オリジナル</span>
+          <span style="font-size:12px;color:var(--text-muted);" id="ls-orig-count">0語</span>
+        </label>
+      </div>
+      <div class="selected-count" id="ls-selected-count">273語が選択されています</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">単語間の間隔</div>
+      <div class="listen-interval-btns">
+        <button class="listen-interval-btn" data-interval="short" onclick="selectListenInterval(this)">短め<br><span style="font-size:10px;opacity:.7;">約3秒</span></button>
+        <button class="listen-interval-btn active" data-interval="normal" onclick="selectListenInterval(this)">ふつう<br><span style="font-size:10px;opacity:.7;">約5秒</span></button>
+        <button class="listen-interval-btn" data-interval="long" onclick="selectListenInterval(this)">長め<br><span style="font-size:10px;opacity:.7;">約8秒</span></button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">スペルアウト読み上げ</div>
+      <div class="timer-toggle">
+        <div class="toggle-info">
+          <div class="toggle-name">スペルアウト</div>
+          <div class="toggle-desc">発音→スペルアウト→発音の順に読み上げる</div>
+        </div>
+        <button class="toggle-switch on" id="listen-spellout-toggle" onclick="toggleListenSpellout()"></button>
+      </div>
+      <div id="listen-spellout-speed-options">
+        <div class="timer-seconds" style="margin-top:8px;">
+          <button class="timer-btn active" data-listen-speed="slow" onclick="selectListenSpelloutSpeed(this)">ゆっくり</button>
+          <button class="timer-btn" data-listen-speed="normal" onclick="selectListenSpelloutSpeed(this)">ふつう</button>
+          <button class="timer-btn" data-listen-speed="fast" onclick="selectListenSpelloutSpeed(this)">はやい</button>
+        </div>
+      </div>
+    </div>
+    <button onclick="startListenMode()" style="width:100%;padding:18px;background:linear-gradient(135deg,#818cf8,#6366f1);border:none;border-radius:var(--radius);color:white;font-size:18px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(99,102,241,.4);">スタート →</button>
+  </div>
+</div>
+
+<!-- ③ 聞き流し再生画面 -->
+<div id="listen-screen" class="screen">
+  <div style="max-width:440px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;align-items:center;gap:20px;padding-bottom:40px;">
+    <div class="screen-header" style="width:100%;">
+      <button class="back-btn" onclick="stopListenMode()">‹</button>
+      <div class="screen-title">聞き流しモード</div>
+    </div>
+    <div class="listen-counter" id="listen-counter">0 / 0</div>
+    <div class="listen-progress">
+      <div class="progress-bar-wrap" style="height:6px;">
+        <div class="progress-bar-fill" id="listen-progress-fill" style="width:0%;background:linear-gradient(90deg,#818cf8,#6366f1);"></div>
+      </div>
+    </div>
+    <div class="listen-card">
+      <div class="listen-phase-badge" id="listen-phase-badge">日本語</div>
+      <div class="pulse-ring" id="listen-pulse"></div>
+      <div class="listen-main-text" id="listen-ja-text">...</div>
+      <div class="listen-sub-text" id="listen-en-text"></div>
+      <div class="listen-spell-text" id="listen-spell-text"></div>
+    </div>
+    <div class="listen-controls" style="width:100%;">
+      <button onclick="listenPrevWord()" style="flex:1;padding:14px;border-radius:var(--radius);border:none;background:var(--card);color:var(--text-muted);font-size:20px;font-weight:800;cursor:pointer;">‹</button>
+      <button id="listen-pause-btn" onclick="toggleListenPause()" style="flex:2;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,#818cf8,#6366f1);color:white;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">一時停止</button>
+      <button onclick="listenNextWord()" style="flex:1;padding:14px;border-radius:var(--radius);border:none;background:var(--card);color:var(--text-muted);font-size:20px;font-weight:800;cursor:pointer;">›</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;text-align:center;">タップ不要・BGM感覚で流せます</div>
+  </div>
+</div>
+
+<!-- ORIGINAL REGISTER SCREEN -->
+<div id="original-screen" class="screen">
+  <div style="gap:16px;max-width:440px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:16px;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">オリジナル登録</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">登録済み単語 <span id="orig-registered-count" style="color:var(--accent2)">0語</span></div>
+      <div id="orig-word-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;"></div>
+      <div id="orig-empty" style="text-align:center;color:var(--text-muted);font-size:13px;font-family:'Noto Sans JP',sans-serif;padding:12px;">まだ登録されていません</div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button onclick="downloadOriginalCSV()" style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">CSVダウンロード</button>
+        <button onclick="clearAllOriginal()" style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">全削除</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">テキストから一括登録</div>
+      <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;line-height:1.7;">
+        Googleレンズでテキストをコピーして貼り付けてね！<br>
+        <span style="color:var(--accent2);">英語（スペース）日本語</span> の形で1行ずつ
+      </div>
+      <textarea id="orig-paste-area" placeholder="例：&#10;apple リンゴ&#10;dog イヌ&#10;cat ネコ" style="width:100%;height:120px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:14px;font-family:'Nunito',sans-serif;padding:12px;resize:none;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'"></textarea>
+      <button onclick="parseAndPreview()" style="width:100%;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent2),#ffb300);color:var(--bg);font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">読み取って確認する</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">1件ずつ登録</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" id="orig-word-input" placeholder="英単語 (例: apple)" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" style="padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-weight:700;font-family:'Nunito',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
+        <input type="text" id="orig-meaning-input" placeholder="意味 (例: リンゴ)" style="padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-family:'Noto Sans JP',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
+        <button onclick="toggleOrigOptions()" id="orig-options-toggle" style="text-align:left;padding:8px 4px;background:none;border:none;color:var(--text-muted);font-size:12px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;">＋ 詳細を追加（品詞・優先度）</button>
+        <div id="orig-options" style="display:none;flex-direction:column;gap:8px;">
+          <select id="orig-pos-select" style="padding:10px 14px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;">
+            <option value="">品詞（省略可）</option>
+            <option value="動">動詞</option><option value="名">名詞</option>
+            <option value="形">形容詞</option><option value="副">副詞</option>
+            <option value="前">前置詞</option><option value="接">接続詞</option>
+            <option value="代">代名詞</option>
+          </select>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">優先度：</span>
+            <button class="orig-prio-btn active" data-prio="🔴" onclick="selectOrigPrio(this)" style="padding:6px 14px;border-radius:10px;border:2px solid var(--accent);background:rgba(255,107,107,.2);color:var(--accent);font-size:14px;cursor:pointer;">🔴</button>
+            <button class="orig-prio-btn" data-prio="🟡" onclick="selectOrigPrio(this)" style="padding:6px 14px;border-radius:10px;border:2px solid var(--surface);background:var(--surface);color:var(--text-muted);font-size:14px;cursor:pointer;">🟡</button>
+            <button class="orig-prio-btn" data-prio="🟢" onclick="selectOrigPrio(this)" style="padding:6px 14px;border-radius:10px;border:2px solid var(--surface);background:var(--surface);color:var(--text-muted);font-size:14px;cursor:pointer;">🟢</button>
+          </div>
+        </div>
+        <button id="add-one-btn" onclick="addOneOriginal()" style="width:100%;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent3),#00b894);color:var(--bg);font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">＋ 登録する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW SCREEN -->
+<div id="preview-screen" class="screen">
+  <div style="max-width:440px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:16px;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('original-screen')">‹</button>
+      <div class="screen-title">確認・修正</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">読み取り結果 <span style="color:var(--text-muted);font-weight:400;font-size:10px;">修正できるよ</span></div>
+      <div id="preview-list" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;"></div>
+    </div>
+    <button onclick="registerPreview()" style="width:100%;padding:18px;background:linear-gradient(135deg,var(--accent3),#00b894);border:none;border-radius:var(--radius);color:var(--bg);font-size:18px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(6,214,160,.3);">これで登録する！</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ===== 説明トグル =====
+function toggleSettingDesc(id) {
+  const body = document.getElementById(id);
+  const toggleId = 'toggle-' + id;
+  const toggle = document.getElementById(toggleId);
+  if (body.classList.contains('open')) {
+    body.classList.remove('open');
+    toggle.textContent = '＋';
+  } else {
+    body.classList.add('open');
+    toggle.textContent = '－';
+  }
+}
+
+// ===== SCREEN =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (typeof stopTimer === 'function') stopTimer();
+}
+function goToSettings() {
+  showScreen('settings-screen');
+  document.getElementById('settings-screen-title').textContent = '英単語フラッシュ設定';
+  const startBtn = document.querySelector('.start-btn');
+  if (startBtn) {
+    startBtn.textContent = 'スタート →';
+    startBtn.onclick = startFlash;
+    startBtn.style.background = 'linear-gradient(135deg,var(--accent),#ff4757)';
+    startBtn.style.boxShadow = '0 8px 24px rgba(255,107,107,.4)';
+  }
+}
+function startSentenceMemory() {
+  showScreen('sentence-memory-screen');
+  document.getElementById('smem-unit-select').style.display = 'flex';
+  document.getElementById('smem-quiz-area').style.display = 'none';
+  document.getElementById('smem-settings-header').style.display = '';
+  document.getElementById('smem-quiz-header').style.display = 'none';
+}
+
+// ===== ⑤ 読み上げ速度設定 =====
+let sentenceSpeed = 'normal'; // 英文暗記モード速度
+let typingSpeed = 'normal';   // タイピングモード速度
+
+function selectSentenceSpeed(btn) {
+  document.querySelectorAll('[data-sentence-speed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  sentenceSpeed = btn.dataset.sentenceSpeed;
+}
+function selectTypingSpeed(btn) {
+  document.querySelectorAll('[data-typing-speed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  typingSpeed = btn.dataset.typingSpeed;
+}
+function getSpeedRate(speedKey) {
+  if (speedKey === 'slow') return 0.6;
+  if (speedKey === 'fast') return 0.9;
+  return 0.75; // normal
+}
+
+// ===== DATA (同v30) =====
+const MINILABO_CSV = `単語,意味,品詞,出典_ミニラボ,優先度,発音記号
+hello,こんにちは,間,あいさつ,🔴,həloʊ
+hi,やあ,間,あいさつ,🔴,haɪ
+goodbye,さようなら,間,あいさつ,🔴,ɡʊdbaɪ
+good,よい,形,あいさつ,🔴,ɡʊd
+morning,朝,名,あいさつ,🔴,mɔːrnɪŋ
+afternoon,午後,名,あいさつ,🔴,æftərnuːn
+evening,夕方,名,あいさつ,🔴,iːvnɪŋ
+night,夜,名,あいさつ,🔴,naɪt
+thank,感謝する,動,あいさつ,🔴,θæŋk
+please,どうか,副,あいさつ,🔴,pliːz
+sorry,ごめんなさい,形,あいさつ,🔴,sɒri
+welcome,ようこそ,間,あいさつ,🔴,welkəm
+yes,はい,副,あいさつ,🔴,jes
+no,いいえ,副,あいさつ,🔴,noʊ
+okay,わかった,副,あいさつ,🔴,oʊkeɪ
+name,名前,名,あいさつ,🔴,neɪm
+nice,すてきな,形,あいさつ,🔴,naɪs
+meet,会う,動,あいさつ,🔴,miːt
+today,今日,副,あいさつ,🔴,tədeɪ
+tomorrow,明日,副,あいさつ,🔴,təmɒroʊ
+yesterday,昨日,副,あいさつ,🔴,jestərdeɪ
+here,ここに,副,あいさつ,🔴,hɪər
+there,そこに,副,あいさつ,🔴,ðɛr
+now,今,副,あいさつ,🔴,naʊ
+fine,元気な,形,あいさつ,🔴,faɪn
+great,すばらしい,形,あいさつ,🔴,ɡreɪt
+ready,準備ができた,形,あいさつ,🔴,redi
+help,助ける,動,あいさつ,🔴,help
+one,1,名,数・色,🔴,wʌn
+two,2,名,数・色,🔴,tuː
+three,3,名,数・色,🔴,θriː
+four,4,名,数・色,🔴,fɔːr
+five,5,名,数・色,🔴,faɪv
+six,6,名,数・色,🔴,sɪks
+seven,7,名,数・色,🔴,sevn
+eight,8,名,数・色,🔴,eɪt
+nine,9,名,数・色,🔴,naɪn
+ten,10,名,数・色,🔴,ten
+red,赤,名,数・色,🔴,red
+blue,青,名,数・色,🔴,bluː
+green,緑,名,数・色,🔴,ɡriːn
+yellow,黄色,名,数・色,🔴,jeloʊ
+white,白,名,数・色,🔴,waɪt
+black,黒,名,数・色,🔴,blæk
+orange,オレンジ色,名,数・色,🔴,ɒrɪndʒ
+pink,ピンク,名,数・色,🔴,pɪŋk
+purple,紫,名,数・色,🔴,pɜːrpl
+brown,茶色,名,数・色,🔴,braʊn
+color,色,名,数・色,🔴,kʌlər
+number,数,名,数・色,🔴,nʌmbər
+big,大きい,形,数・色,🔴,bɪɡ
+small,小さい,形,数・色,🔴,smɔːl
+many,たくさんの,形,数・色,🔴,meni
+dog,犬,名,動物,🔴,dɔːɡ
+cat,猫,名,動物,🔴,kæt
+bird,鳥,名,動物,🔴,bɜːrd
+fish,魚,名,動物,🔴,fɪʃ
+rabbit,ウサギ,名,動物,🔴,ræbɪt
+horse,馬,名,動物,🔴,hɔːrs
+cow,牛,名,動物,🔴,kaʊ
+pig,ブタ,名,動物,🔴,pɪɡ
+sheep,羊,名,動物,🔴,ʃiːp
+lion,ライオン,名,動物,🔴,laɪən
+tiger,トラ,名,動物,🔴,taɪɡər
+bear,クマ,名,動物,🔴,bɛr
+elephant,ゾウ,名,動物,🔴,elɪfənt
+monkey,サル,名,動物,🔴,mʌŋki
+panda,パンダ,名,動物,🔴,pændə
+penguin,ペンギン,名,動物,🔴,peŋɡwɪn
+dolphin,イルカ,名,動物,🔴,dɒlfɪn
+snake,ヘビ,名,動物,🔴,sneɪk
+frog,カエル,名,動物,🔴,frɒɡ
+butterfly,チョウ,名,動物,🔴,bʌtərflaɪ
+ant,アリ,名,動物,🔴,ænt
+bee,ハチ,名,動物,🔴,biː
+animal,動物,名,動物,🔴,ænɪməl
+insect,昆虫,名,動物,🟡,ɪnsekt
+apple,リンゴ,名,食べ物,🔴,æpl
+banana,バナナ,名,食べ物,🔴,bənaːnə
+cherry,さくらんぼ,名,食べ物,🔴,tʃeri
+strawberry,イチゴ,名,食べ物,🔴,strɔːberi
+grape,ブドウ,名,食べ物,🔴,ɡreɪp
+rice,ご飯,名,食べ物,🔴,raɪs
+bread,パン,名,食べ物,🔴,bred
+egg,卵,名,食べ物,🔴,eɡ
+milk,牛乳,名,食べ物,🔴,mɪlk
+water,水,名,食べ物,🔴,wɔːtər
+juice,ジュース,名,食べ物,🔴,dʒuːs
+cake,ケーキ,名,食べ物,🔴,keɪk
+pizza,ピザ,名,食べ物,🔴,piːtsə
+soup,スープ,名,食べ物,🔴,suːp
+tea,お茶,名,食べ物,🔴,tiː
+potato,ジャガイモ,名,食べ物,🔴,pəteɪtoʊ
+tomato,トマト,名,食べ物,🔴,təmeɪtoʊ
+cheese,チーズ,名,食べ物,🔴,tʃiːz
+meat,肉,名,食べ物,🔴,miːt
+hamburger,ハンバーガー,名,食べ物,🔴,hæmbɜːrɡər
+sweet,甘い,形,食べ物,🟡,swiːt
+delicious,おいしい,形,食べ物,🔴,dɪlɪʃəs
+food,食べ物,名,食べ物,🔴,fuːd
+eat,食べる,動,食べ物,🔴,iːt
+drink,飲む,動,食べ物,🔴,drɪŋk
+head,頭,名,体・気持ち,🔴,hed
+eye,目,名,体・気持ち,🔴,aɪ
+ear,耳,名,体・気持ち,🔴,ɪər
+nose,鼻,名,体・気持ち,🔴,noʊz
+mouth,口,名,体・気持ち,🔴,maʊθ
+tooth,歯,名,体・気持ち,🔴,tuːθ
+hair,髪,名,体・気持ち,🔴,hɛr
+face,顔,名,体・気持ち,🔴,feɪs
+hand,手,名,体・気持ち,🔴,hænd
+arm,腕,名,体・気持ち,🔴,ɑːrm
+leg,足,名,体・気持ち,🔴,leɡ
+foot,足首から下,名,体・気持ち,🔴,fʊt
+finger,指,名,体・気持ち,🔴,fɪŋɡər
+body,体,名,体・気持ち,🔴,bɒdi
+happy,うれしい,形,体・気持ち,🔴,hæpi
+sad,悲しい,形,体・気持ち,🔴,sæd
+angry,怒っている,形,体・気持ち,🔴,æŋɡri
+tired,疲れた,形,体・気持ち,🔴,taɪərd
+hungry,お腹がすいた,形,体・気持ち,🔴,hʌŋɡri
+sleepy,眠い,形,体・気持ち,🔴,sliːpi
+sick,病気の,形,体・気持ち,🔴,sɪk
+excited,興奮した,形,体・気持ち,🟡,ɪksaɪtɪd
+nervous,緊張した,形,体・気持ち,🟡,nɜːrvəs
+feel,感じる,動,体・気持ち,🔴,fiːl
+health,健康,名,体・気持ち,🟡,helθ
+father,お父さん,名,家族,🔴,fɑːðər
+mother,お母さん,名,家族,🔴,mʌðər
+brother,兄弟,名,家族,🔴,brʌðər
+sister,姉妹,名,家族,🔴,sɪstər
+grandfather,祖父,名,家族,🔴,ɡrændfɑːðər
+grandmother,祖母,名,家族,🔴,ɡrænmʌðər
+uncle,おじ,名,家族,🟡,ʌŋkl
+aunt,おば,名,家族,🟡,ænt
+friend,友達,名,家族,🔴,frend
+teacher,先生,名,家族,🔴,tiːtʃər
+student,学生,名,家族,🔴,stjuːdnt
+boy,男の子,名,家族,🔴,bɔɪ
+girl,女の子,名,家族,🔴,ɡɜːrl
+baby,赤ちゃん,名,家族,🔴,beɪbi
+man,男性,名,家族,🔴,mæn
+woman,女性,名,家族,🔴,wʊmən
+child,子ども,名,家族,🔴,tʃaɪld
+family,家族,名,家族,🔴,fæməli
+people,人々,名,家族,🔴,piːpl
+person,人,名,家族,🔴,pɜːrsn
+school,学校,名,学校,🔴,skuːl
+class,クラス,名,学校,🔴,klæs
+desk,机,名,学校,🔴,desk
+chair,椅子,名,学校,🔴,tʃɛr
+book,本,名,学校,🔴,bʊk
+pencil,えんぴつ,名,学校,🔴,pensl
+pen,ペン,名,学校,🔴,pen
+eraser,消しゴム,名,学校,🔴,ɪreɪzər
+ruler,定規,名,学校,🟡,ruːlər
+bag,かばん,名,学校,🔴,bæɡ
+notebook,ノート,名,学校,🔴,noʊtbʊk
+dictionary,辞書,名,学校,🟡,dɪkʃəneri
+library,図書室,名,学校,🟡,laɪbreri
+lesson,授業,名,学校,🔴,lesn
+homework,宿題,名,学校,🔴,hoʊmwɜːrk
+test,テスト,名,学校,🔴,test
+subject,科目,名,学校,🟡,sʌbdʒɪkt
+grade,学年,名,学校,🟡,ɡreɪd
+club,部活動,名,学校,🟡,klʌb
+read,読む,動,学校,🔴,riːd
+soccer,サッカー,名,スポーツ,🔴,sɒkər
+baseball,野球,名,スポーツ,🔴,beɪsbɔːl
+basketball,バスケットボール,名,スポーツ,🔴,bæskɪtbɔːl
+tennis,テニス,名,スポーツ,🔴,tenɪs
+swimming,水泳,名,スポーツ,🔴,swɪmɪŋ
+running,走ること,名,スポーツ,🔴,rʌnɪŋ
+music,音楽,名,スポーツ,🔴,mjuːzɪk
+art,美術,名,スポーツ,🔴,ɑːrt
+cooking,料理,名,スポーツ,🔴,kʊkɪŋ
+dancing,ダンス,名,スポーツ,🔴,dænsɪŋ
+singing,歌うこと,名,スポーツ,🔴,sɪŋɪŋ
+game,ゲーム,名,スポーツ,🔴,ɡeɪm
+sport,スポーツ,名,スポーツ,🔴,spɔːrt
+team,チーム,名,スポーツ,🔴,tiːm
+ball,ボール,名,スポーツ,🔴,bɔːl
+practice,練習,名,スポーツ,🔴,præktɪs
+win,勝つ,動,スポーツ,🔴,wɪn
+play,遊ぶ,動,スポーツ,🔴,pleɪ
+run,走る,動,スポーツ,🔴,rʌn
+swim,泳ぐ,動,スポーツ,🔴,swɪm
+sun,太陽,名,天気,🔴,sʌn
+moon,月,名,天気,🔴,muːn
+sky,空,名,天気,🔴,skaɪ
+cloud,雲,名,天気,🔴,klaʊd
+rain,雨,名,天気,🔴,reɪn
+snow,雪,名,天気,🔴,snoʊ
+wind,風,名,天気,🔴,wɪnd
+flower,花,名,天気,🔴,flaʊər
+tree,木,名,天気,🔴,triː
+mountain,山,名,天気,🔴,maʊntɪn
+river,川,名,天気,🔴,rɪvər
+sea,海,名,天気,🔴,siː
+beach,浜辺,名,天気,🔴,biːtʃ
+park,公園,名,天気,🔴,pɑːrk
+spring,春,名,天気,🔴,sprɪŋ
+summer,夏,名,天気,🔴,sʌmər
+autumn,秋,名,天気,🔴,ɔːtəm
+winter,冬,名,天気,🔴,wɪntər
+weather,天気,名,天気,🔴,weðər
+hot,暑い,形,天気,🔴,hɒt
+cold,寒い,形,天気,🔴,koʊld
+warm,暖かい,形,天気,🔴,wɔːrm
+sunny,晴れの,形,天気,🔴,sʌni
+cool,涼しい,形,天気,🔴,kuːl
+house,家,名,まち,🔴,haʊs
+room,部屋,名,まち,🔴,ruːm
+door,ドア,名,まち,🔴,dɔːr
+window,窓,名,まち,🔴,wɪndoʊ
+bed,ベッド,名,まち,🔴,bed
+table,テーブル,名,まち,🔴,teɪbl
+clock,時計,名,まち,🔴,klɒk
+phone,電話,名,まち,🔴,foʊn
+shop,お店,名,まち,🔴,ʃɒp
+hospital,病院,名,まち,🔴,hɒspɪtl
+station,駅,名,まち,🔴,steɪʃn
+road,道路,名,まち,🔴,roʊd
+bus,バス,名,まち,🔴,bʌs
+train,電車,名,まち,🔴,treɪn
+car,車,名,まち,🔴,kɑːr
+bicycle,自転車,名,まち,🔴,baɪsɪkl
+money,お金,名,まち,🔴,mʌni
+movie,映画,名,まち,🔴,muːvi
+city,都市,名,まち,🔴,sɪti
+town,町,名,まち,🔴,taʊn
+airport,空港,名,まち,🔴,ɛrpɔːrt
+hotel,ホテル,名,まち,🔴,hoʊtel`;
+
+const EIKEN_CSV = `単語,意味,品詞,出典_英検5級,優先度,発音記号`;
+
+const MABUTAN_CSV = `単語,意味,品詞,出典_まぶたん,優先度`;
+
+function parseCSV(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const vals = line.split(',');
+    const obj = {};
+    headers.forEach((h,i) => obj[h.trim()] = (vals[i]||'').trim());
+    return obj;
+  });
+}
+
+const MINILABO = parseCSV(MINILABO_CSV);
+
+let state = {
+  timerEnabled: false, timerSec: 15,
+  deck: [], current: 0, answered: false,
+  correct: 0, wrong: 0, skipped: 0, wrongWords: [],
+  timerInterval: null, timerLeft: 0, currentTyped: '',
+};
+
+function updateSourceUI() {
+  const minilaboOn = document.getElementById('chk-minilabo').checked;
+  document.getElementById('unit-grid').style.display = minilaboOn ? 'flex' : 'none';
+  updateOriginalCountLabel();
+  updateSelectedCount();
+}
+function toggleUnit(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
+
+function selectAllUnits() {
+  const btns = document.querySelectorAll('#unit-grid button[data-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSelectedCount();
+}
+
+function buildDeck() {
+  const minilaboOn = document.getElementById('chk-minilabo').checked;
+  const selectedUnits = Array.from(document.querySelectorAll('#unit-grid button.active')).map(b => b.dataset.unit);
+  const result = [];
+  if (minilaboOn) MINILABO.filter(w => selectedUnits.includes(w['出典_ミニラボ'])).forEach(w => result.push({...w, _source: '小学英単語'}));
+  const origEl = document.getElementById('chk-original');
+  if (origEl && origEl.checked) {
+    loadOriginalWords().forEach(w => result.push({...w, _source: 'オリジナル'}));
+  }
+  return result.sort(() => Math.random() - 0.5);
+}
+
+function updateSelectedCount() {
+  const deck = buildDeck();
+  document.getElementById('selected-count').textContent = `${deck.length}語が選択されています`;
+}
+
+function toggleTimer() {}
+function selectTimer(btn) {}
+
+function startFlash() {
+  state.deck = buildDeck();
+  if (!state.deck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
+  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = [];
+  showScreen('flash-screen');
+  loadCard();
+}
+
+function posLabel(pos) {
+  const m = {'動':'動詞','名':'名詞','形':'形容詞','副':'副詞','前':'前置詞','接':'接続詞','代':'代名詞','助':'助動詞','否':'否定形','間':'感嘆詞','句':'熟語'};
+  return m[pos] || pos;
+}
+
+function loadCard() {
+  if (state.current >= state.deck.length) { showResult(); return; }
+  const word = state.deck[state.current];
+  state.answered = false; state.currentTyped = '';
+  const dot = document.getElementById('priority-dot');
+  dot.className = 'priority-dot';
+  if (word['優先度'] === '🔴') dot.classList.add('high');
+  else if (word['優先度'] === '🟡') dot.classList.add('mid');
+  else dot.classList.add('low');
+  document.getElementById('card-source').textContent = word._source || '';
+  document.getElementById('card-meaning-main').textContent = word['意味'];
+  document.getElementById('pos-badge').textContent = posLabel(word['品詞']);
+  document.getElementById('card-answer-wrap').classList.remove('visible');
+  document.getElementById('card-word-answer').textContent = word['単語'];
+  document.getElementById('card-phonetic').textContent = word['発音記号'] ? `[${word['発音記号']}]` : '';
+  mainInput.value = '';
+  mainInput.disabled = false;
+  renderEmptyBoxes();
+  document.getElementById('spellout-display').classList.remove('visible');
+  document.getElementById('feedback-area').className = 'feedback-area';
+  document.getElementById('feedback-area').textContent = '';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('reveal-btn').style.display = 'block';
+  const replayBtn = document.getElementById('replay-btn'); if(replayBtn) replayBtn.style.display='none';
+  const pct = (state.current / state.deck.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${state.current+1}/${state.deck.length}`;
+  const wc = document.getElementById('flash-wrong-count'); if(wc) wc.textContent = '✗ ' + state.wrong;
+  if (state.timerEnabled) startTimer();
+  setTimeout(() => mainInput.focus(), 150);
+}
+
+const mainInput = document.getElementById('main-input');
+mainInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+function focusInput() { if (!state.answered) mainInput.focus(); }
+
+function renderLetterBoxes(typed, correct) {
+  const boxes = document.getElementById('letter-boxes');
+  boxes.innerHTML = '';
+  const maxLen = Math.max(typed.length, correct.length);
+  for (let i = 0; i < maxLen; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box';
+    const tc = (typed[i] || '').toLowerCase();
+    const cc = (correct[i] || '').toLowerCase();
+    if (!typed[i]) { box.textContent = correct[i]; box.classList.add('wrong'); }
+    else if (!correct[i]) { box.textContent = typed[i]; box.classList.add('wrong'); }
+    else if (tc === cc) { box.textContent = typed[i]; box.classList.add('correct'); }
+    else { box.textContent = typed[i]; box.classList.add('wrong'); }
+    boxes.appendChild(box);
+  }
+}
+
+function renderEmptyBoxes() {
+  const word = state.deck[state.current] ? state.deck[state.current]['単語'] : '';
+  const boxes = document.getElementById('letter-boxes');
+  boxes.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box empty';
+    box.textContent = '_';
+    boxes.appendChild(box);
+  }
+}
+
+function checkAnswer() {
+  if (state.answered) return;
+  const typed = mainInput.value.trim();
+  if (!typed) return;
+  const word = state.deck[state.current];
+  const correct = word['単語'].toLowerCase();
+  stopTimer(); state.answered = true;
+  mainInput.disabled = true;
+  renderLetterBoxes(typed.toLowerCase(), correct);
+  document.getElementById('card-answer-wrap').classList.add('visible');
+  const fb = document.getElementById('feedback-area');
+  if (typed.toLowerCase() === correct) {
+    state.correct++;
+    fb.className = 'feedback-area correct'; fb.textContent = '正解！';
+  } else {
+    state.wrong++; state.wrongWords.push(word);
+    fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい！';
+  }
+  const wc2 = document.getElementById('flash-wrong-count'); if(wc2) wc2.textContent = '✗ ' + state.wrong;
+  doSpellOut(word['単語']);
+  const rb = document.getElementById('replay-btn'); if(rb) rb.style.display='inline-block';
+  document.getElementById('next-btn').style.display = 'block';
+  document.getElementById('reveal-btn').style.display = 'none';
+}
+
+function testVoice() {
+  const debug = document.getElementById('voice-debug');
+  if (!('speechSynthesis' in window)) { debug.textContent = '非対応'; return; }
+  let voices = window.speechSynthesis.getVoices();
+  const enVoices = voices.filter(v => v.lang.startsWith('en'));
+  debug.textContent = `voices総数: ${voices.length}\nen系: ${enVoices.map(v=>v.name+'('+v.lang+')').join(', ') || 'なし'}`;
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      voices = window.speechSynthesis.getVoices();
+      const ev = voices.filter(v => v.lang.startsWith('en'));
+      debug.textContent = `[onvoiceschanged後]\nvoices総数: ${voices.length}\nen系: ${ev.map(v=>v.name+'('+v.lang+')').join(', ') || 'なし'}`;
+      speakTest(debug, voices);
+    };
+  } else { speakTest(debug, voices); }
+}
+function speakTest(debug, voices) {
+  const u = new SpeechSynthesisUtterance('hello');
+  u.lang = 'en-US'; u.rate = 0.8; u.volume = 1.0;
+  const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) { u.voice = enVoice; debug.textContent += `\n→ 使用音声: ${enVoice.name}`; }
+  u.onstart = () => { debug.textContent += '\n→ 再生開始'; };
+  u.onend = () => { debug.textContent += '\n→ 完了'; };
+  u.onerror = (e) => { debug.textContent += `\n→ エラー: ${e.error}`; };
+  window.speechSynthesis.speak(u);
+}
+
+let spelloutEnabled = true;
+let spelloutSpeed = 'slow';
+
+function toggleSpellout() {
+  spelloutEnabled = !spelloutEnabled;
+  document.getElementById('spellout-toggle').classList.toggle('on', spelloutEnabled);
+  document.getElementById('spellout-options').style.display = spelloutEnabled ? 'block' : 'none';
+}
+function selectSpeed(btn) {
+  document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  spelloutSpeed = btn.dataset.speed;
+}
+
+function doSpellOut(word) {
+  const letters = word.toUpperCase().split('').join(' - ');
+  document.getElementById('spellout-text').textContent = letters;
+  document.getElementById('spellout-display').classList.add('visible');
+  if (!spelloutEnabled) return;
+  if (!('speechSynthesis' in window)) return;
+  const rate = spelloutSpeed === 'slow' ? 0.7 : spelloutSpeed === 'fast' ? 1.3 : 1.0;
+  const letterRate = spelloutSpeed === 'slow' ? 0.55 : spelloutSpeed === 'fast' ? 1.1 : 0.85;
+  function getEnVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en-')) || voices.find(v => v.lang.startsWith('en')) || null;
+  }
+  function speakChain(items, idx) {
+    if (idx >= items.length) return;
+    const u = new SpeechSynthesisUtterance(items[idx].text);
+    u.lang = 'en-US'; u.rate = items[idx].rate; u.volume = 1.0;
+    const v = getEnVoice(); if (v) u.voice = v;
+    u.onend = () => speakChain(items, idx + 1);
+    u.onerror = () => speakChain(items, idx + 1);
+    window.speechSynthesis.speak(u);
+  }
+  function startSpeak() {
+    const items = [{ text: word, rate: rate }, ...word.split('').map(ch => ({ text: ch, rate: letterRate })), { text: word, rate: rate }];
+    speakChain(items, 0);
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; startSpeak(); };
+  } else { startSpeak(); }
+}
+
+function revealAnswer() {
+  stopTimer(); state.answered = true;
+  document.getElementById('card-answer-wrap').classList.add('visible');
+  renderLetterBoxes('', state.deck[state.current]['単語'].toLowerCase());
+  doSpellOut(state.deck[state.current]['単語']);
+  state.wrong++; state.wrongWords.push(state.deck[state.current]);
+  const wc3 = document.getElementById('flash-wrong-count'); if(wc3) wc3.textContent = '✗ ' + state.wrong;
+  document.getElementById('feedback-area').className = 'feedback-area wrong';
+  document.getElementById('feedback-area').textContent = '答えを確認して書き直してみよう';
+  const rb2 = document.getElementById('replay-btn'); if(rb2) rb2.style.display='inline-block';
+  document.getElementById('next-btn').style.display = 'block';
+  document.getElementById('reveal-btn').style.display = 'none';
+}
+function skipCard() { stopTimer(); state.skipped++; state.current++; loadCard(); }
+function nextCard() { stopTimer(); state.current++; loadCard(); }
+
+function startTimer() {}
+function stopTimer() {}
+
+function showResult() {
+  const pct = (state.correct+state.wrong) > 0 ? Math.round((state.correct/(state.correct+state.wrong))*100) : 0;
+  document.getElementById('score-pct').textContent = (state.correct+state.wrong) > 0 ? pct+'%' : '-';
+  document.getElementById('correct-count').textContent = state.correct;
+  document.getElementById('wrong-count').textContent = state.wrong;
+  document.getElementById('skip-count').textContent = state.skipped;
+  let emoji='😊', title='おつかれさま！';
+  if (pct>=90){emoji='🏆';title='完璧！すごい！';}
+  else if (pct>=70){emoji='⭐';title='よくできました！';}
+  else if (pct>=50){emoji='💪';title='もう少し！';}
+  else {emoji='📚';title='もう一度チャレンジ！';}
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  showScreen('result-screen');
+}
+function retryWrong() {
+  if (!state.wrongWords.length) { showScreen('settings-screen'); return; }
+  state.deck = [...state.wrongWords].sort(() => Math.random()-.5);
+  state.current=0; state.correct=0; state.wrong=0; state.skipped=0; state.wrongWords=[];
+  showScreen('flash-screen'); loadCard();
+}
+
+// ===== 覚えるモード =====
+let learnDeck = [], learnCurrent = 0, learnCurrentWord = null;
+
+function goToLearnSettings() {
+  showScreen('settings-screen');
+  document.getElementById('settings-screen-title').textContent = '単語暗記モード設定';
+  const startBtn = document.querySelector('.start-btn');
+  if (startBtn) {
+    startBtn.textContent = '覚えるモードで開始 →';
+    startBtn.onclick = startLearnMode;
+    startBtn.style.background = 'linear-gradient(135deg,var(--accent3),#00b894)';
+    startBtn.style.boxShadow = '0 8px 24px rgba(6,214,160,.4)';
+  }
+}
+function startLearnMode() {
+  learnDeck = buildDeck();
+  if (!learnDeck.length) { alert('条件に合う単語がありません。'); return; }
+  learnCurrent = 0;
+  const startBtn = document.querySelector('.start-btn');
+  if (startBtn) {
+    startBtn.textContent = 'スタート →';
+    startBtn.onclick = startFlash;
+    startBtn.style.background = 'linear-gradient(135deg,var(--accent),#ff4757)';
+    startBtn.style.boxShadow = '0 8px 24px rgba(255,107,107,.4)';
+  }
+  showScreen('learn-screen');
+  loadLearnCard();
+}
+function loadLearnCard() {
+  if (learnCurrent >= learnDeck.length) { alert('全部おわったよ！'); showScreen('home-screen'); return; }
+  learnCurrentWord = learnDeck[learnCurrent];
+  const pct = (learnCurrent / learnDeck.length) * 100;
+  document.getElementById('learn-progress-fill').style.width = pct + '%';
+  document.getElementById('learn-progress-text').textContent = (learnCurrent+1) + '/' + learnDeck.length;
+  document.getElementById('learn-meaning').textContent = learnCurrentWord['意味'];
+  document.getElementById('learn-pos-badge').textContent = posLabel(learnCurrentWord['品詞']);
+  document.getElementById('learn-card-source').textContent = learnCurrentWord._source || '';
+  document.getElementById('learn-word-display').style.display = 'none';
+  document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
+  document.getElementById('learn-replay-btn').style.display = 'none';
+  document.getElementById('learn-action-row').style.display = 'none';
+  document.getElementById('learn-next-btn').style.display = 'none';
+  renderLearnEmptyBoxes();
+  setTimeout(() => startLearnSpellOut(), 600);
+}
+function renderLearnEmptyBoxes() {
+  const word = learnCurrentWord ? learnCurrentWord['単語'] : '';
+  const boxes = document.getElementById('learn-letter-boxes');
+  boxes.innerHTML = '';
+  for (let i = 0; i < word.length; i++) {
+    const box = document.createElement('div');
+    box.className = 'letter-box empty';
+    box.id = 'learn-box-' + i;
+    box.textContent = '_';
+    boxes.appendChild(box);
+  }
+}
+function startLearnSpellOut() {
+  const word = learnCurrentWord['単語'];
+  const rate = spelloutSpeed === 'slow' ? 0.7 : spelloutSpeed === 'fast' ? 1.3 : 1.0;
+  const letterRate = spelloutSpeed === 'slow' ? 0.55 : spelloutSpeed === 'fast' ? 1.1 : 0.85;
+  const letterDelay = spelloutSpeed === 'slow' ? 700 : spelloutSpeed === 'fast' ? 300 : 500;
+  function getEnVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+  }
+  function speakAndReveal(items, idx) {
+    if (idx >= items.length) {
+      document.getElementById('learn-word-display').textContent = word;
+      document.getElementById('learn-word-display').style.display = 'block';
+      document.getElementById('learn-action-row').style.display = 'flex';
+      document.getElementById('learn-next-btn').style.display = 'block';
+      document.getElementById('learn-status').textContent = '覚えた？';
+      return;
+    }
+    const item = items[idx];
+    if (item.boxIdx >= 0) {
+      const box = document.getElementById('learn-box-' + item.boxIdx);
+      if (box) { box.textContent = item.letter.toUpperCase(); box.classList.remove('empty'); box.classList.add('correct'); }
+    }
+    if ('speechSynthesis' in window && spelloutEnabled) {
+      const u = new SpeechSynthesisUtterance(item.text);
+      u.lang = 'en-US'; u.rate = item.rate; u.volume = 1.0;
+      const v = getEnVoice(); if (v) u.voice = v;
+      u.onend = () => setTimeout(() => speakAndReveal(items, idx + 1), 80);
+      u.onerror = () => setTimeout(() => speakAndReveal(items, idx + 1), letterDelay);
+      window.speechSynthesis.speak(u);
+    } else { setTimeout(() => speakAndReveal(items, idx + 1), letterDelay); }
+  }
+  const items = [
+    { text: word, rate: rate, boxIdx: -1, letter: '' },
+    ...word.split('').map((ch, i) => ({ text: ch, rate: letterRate, boxIdx: i, letter: ch })),
+    { text: word, rate: rate, boxIdx: -1, letter: '' }
+  ];
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0 && 'speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; speakAndReveal(items, 0); };
+  } else { speakAndReveal(items, 0); }
+}
+function replayLearnSpellOut() {
+  renderLearnEmptyBoxes();
+  document.getElementById('learn-word-display').style.display = 'none';
+  document.getElementById('learn-action-row').style.display = 'none';
+  document.getElementById('learn-replay-btn').style.display = 'none';
+  document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
+  setTimeout(() => startLearnSpellOut(), 300);
+}
+function learnAgain() { replayLearnSpellOut(); }
+function learnNext() { learnCurrent++; loadLearnCard(); }
+function replaySpellOut() { if (state.deck[state.current]) doSpellOut(state.deck[state.current]['単語']); }
+
+// ===== 英文タイピング・英文暗記 データ =====
+const SENTENCE_DATA = [
+  {ja:"5分後にかけ直してもいい？―いいよ。",en:"Can I call back in five minutes? — Sure.",unit:1},
+  {ja:"南アフリカにはいつか行ってみたいです。",en:"I want to visit South Africa someday.",unit:1},
+  {ja:"ゆで卵大好き。",en:"I love boiled eggs.",unit:1},
+  {ja:"ぼくはロバート。ボブって呼んで。",en:"I'm Robert. Just call me Bob.",unit:1},
+  {ja:"コンビニの隣に住みたい。",en:"I want to live next to a convenience store.",unit:1},
+  {ja:"シイタケは好きではないのじゃ。",en:"I'm not a fan of shiitake.",unit:1},
+  {ja:"うちの兄はよくトイレでミニラボを読んでいます。",en:"My brother often reads Minilab in the bathroom.",unit:1},
+  {ja:"友達とサッカーしてくる。",en:"I'm going to play soccer with my friends.",unit:1},
+  {ja:"勉強はきらいじゃないけど数学は苦手。",en:"I don't hate studying, but I'm not good at math.",unit:1},
+  {ja:"あ、それ開けちゃだめ！―なんで？",en:"Oh, don't open that! — Why?",unit:1},
+  {ja:"ねー、ここに直吉さんの絵描いて。",en:"Hey, can you draw Naokichi here, please?",unit:1},
+  {ja:"傘持ってる？",en:"Do you have an umbrella?",unit:1},
+  {ja:"このアニメの主題歌がめっちゃ好き。",en:"I love the main theme song of this anime.",unit:1},
+  {ja:"ってことは、私たち同い年？",en:"So, are we the same age?",unit:1},
+  {ja:"さあ、今日は原始人について学びましょう。",en:"Alright, today let's learn about early humans.",unit:1},
+  {ja:"え、サックス習ってるの？すごいね！",en:"Oh, you take sax lessons? That's cool!",unit:1},
+  {ja:"ぼくは1C。きみは？",en:"I'm in 1-C. How about you?",unit:1},
+  {ja:"明日は7時間も授業ある。あー。",en:"We have seven classes tomorrow. Gah.",unit:2},
+  {ja:"私たちの学校は8時15分に始まります。",en:"Our school starts at 8:15.",unit:2},
+  {ja:"カナダのどこ出身ですか？",en:"Where in Canada are you from?",unit:2},
+  {ja:"アメリカでは、公衆トイレのドアが小さめです。",en:"In America, public restroom doors are small.",unit:2},
+  {ja:"わ、ラクダの絵描くの上手。",en:"Oh, you are good at drawing camels.",unit:2},
+  {ja:"森田先生はどちらですか？―今日はお休みですよ。",en:"Where's Mr. Morita? — He's off today.",unit:2},
+  {ja:"ユイも誘ったんだけど、忙しいって。",en:"I invited Yui, but she's busy.",unit:2},
+  {ja:"今日は中華料理の気分です。",en:"I'm in the mood for Chinese food today.",unit:2},
+  {ja:"警告：このサイトにはただいまアクセスできません。",en:"Warning: You cannot access this site right now.",unit:2},
+  {ja:"ケチャップいる？",en:"Do you want some ketchup?",unit:2},
+  {ja:"うちの両親は共働きです。",en:"My parents both work.",unit:2},
+  {ja:"中国では食べ物を少し残すのが礼儀です。",en:"In China, leaving a little food is polite.",unit:2},
+  {ja:"ここ引っぱるんだよ。―ああ、なるほどね。",en:"Just pull it here. — Oh, I see.",unit:2},
+  {ja:"ちょっと！それ私のアイス！",en:"Hey! That's my ice cream!",unit:2},
+  {ja:"いやいやいやいや、人前では歌えないって。",en:"No, no, no, no, I can't sing in front of people.",unit:2},
+  {ja:"字が汚くてごめんなさい。",en:"Please excuse my bad handwriting.",unit:2},
+  {ja:"おっと、スマホ踏んじゃうところだった。",en:"Oops, I almost stepped on my phone.",unit:2},
+  {ja:"充電器はどこじゃ？―ここだよ。",en:"Where's my charger? — Here it is.",unit:3},
+  {ja:"おもしろいアイデアはいつでも大歓迎です。",en:"Funny ideas are always welcome.",unit:3},
+  {ja:"すみませんが、ここはどこでしょうか？",en:"Excuse me, but where am I?",unit:3},
+  {ja:"リモコンとって。―はいよ。",en:"Pass me the remote. — Here you are.",unit:3},
+  {ja:"だれかわからないけど、ありがとう！",en:"Thank you, stranger!",unit:3},
+  {ja:"どうもありがとう。―どういたしまして。",en:"Thanks a lot. — You're welcome.",unit:3},
+  {ja:"わー優しい。ありがとう。",en:"Wow, you're so kind. Thank you.",unit:3},
+  {ja:"気をつけて。熱いよ。",en:"Be careful. It's hot.",unit:3},
+  {ja:"今、発音記号を読むのにはまってるのよ。",en:"I'm into reading phonetic symbols right now.",unit:3},
+  {ja:"「切ない」にあたる英語は何ですか？",en:"What's the English word for 'setsunai'?",unit:3},
+  {ja:"実に面白い。",en:"It's really interesting.",unit:3},
+  {ja:"好きな食べ物は桃の缶詰めです。",en:"My favorite food is canned peaches.",unit:3},
+  {ja:"主人公は3人のおじさんです。",en:"The main characters are three old men.",unit:3},
+  {ja:"ぼくは漫画が好きで、絵を描くのも好きです。",en:"I like manga, and I also like drawing.",unit:3},
+  {ja:"コーラって何が入ってるの？",en:"What's in cola?",unit:3},
+  {ja:"この右側の人だれ？―ヨガ友達じゃ。",en:"Who's this on the right? — A yoga friend.",unit:3},
+  {ja:"みなさん、ピアノのまわりに集まって。",en:"Everyone, gather around the piano.",unit:3},
+  {ja:"発信音のあとにメッセージをどうぞ。",en:"Please leave your message after the beep.",unit:3},
+  {ja:"このサッカーボールはネットで買ったのじゃ。",en:"I bought this soccer ball online.",unit:3},
+  {ja:"放課後はほとんど毎日テニスを練習しています。",en:"I practice tennis almost every day after school.",unit:3},
+  {ja:"今日ろうかで転んじゃって。ついてない日だ。",en:"I fell down in the hallway today. It's not my day.",unit:4},
+  {ja:"次は絶対勝ちたい。",en:"I really want to win next time.",unit:4},
+  {ja:"試合いつ？―次の日曜日。",en:"When's the game? — Next Sunday.",unit:4},
+  {ja:"今日で運ぜんぶ使い果たしちゃった。",en:"I used up all my luck today.",unit:4},
+  {ja:"この近くにコインランドリーはありますか？",en:"Are there any laundromats near here?",unit:4},
+  {ja:"がんばって！―ありがと、がんばる！",en:"Good luck! — Thanks, I'll do my best!",unit:4},
+  {ja:"誕生日いつ？―6月15日。",en:"When's your birthday? — June 15.",unit:4},
+  {ja:"缶切りはどこじゃ？",en:"Where's the can opener?",unit:4},
+  {ja:"ニュージーランドでは人間1人に対してヒツジが6頭います。",en:"In New Zealand, there are 6 sheep per person.",unit:4},
+  {ja:"わ〜、あの子犬めっちゃかわいい！",en:"Oh my gosh, that puppy is super cute!",unit:4},
+  {ja:"鶏肉ってニワトリのお肉だよね？",en:"Chicken is the meat of a chicken, isn't it?",unit:4},
+  {ja:"いつかどこかで、また会おう。",en:"Let's meet again someday and somewhere.",unit:4},
+  {ja:"日本では6月に雨がたくさん降ります。",en:"It rains a lot in June in Japan.",unit:4},
+  {ja:"これってきみのハサミ？―そうだよ。",en:"Are these your scissors? — Yes, they are.",unit:4},
+  {ja:"そのギター、弦が1本切れてるのよ。",en:"One of the guitar strings is broken.",unit:4},
+  {ja:"日本では6月に雨が多いです。",en:"We have a lot of rain in June in Japan.",unit:5},
+  {ja:"腕立て伏せ何回できる？",en:"How many push-ups can you do?",unit:5},
+  {ja:"それ何？―オクラじゃ。",en:"What are those? — They're okra.",unit:5},
+  {ja:"おはよう。もうお昼だけど。",en:"Good morning. Even though it's already noon.",unit:5},
+  {ja:"ああ。最後のシーンがつらすぎた。",en:"Aww. The last scene was too heartbreaking.",unit:5},
+  {ja:"なんかキュウリみたいな味がする。",en:"It tastes kind of like cucumber.",unit:5},
+  {ja:"8時に予約した者です。",en:"I have a reservation for 8 o'clock.",unit:5},
+  {ja:"おやつ食べよう。―いいね。",en:"Let's have a snack. — Sounds nice.",unit:5},
+  {ja:"前から3列目にいるよ。早く来て。",en:"I'm in the third row from the front. Come quick.",unit:5},
+  {ja:"レギュラーになりたいな。",en:"I want to be a regular member.",unit:5},
+  {ja:"飛行機に乗るの初めてなんだ。緊張する。",en:"This is my first flight. I'm nervous.",unit:5},
+  {ja:"心配しないで。元気出して。大丈夫だよ。",en:"Don't worry. Be happy. You'll be fine.",unit:5},
+  {ja:"手ぶらで来てね。",en:"Just bring yourself.",unit:5},
+  {ja:"眠れないの？―うん。羊数えよっと。",en:"Can't you sleep? — No. I'll count sheep.",unit:5},
+  {ja:"キーウィは飛びません、歩きます。",en:"Kiwis don't fly, they walk.",unit:5},
+  {ja:"あの時計合ってる？",en:"Is that clock right?",unit:5},
+  {ja:"試合、楽しむんじゃぞ！",en:"Have fun and enjoy yourself at the game!",unit:5},
+  {ja:"はーい、黒板見てー。",en:"Okay, look at the blackboard.",unit:5},
+  {ja:"友達として好きなの？それとも友達以上？",en:"Do you like her as a friend, or more than a friend?",unit:5},
+  {ja:"ツアーに参加したの？それともひとりで？",en:"Did you join a tour or go by yourself?",unit:5},
+  {ja:"わしが案内しよう。",en:"I'll be your guide.",unit:5},
+  {ja:"プリントにはいつも名前を書きなさい。",en:"Always write your name on your handouts.",unit:5},
+  {ja:"うちの副校長先生のブログあるの、知ってる？",en:"Do you know our vice principal has a blog?",unit:5},
+  {ja:"俺は地元の高校に行くつもり。",en:"I'm going to go to the local high school.",unit:5},
+  {ja:"空きれいだな。",en:"The sky is so beautiful.",unit:5},
+  {ja:"ここがわしの秘密の昼寝場所じゃ。",en:"This is my secret nap spot.",unit:5},
+  {ja:"あいつめっちゃ上手いな。あいつの才能がほしい。",en:"He is so good. I want to have his talent.",unit:5},
+  {ja:"わが野球部は設立30年です。",en:"Our baseball team is 30 years old.",unit:5},
+  {ja:"ミニラボを読むことを楽しんでもらえたらうれしいです。",en:"I hope you enjoy reading your Minilab.",unit:5},
+  {ja:"今日は宿題も予定もなーんにもない。",en:"I don't have any homework or any plans today.",unit:5},
+  {ja:"直吉さん、双葉さんってチョコ好き？",en:"Naokichi, does Futaba like chocolate?",unit:6},
+  {ja:"自転車の鍵がない。黄色のキーホルダーがついたやつ。",en:"My bike key is missing. It has a yellow key chain.",unit:6},
+  {ja:"いいなー。俺もそこに行きたかったなー。",en:"I'm jealous. I wanted to go there, too.",unit:6},
+  {ja:"今日は5時間もネットサーフィンしてしまった。",en:"Today I surfed the internet for five hours.",unit:6},
+  {ja:"人生に模範解答なんてありません。",en:"There is no model answer in life.",unit:6},
+  {ja:"この杏仁豆腐、あんまり味がしない。",en:"This almond jelly doesn't have much taste.",unit:6},
+  {ja:"このカフェ前からあったっけ？",en:"Was this cafe here before?",unit:6},
+  {ja:"ウェブで予約をした者ですが。",en:"I made a reservation through your website.",unit:6},
+  {ja:"今はどんな歌が人気なのじゃ？",en:"What songs are popular right now?",unit:6},
+  {ja:"このノートの持ち主を探そうぜ。",en:"Let's find the owner of this notebook.",unit:6},
+  {ja:"直吉さんの名字知ってる？",en:"Do you know Naokichi's family name?",unit:6},
+  {ja:"パティが本格的じゃ。",en:"The hamburger patty is authentic.",unit:6},
+  {ja:"生徒たちは給食の唐揚げが大好きです。",en:"The students love the fried chicken at lunch.",unit:6},
+  {ja:"缶切りはいちばん上の引き出しじゃ。",en:"The can opener is in the top drawer.",unit:6},
+  {ja:"日本の文房具はすばらしいですよ。",en:"Japanese stationery is wonderful.",unit:6},
+  {ja:"目玉焼きって何かける？",en:"What do you put on your fried egg?",unit:6},
+  {ja:"麺の上に卵を置いて。",en:"Put the egg on top of the noodles.",unit:6},
+  {ja:"これ、彼に渡して。―彼って？",en:"Give this to him. — Who's 'him'?",unit:6},
+  {ja:"英語で「しょっぱ！」ってどう言うの？",en:"How do you say 'Shoppa!' in English?",unit:6},
+  {ja:"今日は何もかもうまくいかない。―そんなこともあるさ。",en:"Everything is going wrong today. — It happens.",unit:6},
+  {ja:"ショーは続かなければならない。",en:"The show must go on.",unit:6},
+  {ja:"今日、初めてあの子と話した。",en:"Today, I talked to her for the first time.",unit:6},
+  {ja:"これ、どこで売ってるの？",en:"Where can I buy this?",unit:7},
+  {ja:"明日、空いてる？",en:"Are you free tomorrow?",unit:7},
+  {ja:"一緒に行こうよ。楽しいよ。",en:"Come with me. It'll be fun.",unit:7},
+  {ja:"お市場、どこにあるか知ってる？",en:"Do you know where the market is?",unit:7},
+  {ja:"お土産、何がいい？",en:"What do you want for a souvenir?",unit:7},
+  {ja:"次の角を曲がって。",en:"Turn at the next corner.",unit:7},
+  {ja:"まっすぐ行くと、工場が見える。",en:"Go straight and you'll see the factory.",unit:7},
+  {ja:"宮殿、すごかったな。",en:"The palace was amazing.",unit:7},
+  {ja:"遅れてごめんなさい。",en:"I'm sorry I'm late.",unit:7},
+  {ja:"道に沿って歩いて。",en:"Walk along the road.",unit:7},
+  {ja:"ボランティア、してみたいな。",en:"I want to try volunteering.",unit:8},
+  {ja:"地球を守るために、プラスチックを減らそう。",en:"Let's reduce plastic to protect the earth.",unit:8},
+  {ja:"この村には、再利用できる袋がある。",en:"This village has reusable bags.",unit:8},
+  {ja:"みんなで集めたお金で、橋を建てた。",en:"We built a bridge with the money we collected.",unit:8},
+  {ja:"演奏会、また来たいな。",en:"I want to come to the concert again.",unit:8},
+  {ja:"あの歌手、声がきれいだね。",en:"That singer has a beautiful voice.",unit:8},
+  {ja:"お正月は、おじいちゃんの家で過ごした。",en:"I spent New Year's at my grandparents' house.",unit:9},
+  {ja:"温泉に入って、リラックスした。",en:"I relaxed in the hot spring.",unit:9},
+  {ja:"伝統的な料理、食べてみたい。",en:"I want to try traditional food.",unit:9},
+  {ja:"雪の中でスキーをした。",en:"I skied in the snow.",unit:9},
+  {ja:"帰る前に、もう一度ここに来たかった。",en:"I wanted to come here again before going back.",unit:9},
+  {ja:"間違えても大丈夫。誰でも間違える。",en:"It's okay to make mistakes. Anyone can make them.",unit:10},
+  {ja:"この旅行、一生忘れないよ。",en:"I'll never forget this trip.",unit:10},
+  {ja:"頭痛がするから、薬を飲んだ。",en:"I took medicine because I had a headache.",unit:10},
+  {ja:"熱があるから、休んで。",en:"You have a fever, so rest.",unit:10},
+  {ja:"心臓がどきどきする。",en:"My heart is beating fast.",unit:10},
+];
+
+// ===== ④ 記号検出ヘルパー =====
+const SYMBOL_CHARS = ['.', ',', '?', '!', "'", '—', '-', ':'];
+function extractSymbols(text) {
+  return text.split('').filter(c => SYMBOL_CHARS.includes(c));
+}
+function normalizeForCompare(text) {
+  // 大文字小文字無視・記号除去してスペル部分だけ比較
+  return text.toLowerCase().replace(/[.,?!'—\-:]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// ===== タイピングモード =====
+let typingDeck = [], typingCurrent = 0, typingAnswered = false;
+let currentTypingSentence = null;
+
+function selectAllTypingUnits() {
+  const btns = document.querySelectorAll('[data-typing-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateTypingCount();
+}
+function toggleTypingUnit(btn) { btn.classList.toggle('active'); updateTypingCount(); }
+function updateTypingCount() {
+  const selected = Array.from(document.querySelectorAll('[data-typing-unit].active')).map(b => parseInt(b.dataset.typingUnit));
+  const count = SENTENCE_DATA.filter(s => selected.includes(s.unit)).length;
+  document.getElementById('typing-sentence-count').textContent = count + '文が選択されています';
+}
+
+function goToTypingSettings() {
+  showScreen('typing-screen');
+  document.getElementById('typing-unit-select').style.display = 'flex';
+  document.getElementById('typing-quiz-area').style.display = 'none';
+  document.getElementById('typing-settings-header').style.display = '';
+  document.getElementById('typing-quiz-header').style.display = 'none';
+}
+function startTypingMode() {
+  const selected = Array.from(document.querySelectorAll('[data-typing-unit].active')).map(b => parseInt(b.dataset.typingUnit));
+  typingDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)).sort(() => Math.random() - 0.5);
+  if (!typingDeck.length) { alert('条件に合う文がありません。'); return; }
+  typingCurrent = 0;
+  document.getElementById('typing-unit-select').style.display = 'none';
+  document.getElementById('typing-quiz-area').style.display = 'flex';
+  document.getElementById('typing-settings-header').style.display = 'none';
+  document.getElementById('typing-quiz-header').style.display = 'flex';
+  loadTypingCard();
+}
+
+function loadTypingCard() {
+  if (typingCurrent >= typingDeck.length) {
+    alert('全部おわったよ！');
+    document.getElementById('typing-unit-select').style.display = 'flex';
+    document.getElementById('typing-quiz-area').style.display = 'none';
+    return;
+  }
+  typingAnswered = false;
+  currentTypingSentence = typingDeck[typingCurrent];
+  const pct = (typingCurrent / typingDeck.length) * 100;
+  document.getElementById('typing-progress-fill').style.width = pct + '%';
+  document.getElementById('typing-progress-text').textContent = (typingCurrent+1) + '/' + typingDeck.length;
+  document.getElementById('typing-unit-badge').textContent = 'Unit' + currentTypingSentence.unit;
+  document.getElementById('typing-ja-text').textContent = currentTypingSentence.ja;
+  document.getElementById('typing-input').value = '';
+  document.getElementById('typing-feedback').textContent = '';
+  document.getElementById('typing-feedback').style.color = '';
+  document.getElementById('typing-answer-display').style.display = 'none';
+  document.getElementById('typing-next-btn').style.display = 'none';
+  document.getElementById('typing-reveal-btn').style.display = 'block';
+  document.getElementById('typing-replay-btn').style.display = 'none';
+  // 単語数下線ヒント
+  const wordUnderlines = document.getElementById('typing-word-underlines');
+  if (wordUnderlines) {
+    const words = currentTypingSentence.en.replace(/[.,?!'—\-:]/g, '').split(/\s+/).filter(w => w.length > 0);
+    wordUnderlines.innerHTML = words.map(w =>
+      `<span style="display:inline-block;border-bottom:2px solid rgba(167,169,190,.6);min-width:${w.length * 9 + 4}px;height:1em;margin:0 4px;vertical-align:bottom;"></span>`
+    ).join('');
+    wordUnderlines.style.display = 'block';
+  }
+  // ④ 記号ヒント表示
+  const symbols = extractSymbols(currentTypingSentence.en);
+  const hintEl = document.getElementById('typing-symbol-hint');
+  const hintText = document.getElementById('typing-symbol-text');
+  if (symbols.length > 0) {
+    const uniqueSymbols = [...new Set(symbols)];
+    hintText.textContent = uniqueSymbols.join('  ');
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
+  setTimeout(() => document.getElementById('typing-input').focus(), 150);
+}
+
+document.getElementById('typing-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); checkTypingAnswer(); }
+});
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function buildTypingDiffHtml(typed, correct) {
+  const typedWords = typed.split(/\s+/);
+  const correctWords = correct.split(/\s+/);
+  const maxLen = Math.max(typedWords.length, correctWords.length);
+  let html = '';
+  for (let i = 0; i < maxLen; i++) {
+    const tw = (typedWords[i] || '').toLowerCase().replace(/[.,?!'—\-:]/g, '');
+    const cw = (correctWords[i] || '').toLowerCase().replace(/[.,?!'—\-:]/g, '');
+    const word = escHtml(correctWords[i] || '');
+    if (i > 0) html += ' ';
+    if (tw === cw) {
+      html += `<span style="color:#06d6a0">${word}</span>`;
+    } else {
+      html += `<span style="color:#ff6b6b;font-weight:900;">${word}</span>`;
+    }
+  }
+  return html;
+}
+
+function checkTypingAnswer() {
+  if (typingAnswered) return;
+  const typed = document.getElementById('typing-input').value.trim();
+  if (!typed) return;
+  typingAnswered = true;
+  const correct = currentTypingSentence.en;
+  const fb = document.getElementById('typing-feedback');
+
+  // ④ 段階採点：完全一致 / スペルOK（記号違い）/ まちがい
+  if (typed.toLowerCase() === correct.toLowerCase()) {
+    fb.textContent = '完璧！'; fb.style.color = '#06d6a0';
+    document.getElementById('typing-correct-text').innerHTML = `<span style="color:#06d6a0">${escHtml(correct)}</span>`;
+    document.getElementById('typing-answer-display').style.display = 'block';
+  } else if (normalizeForCompare(typed) === normalizeForCompare(correct)) {
+    fb.textContent = '惜しい！記号に注意'; fb.style.color = 'var(--accent2)';
+    document.getElementById('typing-correct-text').innerHTML = buildTypingDiffHtml(typed, correct);
+    document.getElementById('typing-answer-display').style.display = 'block';
+  } else {
+    fb.textContent = 'まちがい！'; fb.style.color = 'var(--accent)';
+    document.getElementById('typing-correct-text').innerHTML = buildTypingDiffHtml(typed, correct);
+    document.getElementById('typing-answer-display').style.display = 'block';
+  }
+  const ul = document.getElementById('typing-word-underlines'); if(ul) ul.style.display = 'none';
+  speakSentence(correct, null, typingSpeed);
+  document.getElementById('typing-replay-btn').style.display = 'inline-block';
+  document.getElementById('typing-next-btn').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
+}
+
+function typingReveal() {
+  typingAnswered = true;
+  const correct = currentTypingSentence.en;
+  document.getElementById('typing-correct-text').innerHTML = `<span style="color:#06d6a0">${escHtml(correct)}</span>`;
+  document.getElementById('typing-answer-display').style.display = 'block';
+  document.getElementById('typing-feedback').textContent = '答えを確認してね';
+  document.getElementById('typing-feedback').style.color = 'var(--text-muted)';
+  const ul = document.getElementById('typing-word-underlines'); if(ul) ul.style.display = 'none';
+  speakSentence(correct, null, typingSpeed);
+  document.getElementById('typing-replay-btn').style.display = 'inline-block';
+  document.getElementById('typing-next-btn').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
+}
+function typingNext() { typingCurrent++; loadTypingCard(); }
+function typingSkip() { typingCurrent++; loadTypingCard(); }
+function replayTypingSentence() { if(currentTypingSentence) speakSentence(currentTypingSentence.en, null, typingSpeed); }
+
+// ===== 英文暗記モード =====
+let smemDeck = [], smemCurrent = 0;
+let currentSmemSentence = null;
+
+function selectAllSmemUnits() {
+  const btns = document.querySelectorAll('[data-smem-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateSmemCount();
+}
+function toggleSmemUnit(btn) { btn.classList.toggle('active'); updateSmemCount(); }
+function updateSmemCount() {
+  const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
+  const count = SENTENCE_DATA.filter(s => selected.includes(s.unit)).length;
+  document.getElementById('smem-sentence-count').textContent = count + '文が選択されています';
+}
+
+function startSmemMode() {
+  const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
+  smemDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)).sort(() => Math.random() - 0.5);
+  if (!smemDeck.length) { alert('条件に合う文がありません。'); return; }
+  smemCurrent = 0;
+  document.getElementById('smem-unit-select').style.display = 'none';
+  document.getElementById('smem-quiz-area').style.display = 'flex';
+  document.getElementById('smem-settings-header').style.display = 'none';
+  document.getElementById('smem-quiz-header').style.display = 'flex';
+  loadSmemCard();
+}
+
+function loadSmemCard() {
+  if (smemCurrent >= smemDeck.length) {
+    alert('全部おわったよ！');
+    document.getElementById('smem-unit-select').style.display = 'flex';
+    document.getElementById('smem-quiz-area').style.display = 'none';
+    return;
+  }
+  currentSmemSentence = smemDeck[smemCurrent];
+  const pct = (smemCurrent / smemDeck.length) * 100;
+  document.getElementById('smem-progress-fill').style.width = pct + '%';
+  document.getElementById('smem-progress-text').textContent = (smemCurrent+1) + '/' + smemDeck.length;
+  document.getElementById('smem-unit-badge').textContent = 'Unit' + currentSmemSentence.unit;
+  document.getElementById('smem-ja-text').textContent = currentSmemSentence.ja;
+  document.getElementById('smem-en-display').style.display = 'none';
+  document.getElementById('smem-en-display').textContent = '';
+  document.getElementById('smem-status').textContent = '音声を聞いてね';
+  document.getElementById('smem-replay-btn').style.display = 'none';
+  document.getElementById('smem-action-row').style.display = 'none';
+  setTimeout(() => {
+    speakSentence(currentSmemSentence.en, () => {
+      document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
+      document.getElementById('smem-en-display').style.display = 'block';
+      document.getElementById('smem-status').textContent = '覚えた？';
+      document.getElementById('smem-replay-btn').style.display = 'inline-block';
+      document.getElementById('smem-action-row').style.display = 'flex';
+    }, sentenceSpeed);
+  }, 400);
+}
+
+function smemReplay() { if(currentSmemSentence) speakSentence(currentSmemSentence.en, null, sentenceSpeed); }
+function smemNext() { smemCurrent++; loadSmemCard(); }
+function smemAgain() {
+  document.getElementById('smem-en-display').style.display = 'none';
+  document.getElementById('smem-status').textContent = '音声を聞いてね';
+  document.getElementById('smem-replay-btn').style.display = 'none';
+  document.getElementById('smem-action-row').style.display = 'none';
+  setTimeout(() => {
+    speakSentence(currentSmemSentence.en, () => {
+      document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
+      document.getElementById('smem-en-display').style.display = 'block';
+      document.getElementById('smem-status').textContent = '覚えた？';
+      document.getElementById('smem-replay-btn').style.display = 'inline-block';
+      document.getElementById('smem-action-row').style.display = 'flex';
+    }, sentenceSpeed);
+  }, 300);
+}
+
+// ⑤ 速度パラメータ対応の共通読み上げ関数
+function speakSentence(text, onEndCallback, speedKey) {
+  if (!('speechSynthesis' in window)) { if(onEndCallback) onEndCallback(); return; }
+  window.speechSynthesis.cancel();
+  const rate = getSpeedRate(speedKey || 'normal');
+  function doSpeak() {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = rate; u.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+    if (v) u.voice = v;
+    u.onend = () => { if(onEndCallback) onEndCallback(); };
+    u.onerror = () => { if(onEndCallback) onEndCallback(); };
+    window.speechSynthesis.speak(u);
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; doSpeak(); };
+  } else { doSpeak(); }
+}
+
+// ===== ③ 聞き流しモード =====
+let listenDeck = [], listenCurrent = 0, listenPaused = false;
+let listenInterval = 'normal'; // short/normal/long
+let listenSpelloutEnabled = true;
+let listenSpelloutSpeed = 'slow';
+let listenTimeoutId = null;
+
+function toggleListenSourceGrid(gridId) {
+  const grid = document.getElementById(gridId);
+  if (grid) grid.style.display = (grid.style.display === 'none') ? 'flex' : 'none';
+}
+function toggleLsMinilabo(btn) {
+  btn.classList.toggle('active');
+  const chk = document.getElementById('ls-chk-minilabo');
+  if (chk && !chk.checked) chk.checked = true;
+  updateListenCount();
+}
+function selectAllLsMinilabo() {
+  const btns = document.querySelectorAll('[data-ls-ml]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateListenCount();
+}
+function minilaboInRange(w, range) {
+  return w['出典_ミニラボ'] === range;
+}
+function updateListenCount() {
+  let count = 0;
+  if (document.getElementById('ls-chk-minilabo').checked) {
+    const ranges = Array.from(document.querySelectorAll('[data-ls-ml].active')).map(b => b.dataset.lsMl);
+    count += MINILABO.filter(w => ranges.some(r => minilaboInRange(w, r))).length;
+  }
+  if (document.getElementById('ls-chk-original').checked) count += loadOriginalWords().length;
+  const el = document.getElementById('ls-selected-count');
+  if (el) el.textContent = count + '語が選択されています';
+}
+
+function selectListenInterval(btn) {
+  document.querySelectorAll('[data-interval]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  listenInterval = btn.dataset.interval;
+}
+function selectListenSpelloutSpeed(btn) {
+  document.querySelectorAll('[data-listen-speed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  listenSpelloutSpeed = btn.dataset.listenSpeed;
+}
+function toggleListenSpellout() {
+  listenSpelloutEnabled = !listenSpelloutEnabled;
+  document.getElementById('listen-spellout-toggle').classList.toggle('on', listenSpelloutEnabled);
+  const opts = document.getElementById('listen-spellout-speed-options');
+  if (opts) opts.style.display = listenSpelloutEnabled ? 'block' : 'none';
+}
+function getListenDelay() {
+  if (listenInterval === 'short') return 1500;
+  if (listenInterval === 'long') return 4000;
+  return 2500; // normal
+}
+
+function buildListenDeck() {
+  const result = [];
+  if (document.getElementById('ls-chk-minilabo').checked) {
+    const ranges = Array.from(document.querySelectorAll('[data-ls-ml].active')).map(b => b.dataset.lsMl);
+    MINILABO.filter(w => ranges.some(r => minilaboInRange(w, r))).forEach(w => result.push({...w, _source:'小学英単語'}));
+  }
+  if (document.getElementById('ls-chk-original').checked) loadOriginalWords().forEach(w => result.push({...w, _source:'オリジナル'}));
+  return result.sort(() => Math.random() - 0.5);
+}
+
+function startListenMode() {
+  listenDeck = buildListenDeck();
+  if (!listenDeck.length) { alert('条件に合う単語がありません。'); return; }
+  listenCurrent = 0;
+  listenPaused = false;
+  showScreen('listen-screen');
+  document.getElementById('listen-pause-btn').textContent = '一時停止';
+  playListenWord();
+}
+
+function stopListenMode() {
+  listenPaused = true;
+  if (listenTimeoutId) { clearTimeout(listenTimeoutId); listenTimeoutId = null; }
+  window.speechSynthesis.cancel();
+  showScreen('home-screen');
+}
+
+function updateListenDisplay(word, phase) {
+  const phaseNames = { ja:'日本語', en:'英語', spell:'スペルアウト' };
+  document.getElementById('listen-phase-badge').textContent = phaseNames[phase] || phase;
+  if (phase === 'ja') {
+    document.getElementById('listen-ja-text').textContent = word['意味'];
+    document.getElementById('listen-en-text').textContent = '';
+    document.getElementById('listen-spell-text').textContent = '';
+  } else if (phase === 'en') {
+    document.getElementById('listen-en-text').textContent = word['単語'];
+  } else if (phase === 'spell') {
+    document.getElementById('listen-spell-text').textContent = word['単語'].toUpperCase().split('').join(' ');
+  }
+  const pct = (listenCurrent / listenDeck.length) * 100;
+  document.getElementById('listen-progress-fill').style.width = pct + '%';
+  document.getElementById('listen-counter').textContent = `${listenCurrent + 1} / ${listenDeck.length}`;
+}
+
+function playListenWord() {
+  if (listenPaused) return;
+  if (listenCurrent >= listenDeck.length) {
+    // 一周したらループ
+    listenCurrent = 0;
+    listenDeck = listenDeck.sort(() => Math.random() - 0.5);
+  }
+  const word = listenDeck[listenCurrent];
+  const pulse = document.getElementById('listen-pulse');
+  pulse.classList.add('playing');
+
+  // Phase 1: 日本語表示
+  updateListenDisplay(word, 'ja');
+
+  // Phase 2: 英語読み上げ
+  listenTimeoutId = setTimeout(() => {
+    if (listenPaused) return;
+    updateListenDisplay(word, 'en');
+    speakWord(word['単語'], () => {
+      if (listenPaused) return;
+      // Phase 3: スペルアウト（オン/オフ）
+      if (listenSpelloutEnabled) {
+        updateListenDisplay(word, 'spell');
+        spellOutListen(word['単語'], () => {
+          if (listenPaused) return;
+          pulse.classList.remove('playing');
+          listenTimeoutId = setTimeout(() => {
+            if (!listenPaused) {
+              listenCurrent++;
+              playListenWord();
+            }
+          }, getListenDelay());
+        });
+      } else {
+        pulse.classList.remove('playing');
+        listenTimeoutId = setTimeout(() => {
+          if (!listenPaused) {
+            listenCurrent++;
+            playListenWord();
+          }
+        }, getListenDelay());
+      }
+    });
+  }, 800);
+}
+
+function speakWord(word, onEnd) {
+  if (!('speechSynthesis' in window)) { if(onEnd) onEnd(); return; }
+  window.speechSynthesis.cancel();
+  function doSpeak() {
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US'; u.rate = 0.8; u.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+    if (v) u.voice = v;
+    u.onend = () => { if(onEnd) onEnd(); };
+    u.onerror = () => { if(onEnd) onEnd(); };
+    window.speechSynthesis.speak(u);
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; doSpeak(); };
+  } else { doSpeak(); }
+}
+
+function spellOutListen(word, onEnd, speedKey) {
+  if (!('speechSynthesis' in window)) { if(onEnd) onEnd(); return; }
+  const sp = speedKey || listenSpelloutSpeed || 'slow';
+  const letterRate = sp === 'slow' ? 0.65 : sp === 'fast' ? 1.1 : 0.85;
+  const wordRate = sp === 'slow' ? 0.75 : sp === 'fast' ? 1.3 : 1.0;
+  const voices = window.speechSynthesis.getVoices();
+  const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
+  const items = [
+    ...word.split('').map(ch => ({ text: ch, rate: letterRate })),
+    { text: word, rate: wordRate }
+  ];
+  function speakItem(idx) {
+    if (idx >= items.length) { if(onEnd) onEnd(); return; }
+    const u = new SpeechSynthesisUtterance(items[idx].text);
+    u.lang = 'en-US'; u.rate = items[idx].rate; u.volume = 1.0;
+    if (v) u.voice = v;
+    u.onend = () => setTimeout(() => speakItem(idx + 1), 60);
+    u.onerror = () => setTimeout(() => speakItem(idx + 1), 300);
+    window.speechSynthesis.speak(u);
+  }
+  speakItem(0);
+}
+
+function toggleListenPause() {
+  listenPaused = !listenPaused;
+  document.getElementById('listen-pause-btn').textContent = listenPaused ? '再開' : '一時停止';
+  document.getElementById('listen-pulse').classList.toggle('playing', !listenPaused);
+  if (!listenPaused) {
+    window.speechSynthesis.cancel();
+    playListenWord();
+  } else {
+    if (listenTimeoutId) { clearTimeout(listenTimeoutId); listenTimeoutId = null; }
+    window.speechSynthesis.cancel();
+  }
+}
+
+function listenNextWord() {
+  if (listenTimeoutId) { clearTimeout(listenTimeoutId); listenTimeoutId = null; }
+  window.speechSynthesis.cancel();
+  listenCurrent++;
+  if (!listenPaused) playListenWord();
+  else {
+    // 一時停止中でも表示だけ更新
+    if (listenCurrent >= listenDeck.length) listenCurrent = 0;
+    updateListenDisplay(listenDeck[listenCurrent], 'ja');
+  }
+}
+
+function listenPrevWord() {
+  if (listenTimeoutId) { clearTimeout(listenTimeoutId); listenTimeoutId = null; }
+  window.speechSynthesis.cancel();
+  listenCurrent = Math.max(0, listenCurrent - 1);
+  if (!listenPaused) playListenWord();
+  else {
+    updateListenDisplay(listenDeck[listenCurrent], 'ja');
+  }
+}
+
+// ===== オリジナル登録 =====
+function loadOriginalWords() {
+  try { return JSON.parse(localStorage.getItem('original_words') || '[]'); } catch { return []; }
+}
+function saveOriginalWords(words) {
+  localStorage.setItem('original_words', JSON.stringify(words));
+}
+function updateOriginalCountLabel() {
+  const words = loadOriginalWords();
+  const el = document.getElementById('original-count-label');
+  if (el) el.textContent = words.length + '語';
+  const lsEl = document.getElementById('ls-orig-count');
+  if (lsEl) lsEl.textContent = words.length + '語';
+  const home = document.getElementById('orig-home-count');
+  if (home && words.length > 0) home.textContent = `登録済み: ${words.length}語`;
+}
+function renderOriginalList() {
+  const words = loadOriginalWords();
+  const list = document.getElementById('orig-word-list');
+  const empty = document.getElementById('orig-empty');
+  const countEl = document.getElementById('orig-registered-count');
+  if (countEl) countEl.textContent = words.length + '語';
+  if (!words.length) { if(list) list.innerHTML = ''; if(empty) empty.style.display = 'block'; return; }
+  if(empty) empty.style.display = 'none';
+  if (!list) return;
+  list.innerHTML = words.map((w, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--surface);border-radius:12px;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;">${w['単語']}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${w['意味']}</div>
+      </div>
+      <button onclick="deleteOriginal(${i})" style="padding:4px 10px;border-radius:8px;border:none;background:rgba(255,107,107,.2);color:var(--accent);font-size:12px;cursor:pointer;">削除</button>
+    </div>`).join('');
+}
+function deleteOriginal(idx) {
+  const words = loadOriginalWords();
+  words.splice(idx, 1);
+  saveOriginalWords(words);
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+}
+function clearAllOriginal() {
+  if (!confirm('全部削除しますか？')) return;
+  saveOriginalWords([]);
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+}
+
+let origOptionsOpen = false;
+function toggleOrigOptions() {
+  origOptionsOpen = !origOptionsOpen;
+  document.getElementById('orig-options').style.display = origOptionsOpen ? 'flex' : 'none';
+  document.getElementById('orig-options-toggle').textContent = origOptionsOpen ? '－ 詳細を非表示' : '＋ 詳細を追加（品詞・優先度）';
+}
+let selectedOrigPrio = '🔴';
+function selectOrigPrio(btn) {
+  document.querySelectorAll('.orig-prio-btn').forEach(b => {
+    b.style.borderColor = 'var(--surface)'; b.style.background = 'var(--surface)'; b.style.color = 'var(--text-muted)';
+  });
+  btn.style.borderColor = 'var(--accent2)'; btn.style.background = 'rgba(255,209,102,.2)'; btn.style.color = 'var(--accent2)';
+  selectedOrigPrio = btn.dataset.prio;
+}
+function addOneOriginal() {
+  const word = document.getElementById('orig-word-input').value.trim();
+  const meaning = document.getElementById('orig-meaning-input').value.trim();
+  if (!word || !meaning) { alert('単語と意味を入力してね'); return; }
+  const pos = document.getElementById('orig-pos-select').value;
+  const words = loadOriginalWords();
+  words.push({ '単語': word, '意味': meaning, '品詞': pos, '優先度': selectedOrigPrio });
+  saveOriginalWords(words);
+  document.getElementById('orig-word-input').value = '';
+  document.getElementById('orig-meaning-input').value = '';
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+  alert('登録したよ！');
+}
+
+let previewData = [];
+function parseAndPreview() {
+  const text = document.getElementById('orig-paste-area').value;
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  previewData = lines.map(line => {
+    const parts = line.trim().split(/\s+/);
+    const word = parts[0] || '';
+    const meaning = parts.slice(1).join(' ') || '';
+    return { '単語': word, '意味': meaning, '品詞': '', '優先度': '🟡' };
+  }).filter(w => w['単語'] && w['意味']);
+  if (!previewData.length) { alert('読み取れませんでした。形式を確認してね。'); return; }
+  const list = document.getElementById('preview-list');
+  list.innerHTML = previewData.map((w, i) => `
+    <div style="display:flex;gap:8px;align-items:center;padding:8px;background:var(--surface);border-radius:12px;">
+      <input type="text" value="${w['単語']}" onchange="previewData[${i}]['単語']=this.value" style="flex:1;padding:8px;background:var(--bg);border:1px solid var(--surface);border-radius:8px;color:var(--text);font-size:14px;font-family:'Nunito',sans-serif;">
+      <input type="text" value="${w['意味']}" onchange="previewData[${i}]['意味']=this.value" style="flex:1;padding:8px;background:var(--bg);border:1px solid var(--surface);border-radius:8px;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;">
+    </div>`).join('');
+  showScreen('preview-screen');
+}
+function registerPreview() {
+  if (!previewData.length) { alert('データがありません'); return; }
+  const words = loadOriginalWords();
+  previewData.forEach(w => words.push(w));
+  saveOriginalWords(words);
+  showScreen('original-screen');
+  renderOriginalList();
+  updateOriginalCountLabel();
+  updateSelectedCount();
+  document.getElementById('orig-paste-area').value = '';
+  alert(`${previewData.length}語を登録したよ！`);
+  previewData = [];
+}
+function downloadOriginalCSV() {
+  const words = loadOriginalWords();
+  if (!words.length) { alert('登録されていません'); return; }
+  const header = '単語,意味,品詞,優先度';
+  const rows = words.map(w => `${w['単語']},${w['意味']},${w['品詞']||''},${w['優先度']||''}`);
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'original_words.csv'; a.click();
+}
+
+// ===== 初期化 =====
+document.addEventListener('DOMContentLoaded', () => {
+  updateSourceUI();
+  updateSelectedCount();
+  updateListenCount();
+  renderOriginalList();
+  updateOriginalCountLabel();
+});
+</script>
+</body>
+</html>
