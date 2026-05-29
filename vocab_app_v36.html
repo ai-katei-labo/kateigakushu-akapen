@@ -18,19 +18,19 @@
   .screen { display:none; min-height:100vh; padding:20px; }
   .screen.active { display:flex; flex-direction:column; }
 
-  #home-screen { align-items:center; justify-content:center; gap:32px; padding:40px 24px; }
+  #home-screen { align-items:center; justify-content:center; gap:16px; padding:24px 20px; }
   .logo-icon { font-size:56px; display:block; margin-bottom:8px; animation:float 3s ease-in-out infinite; }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   .logo-title { font-size:28px; font-weight:900; font-family:'Cormorant Garamond','Noto Serif JP',serif; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
   .logo-sub { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
-  .mode-cards { width:100%; max-width:380px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .mode-card { background:var(--card); border-radius:var(--radius); padding:20px 24px; display:flex; align-items:center; gap:16px; cursor:pointer; border:2px solid transparent; transition:all .25s; }
+  .mode-cards { width:100%; max-width:480px; display:flex; flex-direction:column; gap:8px; }
+  .mode-card { background:var(--card); border-radius:14px; padding:10px 14px; display:flex; align-items:center; gap:12px; cursor:pointer; border:2px solid transparent; transition:all .25s; }
   .mode-card.flash:hover,.mode-card.flash:active { border-color:var(--accent); }
   .mode-card:active { transform:scale(.97); }
-  .mode-icon { font-size:36px; flex-shrink:0; }
-  .mode-name { font-size:18px; font-weight:800; margin-bottom:2px; }
-  .mode-desc { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
-  .mode-arrow { font-size:20px; color:var(--text-muted); }
+  .mode-icon { flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .mode-name { font-size:14px; font-weight:800; margin-bottom:1px; line-height:1.2; }
+  .mode-desc { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mode-arrow { font-size:16px; color:var(--text-muted); flex-shrink:0; }
 
   #settings-screen { gap:16px; max-width:440px; margin:0 auto; width:100%; padding-bottom:40px; }
   .screen-header { display:flex; align-items:center; gap:12px; padding:8px 0; }
@@ -135,10 +135,12 @@
   .btn-reveal { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); box-shadow:0 6px 20px rgba(255,209,102,.3); }
 
   @media (min-width: 768px) {
-    #home-screen { padding: 60px 40px; }
-    .mode-cards { max-width: 680px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .mode-card { padding: 24px 28px; }
-    .mode-name { font-size: 20px; }
+    #home-screen { padding: 40px 40px; gap: 20px; }
+    .mode-cards { max-width: 680px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mode-card { padding: 16px 20px; gap: 14px; }
+    .mode-name { font-size: 16px; }
+    .mode-desc { font-size: 12px; }
+    .home-badge-row { max-width: 680px; }
     #settings-screen { max-width: 680px; }
     #flash-screen { max-width: 680px; }
     .flashcard { padding: 48px 40px; min-height: 240px; }
@@ -247,6 +249,7 @@
 
   /* ===== パーソナライズ学習システム ===== */
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+  @keyframes don-shake { 0%,100%{transform:translate(0,0) scale(1)} 10%{transform:translate(-8px,-4px) scale(1.05)} 20%{transform:translate(8px,4px) scale(1.05)} 30%{transform:translate(-6px,2px) scale(1.03)} 40%{transform:translate(6px,-2px) scale(1.03)} 50%{transform:translate(-4px,4px) scale(1.02)} 60%{transform:translate(4px,-4px) scale(1.02)} 70%{transform:translate(-2px,2px) scale(1.01)} 80%{transform:translate(2px,-2px) scale(1.01)} }
   .spell-highlight { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; padding:10px 4px; }
   .spell-ch { display:inline-flex; align-items:center; justify-content:center; border-radius:6px; padding:2px 5px; font-family:'Nunito',sans-serif; font-weight:700; }
   .spell-ch.m0 { font-size:1.1rem; color:var(--text); }
@@ -276,7 +279,7 @@
   #training-result-area { display:none; text-align:center; font-size:18px; font-weight:900; padding:6px 0; animation:bounce .5s ease; }
   #training-result-area.training-win { color:var(--accent3); }
   #training-result-area.hall-keep { color:var(--accent3); font-size:14px; }
-  .home-badge-row { display:none; flex-direction:row; gap:10px; width:100%; max-width:380px; }
+  .home-badge-row { display:none; flex-direction:row; gap:10px; width:100%; max-width:480px; }
   .home-badge { flex:1; padding:12px 8px; background:var(--card); border-radius:14px; text-align:center; cursor:pointer; border:2px solid transparent; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .home-badge.weak-badge-card { border-color:rgba(255,107,107,.35); }
   .home-badge.hall-badge-card { border-color:rgba(6,214,160,.35); }
@@ -318,56 +321,56 @@
   </div>
   <div class="mode-cards">
     <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
-      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
-      <div style="flex:1;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;"></div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">単語暗記</div>
         <div class="mode-desc">日本語→音声→スペル確認</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
     <div class="mode-card flash" onclick="goToSettings()" style="border-color:var(--accent);">
-      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_flash.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
-      <div style="flex:1;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_flash.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;"></div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">英単語フラッシュ</div>
         <div class="mode-desc">日本語を見て英語で答える</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
     <div class="mode-card flash" onclick="startSentenceMemory()" style="border-color:#f59e0b;">
-      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_reading.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
-      <div style="flex:1;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_reading.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;"></div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">英文暗記</div>
         <div class="mode-desc">日本語→音声→英文で覚える</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
     <div class="mode-card flash" onclick="goToTypingSettings()" style="border-color:#a78bfa;">
-      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_typing.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
-      <div style="flex:1;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_typing.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;"></div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">英文タイピング</div>
         <div class="mode-desc">日本語を見て英文を打つ</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
     <div class="mode-card flash" onclick="showScreen('listen-setup-screen')" style="border-color:#818cf8;">
-      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;opacity:0.7;filter:hue-rotate(60deg);"></div>
-      <div style="flex:1;">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;opacity:0.7;filter:hue-rotate(60deg);"></div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">耳で覚える</div>
         <div class="mode-desc">自動再生・BGM感覚で覚える</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
     <div class="mode-card flash" onclick="openAIChat('home-screen')" style="border-color:#4ecdc4;">
-      <div class="mode-icon" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4ecdc4,#44a08d);border-radius:8px;font-size:22px;color:white;font-weight:900;">AI</div>
-      <div style="flex:1;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4ecdc4,#44a08d);border-radius:6px;font-size:16px;color:white;font-weight:900;flex-shrink:0;">AI</div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">英会話</div>
         <div class="mode-desc">AIと自由に英語で話してみよう</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
-    <div class="mode-card flash" onclick="showScreen('original-screen')" style="border-color:var(--accent3);grid-column:1/-1;">
-      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_original.png" style="width:40px;height:40px;object-fit:contain;border-radius:8px;"></div>
-      <div style="flex:1;">
+    <div class="mode-card flash" onclick="showScreen('original-screen')" style="border-color:var(--accent3);">
+      <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_original.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;"></div>
+      <div style="flex:1;min-width:0;">
         <div class="mode-name">オリジナル登録</div>
         <div class="mode-desc" id="orig-home-count">自分の単語を追加する</div>
       </div>
@@ -534,6 +537,7 @@
 <div id="flash-screen" class="screen">
   <div class="flash-header">
     <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <button class="back-btn" id="prev-btn" onclick="backCard()" style="display:none;font-size:14px;" title="前の問題へ">◀</button>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
     </div>
@@ -1080,6 +1084,13 @@
   <div class="rec-section">
     <div class="rec-title">最近間違えた単語</div>
     <div id="rec-recent-list"></div>
+  </div>
+
+  <!-- 手薄単元 -->
+  <div class="rec-section">
+    <div class="rec-title" style="color:var(--accent2);">手薄な単元（練習5回未満）</div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">練習回数が少ない単元 / 重点的に練習しよう</div>
+    <div id="rec-unit-list"></div>
   </div>
 
   <!-- リセット -->
@@ -1814,6 +1825,7 @@ let state = {
   correct: 0, wrong: 0, skipped: 0, wrongWords: [],
   timerInterval: null, timerLeft: 0, currentTyped: '',
   isWeak: false, isHall: false, weakWrongCount: 0,
+  history: [], wrongThisCard: 0,
 };
 
 function updateSourceUI() {
@@ -1824,29 +1836,30 @@ function updateSourceUI() {
   document.getElementById('eiken-grid').style.display = eikenOn ? 'flex' : 'none';
   document.getElementById('mabutan-grid').style.display = mabutanOn ? 'flex' : 'none';
   updateOriginalCountLabel();
+  saveUnitSelection();
   updateSelectedCount();
 }
-function toggleUnit(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
-function toggleEiken(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
-function toggleMabutan(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
+function toggleUnit(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
+function toggleEiken(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
+function toggleMabutan(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
 
 function selectAllUnits() {
   const btns = document.querySelectorAll('#unit-grid button[data-unit]');
   const allActive = Array.from(btns).every(b => b.classList.contains('active'));
   btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
-  updateSelectedCount();
+  saveUnitSelection(); updateSelectedCount();
 }
 function selectAllEiken() {
   const btns = document.querySelectorAll('#eiken-grid button[data-eiken]');
   const allActive = Array.from(btns).every(b => b.classList.contains('active'));
   btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
-  updateSelectedCount();
+  saveUnitSelection(); updateSelectedCount();
 }
 function selectAllMabutan() {
   const btns = document.querySelectorAll('#mabutan-grid button[data-mabutan]');
   const allActive = Array.from(btns).every(b => b.classList.contains('active'));
   btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
-  updateSelectedCount();
+  saveUnitSelection(); updateSelectedCount();
 }
 
 function buildDeck() {
@@ -1879,8 +1892,9 @@ function startFlash() {
   const baseDeck = buildDeck();
   if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
   state.deck = buildWeightedDeck(baseDeck);
-  if (!state.deck.length) state.deck = baseDeck; // fallback if all hall and all filtered out
-  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = [];
+  if (!state.deck.length) state.deck = baseDeck;
+  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
+  recordUnitPractice();
   showScreen('flash-screen');
   loadCard();
 }
@@ -1925,6 +1939,9 @@ function loadCard() {
   state.isWeak = isWeakWord(wordStr);
   state.isHall = isHallWord(wordStr);
   state.weakWrongCount = 0;
+  state.wrongThisCard = 0;
+  const prevBtn = document.getElementById('prev-btn');
+  if (prevBtn) prevBtn.style.display = state.history.length > 0 ? 'inline-flex' : 'none';
   const hallInd = document.getElementById('hall-indicator');
   if (hallInd) hallInd.style.display = state.isHall ? 'block' : 'none';
   // 特訓モードはヒントなし（問題提示時は隠す）
@@ -2020,7 +2037,7 @@ function checkAnswer() {
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
-    if (justEnteredHall) { showHallAnimation(); } else { showCorrectAnimation(); }
+    if (justEnteredHall) { showHallAnimation(); } else if (state.wrongThisCard > 0 || state.weakWrongCount > 0) { showCorrectAnimation(); }
 
   } else if (state.isWeak) {
     // 特訓モード: 正解するまでリトライ
@@ -2038,29 +2055,42 @@ function checkAnswer() {
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     updateHomeBadges();
 
-    if (state.weakWrongCount >= 3) {
-      // 3回目以降 → 恐怖演出
-      fb.className = 'feedback-area wrong'; fb.textContent = 'ひっ！';
+    if (state.weakWrongCount >= 4) {
+      // 4回目以降 → 飛び散って集まる＋10回高速連打
+      fb.className = 'feedback-area wrong'; fb.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb.textContent = '';
-        showFearAnimation(() => resetForWeakRetry(wordStr));
-      }, 600);
+        showScatterAnimation(wordStr, typed, () => resetForWeakRetry(wordStr));
+      }, 350);
+    } else if (state.weakWrongCount >= 3) {
+      // 3回目 → ドン震え＋5回高速連打
+      fb.className = 'feedback-area wrong'; fb.textContent = 'ドン!!!!!';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        fb.textContent = '';
+        showDonShakeAnimation(wordStr, () => resetForWeakRetry(wordStr));
+      }, 350);
     } else if (state.weakWrongCount >= 2) {
-      // 2回目 → ひゅんひゅん演出
-      fb.className = 'feedback-area wrong'; fb.textContent = 'ひゅんひゅん！';
+      // 2回目 → ドン大きく
+      fb.className = 'feedback-area wrong'; fb.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb.textContent = '';
-        showHyunHyunAnimation(wordStr, typed);
-      }, 600);
-      setTimeout(() => resetForWeakRetry(wordStr), 3200);
+        showDonAnimation(() => resetForWeakRetry(wordStr));
+      }, 300);
     } else {
-      // 1回目の間違い → ぶるぶる表示して再出題
-      fb.className = 'feedback-area wrong'; fb.textContent = 'もう一度！';
-      setTimeout(() => resetForWeakRetry(wordStr), 1800);
+      // 1回目 → トンと出る
+      fb.className = 'feedback-area wrong'; fb.textContent = 'トン';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        fb.textContent = '';
+        showTonAnimation(() => resetForWeakRetry(wordStr));
+      }, 300);
     }
 
   } else {
@@ -2070,6 +2100,7 @@ function checkAnswer() {
     renderLetterBoxes(typed.toLowerCase(), correct);
     document.getElementById('card-answer-wrap').classList.add('visible');
     state.wrong++; state.wrongWords.push(word);
+    state.wrongThisCard++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい！';
     const wasAlreadyCorrectN = hasEverBeenCorrect(wordStr);
     recordWrong(wordStr, word['意味'], typed);
@@ -2164,6 +2195,7 @@ function revealAnswer() {
   renderLetterBoxes('', wordStr.toLowerCase());
   recordWrong(wordStr, word['意味'], '');
   state.wrong++; state.wrongWords.push(word);
+  state.wrongThisCard++;
   const wc3 = document.getElementById('flash-wrong-count'); if(wc3) wc3.textContent = '✗ ' + state.wrong;
   document.getElementById('feedback-area').className = 'feedback-area wrong';
   document.getElementById('feedback-area').textContent = state.isWeak ? '答えを見たよ！もう一度挑戦しよう' : '答えを確認して書き直してみよう';
@@ -2178,25 +2210,39 @@ function revealAnswer() {
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = true;
     document.getElementById('next-btn').style.display = 'none';
-    if (state.weakWrongCount >= 3) {
-      document.getElementById('feedback-area').textContent = 'ひっ！';
+    const fb2 = document.getElementById('feedback-area');
+    if (state.weakWrongCount >= 4) {
+      fb2.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        document.getElementById('feedback-area').textContent = '';
-        showFearAnimation(() => resetForWeakRetry(wordStr));
-      }, 600);
+        fb2.textContent = '';
+        showScatterAnimation(wordStr, '', () => resetForWeakRetry(wordStr));
+      }, 350);
+    } else if (state.weakWrongCount >= 3) {
+      fb2.textContent = 'ドン!!!!!';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        fb2.textContent = '';
+        showDonShakeAnimation(wordStr, () => resetForWeakRetry(wordStr));
+      }, 350);
     } else if (state.weakWrongCount >= 2) {
-      document.getElementById('feedback-area').textContent = 'ひゅんひゅん！';
+      fb2.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        document.getElementById('feedback-area').textContent = '';
-        showHyunHyunAnimation(wordStr, '');
-      }, 600);
-      setTimeout(() => resetForWeakRetry(wordStr), 3200);
+        fb2.textContent = '';
+        showDonAnimation(() => resetForWeakRetry(wordStr));
+      }, 300);
     } else {
-      setTimeout(() => resetForWeakRetry(wordStr), 2000);
+      fb2.textContent = 'トン';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        fb2.textContent = '';
+        showTonAnimation(() => resetForWeakRetry(wordStr));
+      }, 300);
     }
   } else {
     document.getElementById('next-btn').style.display = 'block';
@@ -2205,10 +2251,16 @@ function revealAnswer() {
   updateHomeBadges();
 }
 function skipCard() {
-  if (state.isWeak && !state.answered) return; // 特訓中はスキップ不可
-  stopTimer(); state.skipped++; state.current++; loadCard();
+  if (state.isWeak && !state.answered) return;
+  stopTimer(); state.history.push(state.current); state.skipped++; state.current++; loadCard();
 }
-function nextCard() { stopTimer(); state.current++; loadCard(); }
+function nextCard() { stopTimer(); state.history.push(state.current); state.current++; loadCard(); }
+function backCard() {
+  if (!state.history.length) return;
+  state.current = state.history.pop();
+  state.answered = false; state.weakWrongCount = 0; state.wrongThisCard = 0;
+  loadCard();
+}
 
 function startTimer() {}
 function stopTimer() {}
@@ -2232,7 +2284,7 @@ function showResult() {
 function retryWrong() {
   if (!state.wrongWords.length) { showScreen('settings-screen'); return; }
   state.deck = [...state.wrongWords].sort(() => Math.random()-.5);
-  state.current=0; state.correct=0; state.wrong=0; state.skipped=0; state.wrongWords=[];
+  state.current=0; state.correct=0; state.wrong=0; state.skipped=0; state.wrongWords=[]; state.history=[];
   showScreen('flash-screen'); loadCard();
 }
 
@@ -4093,6 +4145,170 @@ function showFearAnimation(callback) {
   }, 2900);
 }
 
+// ===== 新しい苦手演出 =====
+
+function showTonAnimation(callback) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;';
+  const t = document.createElement('div');
+  t.textContent = 'トン';
+  t.style.cssText = "font-size:4rem;font-weight:900;color:#ff9f43;font-family:'Noto Sans JP',sans-serif;transform:scale(0.6);opacity:0;transition:transform 0.2s cubic-bezier(.36,2,.6,1),opacity 0.15s;text-shadow:0 0 20px rgba(255,159,67,0.6);";
+  ov.appendChild(t); document.body.appendChild(ov);
+  setTimeout(() => { t.style.transform = 'scale(1.25)'; t.style.opacity = '1'; }, 30);
+  setTimeout(() => { t.style.transform = 'scale(1)'; }, 250);
+  setTimeout(() => { t.style.opacity = '0'; }, 650);
+  setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 950);
+}
+
+function showDonAnimation(callback) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,30,0,0.06);transition:background 0.35s;';
+  const t = document.createElement('div');
+  t.textContent = 'ドン！！！！！';
+  t.style.cssText = "font-size:5rem;font-weight:900;color:var(--accent);font-family:'Noto Sans JP',sans-serif;transform:scale(0.1);opacity:0;transition:transform 0.22s cubic-bezier(.36,2.2,.6,1),opacity 0.16s;text-shadow:0 0 40px rgba(255,107,107,0.9);";
+  ov.appendChild(t); document.body.appendChild(ov);
+  setTimeout(() => { t.style.transform = 'scale(1.5)'; t.style.opacity = '1'; ov.style.background = 'rgba(255,30,0,0.14)'; }, 30);
+  setTimeout(() => { t.style.transform = 'scale(1)'; ov.style.background = 'rgba(255,30,0,0)'; }, 270);
+  setTimeout(() => { t.style.opacity = '0'; }, 900);
+  setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 1400);
+}
+
+function showDonShakeAnimation(word, callback) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,30,0,0.1);';
+  const t = document.createElement('div');
+  t.textContent = 'ドン!!!!!';
+  t.style.cssText = "font-size:5.5rem;font-weight:900;color:var(--accent);font-family:'Noto Sans JP',sans-serif;text-shadow:0 0 50px rgba(255,107,107,1);animation:don-shake 0.12s ease infinite;";
+  ov.appendChild(t); document.body.appendChild(ov);
+  setTimeout(() => { ov.style.transition = 'opacity 0.25s'; ov.style.opacity = '0'; }, 750);
+  setTimeout(() => {
+    if (ov.parentNode) ov.remove();
+    rapidSpellFlash(word, 5, 190, callback);
+  }, 1020);
+}
+
+function rapidSpellFlash(word, times, msEach, callback) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9993;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;';
+  const t = document.createElement('div');
+  t.textContent = word.toUpperCase();
+  t.style.cssText = "font-size:4rem;font-weight:900;color:var(--accent2);font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 24px rgba(255,209,102,0.7);";
+  ov.appendChild(t); document.body.appendChild(ov);
+  let count = 0;
+  function flash() {
+    if (count >= times * 2) { if (ov.parentNode) ov.remove(); if (callback) callback(); return; }
+    ov.style.opacity = count % 2 === 0 ? '1' : '0';
+    count++; setTimeout(flash, msEach);
+  }
+  flash();
+}
+
+function showScatterAnimation(word, typed, callback) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;overflow:hidden;pointer-events:none;';
+  document.body.appendChild(ov);
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const letters = word.toUpperCase().split('');
+  const lw = Math.min(46, Math.floor(vw * 0.88 / Math.max(letters.length, 1)));
+  const totalW = letters.length * lw;
+  const startX = (vw - totalW) / 2;
+  const cy = vh * 0.44;
+  const spans = letters.map((ch, i) => {
+    const s = document.createElement('span');
+    s.textContent = ch;
+    const isWrong = typed && typed[i] ? typed[i].toLowerCase() !== word[i].toLowerCase() : true;
+    s.style.cssText = `position:absolute;width:${lw}px;text-align:center;font-size:${Math.min(3, lw * 0.065)}rem;font-weight:900;font-family:'Nunito',sans-serif;color:${isWrong ? 'var(--accent)' : 'var(--accent2)'};left:${startX + i * lw}px;top:${cy}px;transition:all 0.5s cubic-bezier(.2,1.3,.8,1);`;
+    ov.appendChild(s);
+    return { el: s, fx: startX + i * lw };
+  });
+  setTimeout(() => {
+    spans.forEach(s => {
+      s.el.style.left = (Math.random() * vw * 0.8 + vw * 0.1 - lw / 2) + 'px';
+      s.el.style.top = (Math.random() * vh * 0.75 + vh * 0.1) + 'px';
+      s.el.style.transform = `rotate(${Math.random()*360-180}deg) scale(${0.3 + Math.random()*1.7})`;
+      s.el.style.opacity = '0.75';
+    });
+  }, 50);
+  setTimeout(() => {
+    spans.forEach(s => {
+      s.el.style.transition = 'all 0.6s cubic-bezier(.2,1,.6,1)';
+      s.el.style.left = s.fx + 'px'; s.el.style.top = cy + 'px';
+      s.el.style.transform = 'rotate(0deg) scale(1)'; s.el.style.opacity = '1';
+      s.el.style.color = 'var(--accent2)';
+    });
+  }, 760);
+  setTimeout(() => {
+    if (ov.parentNode) ov.remove();
+    rapidSpellFlash(word, 10, 110, callback);
+  }, 1550);
+}
+
+// ===== 単元選択の保存・復元 =====
+
+function saveUnitSelection() {
+  try {
+    const sel = {
+      minilabo: document.getElementById('chk-minilabo').checked,
+      eiken: document.getElementById('chk-eiken').checked,
+      mabutan: document.getElementById('chk-mabutan').checked,
+      original: document.getElementById('chk-original').checked,
+      minilaboUnits: Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit),
+      eikenUnits: Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken),
+      mabutanUnits: Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan),
+    };
+    localStorage.setItem('unit_selection', JSON.stringify(sel));
+  } catch(e) {}
+}
+
+function restoreUnitSelection() {
+  try {
+    const raw = localStorage.getItem('unit_selection');
+    if (!raw) return;
+    const sel = JSON.parse(raw);
+    if (sel.minilabo !== undefined) document.getElementById('chk-minilabo').checked = sel.minilabo;
+    if (sel.eiken !== undefined) document.getElementById('chk-eiken').checked = sel.eiken;
+    if (sel.mabutan !== undefined) document.getElementById('chk-mabutan').checked = sel.mabutan;
+    if (sel.original !== undefined) document.getElementById('chk-original').checked = sel.original;
+    if (sel.minilaboUnits) {
+      document.querySelectorAll('#unit-grid [data-unit]').forEach(b => {
+        b.classList.toggle('active', sel.minilaboUnits.includes(b.dataset.unit));
+      });
+    }
+    if (sel.eikenUnits) {
+      document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => {
+        b.classList.toggle('active', sel.eikenUnits.includes(b.dataset.eiken));
+      });
+    }
+    if (sel.mabutanUnits) {
+      document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => {
+        b.classList.toggle('active', sel.mabutanUnits.includes(b.dataset.mabutan));
+      });
+    }
+    updateSourceUI();
+  } catch(e) {}
+}
+
+function recordUnitPractice() {
+  if (document.getElementById('chk-minilabo').checked) {
+    document.querySelectorAll('#unit-grid [data-unit].active').forEach(b => {
+      const k = 'practice_ml_' + b.dataset.unit;
+      localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
+    });
+  }
+  if (document.getElementById('chk-eiken').checked) {
+    document.querySelectorAll('#eiken-grid [data-eiken].active').forEach(b => {
+      const k = 'practice_ek_' + b.dataset.eiken;
+      localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
+    });
+  }
+  if (document.getElementById('chk-mabutan').checked) {
+    document.querySelectorAll('#mabutan-grid [data-mabutan].active').forEach(b => {
+      const k = 'practice_mb_' + b.dataset.mabutan;
+      localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
+    });
+  }
+}
+
 function resetForWeakRetry(wordStr) {
   state.answered = false;
   mainInput.value = '';
@@ -4111,7 +4327,7 @@ function startWeakOnlyMode() {
   const weakWords = getWeakWordsFromData();
   if (!weakWords.length) { alert('苦手単語はまだありません！'); return; }
   state.deck = weakWords.sort(() => Math.random()-.5);
-  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = [];
+  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
   showScreen('flash-screen'); loadCard();
 }
 
@@ -4119,7 +4335,7 @@ function startHallOnlyMode() {
   const hallWords = getHallWordsFromData();
   if (!hallWords.length) { alert('殿堂入りはまだありません！3回連続正解で殿堂入りです。'); return; }
   state.deck = hallWords.sort(() => Math.random()-.5);
-  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = [];
+  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
   showScreen('flash-screen'); loadCard();
 }
 
@@ -4127,7 +4343,7 @@ function startSingleWordTraining(word) {
   const found = getAllDataWords().find(w => w['単語'] === word);
   if (!found) return;
   state.deck = [found];
-  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = [];
+  state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
   showScreen('flash-screen'); loadCard();
 }
 
@@ -4185,6 +4401,32 @@ function renderRecords() {
   } else {
     recentList.innerHTML = '<div class="rec-empty">まだ記録がありません</div>';
   }
+
+  // 単元別練習回数（手薄単元を表示）
+  const unitRows = [];
+  ['Unit1','Unit2','Unit3','Unit4','Unit5','Unit6','Unit7','Unit8','Unit9','Unit10'].forEach(u => {
+    const cnt = parseInt(localStorage.getItem('practice_ml_'+u)||'0');
+    unitRows.push({name:'ミニラボ '+u, cnt});
+  });
+  [['1-25','26-50','51-75','76-100','101-125','126-150','151-175','176-200','201-225']].flat().forEach(g => {
+    const cnt = parseInt(localStorage.getItem('practice_ek_'+g)||'0');
+    unitRows.push({name:'英検 '+g, cnt});
+  });
+  unitRows.sort((a,b) => a.cnt - b.cnt);
+  const thin = unitRows.filter(x => x.cnt < 5).slice(0, 6);
+  const unitEl = document.getElementById('rec-unit-list');
+  if (unitEl) {
+    if (thin.length) {
+      unitEl.innerHTML = thin.map(x =>
+        `<div class="rec-item" style="cursor:default;">
+          <span class="rec-word" style="font-size:13px;">${x.name}</span>
+          <span class="rec-meaning">${x.cnt}回</span>
+        </div>`
+      ).join('');
+    } else {
+      unitEl.innerHTML = '<div class="rec-empty">全単元バランスよく練習できています！</div>';
+    }
+  }
 }
 
 function speakWord(word) {
@@ -4217,6 +4459,7 @@ function resetAllRecords() {
 
 // ===== 初期化 =====
 document.addEventListener('DOMContentLoaded', () => {
+  restoreUnitSelection();
   updateSourceUI();
   updateSelectedCount();
   renderOriginalList();
