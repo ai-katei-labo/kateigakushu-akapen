@@ -250,9 +250,11 @@
   .spell-highlight { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; padding:10px 4px; }
   .spell-ch { display:inline-flex; align-items:center; justify-content:center; border-radius:6px; padding:2px 5px; font-family:'Nunito',sans-serif; font-weight:700; }
   .spell-ch.m0 { font-size:1.1rem; color:var(--text); }
-  .spell-ch.m12 { font-size:1.6rem; color:#ff9f43; background:rgba(255,159,67,.12); }
-  .spell-ch.m34 { font-size:2.2rem; color:var(--accent); font-weight:800; background:rgba(255,107,107,.12); }
-  .spell-ch.m5p { font-size:3rem; color:var(--accent); font-weight:900; background:rgba(255,107,107,.15); animation:shake 0.5s ease infinite; }
+  .spell-ch.m1 { font-size:1.6rem; color:#ff9f43; background:rgba(255,159,67,.12); }
+  .spell-ch.m2 { font-size:2.2rem; color:var(--accent); font-weight:800; background:rgba(255,107,107,.12); }
+  .spell-ch.m3p { font-size:4rem; color:var(--accent); font-weight:900; background:rgba(255,107,107,.18); animation:shake 0.45s ease infinite; line-height:1.1; }
+  /* ひゅんひゅん演出 */
+  #hyun-overlay { position:fixed; inset:0; z-index:9999; overflow:hidden; pointer-events:none; background:rgba(0,0,0,0.25); }
   #hall-indicator { display:none; text-align:center; padding:8px 0; }
   .hall-circle { font-size:72px; color:var(--accent3); display:block; animation:float 2s ease-in-out infinite; }
   .hall-label { font-size:13px; color:var(--accent3); font-weight:700; font-family:'Noto Sans JP',sans-serif; margin-top:2px; }
@@ -1800,7 +1802,7 @@ let state = {
   deck: [], current: 0, answered: false,
   correct: 0, wrong: 0, skipped: 0, wrongWords: [],
   timerInterval: null, timerLeft: 0, currentTyped: '',
-  isWeak: false, isHall: false,
+  isWeak: false, isHall: false, weakWrongCount: 0,
 };
 
 function updateSourceUI() {
@@ -1911,17 +1913,12 @@ function loadCard() {
   const wordStr = word['単語'];
   state.isWeak = isWeakWord(wordStr);
   state.isHall = isHallWord(wordStr);
+  state.weakWrongCount = 0;
   const hallInd = document.getElementById('hall-indicator');
   if (hallInd) hallInd.style.display = state.isHall ? 'block' : 'none';
+  // 特訓モードはヒントなし（問題提示時は隠す）
   const weakHintArea = document.getElementById('weak-hint-area');
-  if (weakHintArea) {
-    if (state.isWeak) {
-      document.getElementById('weak-hint-row').innerHTML = renderWeakHint(wordStr);
-      weakHintArea.style.display = 'block';
-    } else {
-      weakHintArea.style.display = 'none';
-    }
-  }
+  if (weakHintArea) weakHintArea.style.display = 'none';
   const tb = document.getElementById('training-badge');
   if (tb) { tb.style.display = state.isWeak ? 'inline-block' : 'none'; tb.textContent = state.isWeak ? '特訓中' : ''; }
   const spellHL = document.getElementById('spell-highlight-area');
@@ -2015,27 +2012,33 @@ function checkAnswer() {
   } else if (state.isWeak) {
     // 特訓モード: 正解するまでリトライ
     recordWrong(wordStr, word['意味'], typed);
+    state.weakWrongCount++;
     state.wrong++;
-    if (!state.wrongWords.includes(word)) state.wrongWords.push(word);
+    if (!state.wrongWords.find(w => w['単語'] === wordStr)) state.wrongWords.push(word);
     renderLetterBoxes(typed.toLowerCase(), correct);
     document.getElementById('card-answer-wrap').classList.add('visible');
-    fb.className = 'feedback-area wrong'; fb.textContent = 'もう一度！';
     const spellHL = document.getElementById('spell-highlight-area');
     if (spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = true;
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     updateHomeBadges();
-    // 1.5秒後にリセットして再入力可能に
-    setTimeout(() => {
-      mainInput.value = '';
-      document.getElementById('card-answer-wrap').classList.remove('visible');
-      spellHL.innerHTML = ''; spellHL.style.display = 'none';
-      fb.textContent = '';
-      // 弱点ヒント再表示
-      const whr = document.getElementById('weak-hint-row');
-      if (whr) whr.innerHTML = renderWeakHint(wordStr);
-    }, 1500);
+
+    if (state.weakWrongCount >= 2) {
+      // 2回目以降の間違い → ひゅんひゅん演出
+      fb.className = 'feedback-area wrong'; fb.textContent = 'ひゅんひゅん！';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        fb.textContent = '';
+        showHyunHyunAnimation(wordStr, typed);
+      }, 600);
+      setTimeout(() => resetForWeakRetry(wordStr), 3200);
+    } else {
+      // 1回目の間違い → ぶるぶる表示して再出題
+      fb.className = 'feedback-area wrong'; fb.textContent = 'もう一度！';
+      setTimeout(() => resetForWeakRetry(wordStr), 1800);
+    }
 
   } else {
     // 通常モード: 不正解
@@ -2146,20 +2149,22 @@ function revealAnswer() {
     const rb2 = document.getElementById('replay-btn'); if(rb2) rb2.style.display='inline-block';
   }
   if (state.isWeak) {
-    // 特訓中は次へをロック・スキップもロック
+    state.weakWrongCount++;
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = true;
     document.getElementById('next-btn').style.display = 'none';
-    // 2秒後にリセットして再挑戦
-    setTimeout(() => {
-      state.answered = false;
-      document.getElementById('card-answer-wrap').classList.remove('visible');
-      if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-      document.getElementById('feedback-area').textContent = '';
-      const whr = document.getElementById('weak-hint-row');
-      if (whr) whr.innerHTML = renderWeakHint(wordStr);
-      mainInput.value = ''; mainInput.disabled = false; mainInput.focus();
-    }, 2000);
+    if (state.weakWrongCount >= 2) {
+      document.getElementById('feedback-area').textContent = 'ひゅんひゅん！';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        document.getElementById('feedback-area').textContent = '';
+        showHyunHyunAnimation(wordStr, '');
+      }, 600);
+      setTimeout(() => resetForWeakRetry(wordStr), 3200);
+    } else {
+      setTimeout(() => resetForWeakRetry(wordStr), 2000);
+    }
   } else {
     document.getElementById('next-btn').style.display = 'block';
   }
@@ -3728,7 +3733,7 @@ function setCharMistakes(word, data) {
 }
 function isWeakWord(word) {
   const cm = getCharMistakes(word);
-  return Object.values(cm).some(v => v >= 5);
+  return Object.values(cm).some(v => v >= 3);
 }
 function isHallWord(word) {
   return getWordStatus(word).hall === true;
@@ -3842,9 +3847,9 @@ function renderSpellHighlight(word) {
   for (let i = 0; i < word.length; i++) {
     const cnt = cm[i] || 0;
     let cls = 'm0';
-    if (cnt >= 5) cls = 'm5p';
-    else if (cnt >= 3) cls = 'm34';
-    else if (cnt >= 1) cls = 'm12';
+    if (cnt >= 3) cls = 'm3p';
+    else if (cnt === 2) cls = 'm2';
+    else if (cnt === 1) cls = 'm1';
     html += `<span class="spell-ch ${cls}">${word[i].toUpperCase()}</span>`;
   }
   html += '</div>';
@@ -3868,6 +3873,71 @@ function renderWeakHint(word) {
   }
   html += '</div>';
   return html;
+}
+
+function showHyunHyunAnimation(word, typed) {
+  const existing = document.getElementById('hyun-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'hyun-overlay';
+  document.body.appendChild(overlay);
+
+  const correct = word.toLowerCase();
+  const typedL = (typed || '').toLowerCase();
+  const chars = [];
+  for (let i = 0; i < correct.length; i++) {
+    if (typedL[i] !== correct[i]) chars.push(correct[i].toUpperCase());
+  }
+  if (!chars.length) word.split('').forEach(c => chars.push(c.toUpperCase()));
+
+  const count = Math.max(10, chars.length * 4);
+  const vw = window.innerWidth, vh = window.innerHeight;
+
+  for (let i = 0; i < count; i++) {
+    const span = document.createElement('span');
+    const ch = chars[i % chars.length];
+    const size = Math.floor(Math.random() * 90 + 16);
+    const startX = Math.random() * (vw - 80);
+    const startY = Math.random() * (vh - 80);
+    span.textContent = ch;
+    span.style.cssText = `
+      position:absolute;left:${startX}px;top:${startY}px;
+      font-size:${size}px;font-weight:900;
+      font-family:'Nunito',sans-serif;
+      color:hsl(${Math.random()*25+355}deg,100%,${Math.random()*20+50}%);
+      opacity:0;transition:all ${0.6+Math.random()*1.2}s cubic-bezier(.2,1.2,.8,1);
+    `;
+    overlay.appendChild(span);
+
+    const delay = i * 40;
+    setTimeout(() => {
+      span.style.opacity = '1';
+      span.style.left = (Math.random() * (vw - 80)) + 'px';
+      span.style.top = (Math.random() * (vh - 80)) + 'px';
+      span.style.transform = `rotate(${Math.random()*360-180}deg) scale(${0.5+Math.random()*2})`;
+    }, delay);
+
+    setTimeout(() => {
+      span.style.opacity = '0';
+      span.style.transform += ' scale(0.1)';
+    }, delay + 1600);
+  }
+
+  setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 3000);
+}
+
+function resetForWeakRetry(wordStr) {
+  state.answered = false;
+  mainInput.value = '';
+  mainInput.disabled = false;
+  document.getElementById('card-answer-wrap').classList.remove('visible');
+  const spellHL = document.getElementById('spell-highlight-area');
+  if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+  document.getElementById('feedback-area').className = 'feedback-area';
+  document.getElementById('feedback-area').textContent = '';
+  const weakHintArea = document.getElementById('weak-hint-area');
+  if (weakHintArea) weakHintArea.style.display = 'none';
+  mainInput.focus();
 }
 
 function startWeakOnlyMode() {
