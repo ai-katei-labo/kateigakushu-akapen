@@ -255,6 +255,17 @@
   .spell-ch.m3p { font-size:4rem; color:var(--accent); font-weight:900; background:rgba(255,107,107,.18); animation:shake 0.45s ease infinite; line-height:1.1; }
   /* ひゅんひゅん演出 */
   #hyun-overlay { position:fixed; inset:0; z-index:9999; overflow:hidden; pointer-events:none; background:rgba(0,0,0,0.25); }
+  /* 正解・殿堂・恐怖演出 */
+  @keyframes float-gentle {
+    0% { transform:translateY(8px) scale(0.8); opacity:0; }
+    20% { opacity:1; }
+    70% { opacity:1; }
+    100% { transform:translateY(-38px) scale(1); opacity:0; }
+  }
+  @keyframes rainbow-glow {
+    0% { filter:hue-rotate(0deg); }
+    100% { filter:hue-rotate(360deg); }
+  }
   #hall-indicator { display:none; text-align:center; padding:8px 0; }
   .hall-circle { font-size:72px; color:var(--accent3); display:block; animation:float 2s ease-in-out infinite; }
   .hall-label { font-size:13px; color:var(--accent3); font-weight:700; font-family:'Noto Sans JP',sans-serif; margin-top:2px; }
@@ -1981,7 +1992,7 @@ function checkAnswer() {
     renderLetterBoxes(typed.toLowerCase(), correct);
     document.getElementById('card-answer-wrap').classList.add('visible');
     state.correct++;
-    recordCorrect(wordStr);
+    const justEnteredHall = recordCorrect(wordStr);
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = false;
 
@@ -2008,6 +2019,7 @@ function checkAnswer() {
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
+    if (justEnteredHall) { showHallAnimation(); } else { showCorrectAnimation(); }
 
   } else if (state.isWeak) {
     // 特訓モード: 正解するまでリトライ
@@ -2024,8 +2036,17 @@ function checkAnswer() {
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     updateHomeBadges();
 
-    if (state.weakWrongCount >= 2) {
-      // 2回目以降の間違い → ひゅんひゅん演出
+    if (state.weakWrongCount >= 3) {
+      // 3回目以降 → 恐怖演出
+      fb.className = 'feedback-area wrong'; fb.textContent = 'ひっ！';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        fb.textContent = '';
+        showFearAnimation(() => resetForWeakRetry(wordStr));
+      }, 600);
+    } else if (state.weakWrongCount >= 2) {
+      // 2回目 → ひゅんひゅん演出
       fb.className = 'feedback-area wrong'; fb.textContent = 'ひゅんひゅん！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
@@ -2153,7 +2174,15 @@ function revealAnswer() {
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = true;
     document.getElementById('next-btn').style.display = 'none';
-    if (state.weakWrongCount >= 2) {
+    if (state.weakWrongCount >= 3) {
+      document.getElementById('feedback-area').textContent = 'ひっ！';
+      setTimeout(() => {
+        document.getElementById('card-answer-wrap').classList.remove('visible');
+        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+        document.getElementById('feedback-area').textContent = '';
+        showFearAnimation(() => resetForWeakRetry(wordStr));
+      }, 600);
+    } else if (state.weakWrongCount >= 2) {
       document.getElementById('feedback-area').textContent = 'ひゅんひゅん！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
@@ -3743,11 +3772,13 @@ function recordCorrect(word) {
   const ws = getWordStatus(word);
   ws.count = (ws.count||0) + 1;
   ws.streak = (ws.streak||0) + 1;
-  if (!ws.hall && ws.streak >= 3) ws.hall = true;
+  const justEnteredHall = !ws.hall && ws.streak >= 3;
+  if (justEnteredHall) ws.hall = true;
   setWordStatus(word, ws);
   localStorage.setItem('total_questions', (parseInt(localStorage.getItem('total_questions')||'0')+1));
   localStorage.setItem('total_correct', (parseInt(localStorage.getItem('total_correct')||'0')+1));
   recordStudyDay();
+  return justEnteredHall;
 }
 
 function recordWrong(word, meaning, typedStr) {
@@ -3924,6 +3955,134 @@ function showHyunHyunAnimation(word, typed) {
   }
 
   setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 3000);
+}
+
+function playCorrectSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523.25,0,.28],[659.25,.13,.22],[783.99,.26,.28]].forEach(([f,t,v]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(v, ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.45);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.5);
+    });
+  } catch(e) {}
+}
+
+function showCorrectAnimation() {
+  playCorrectSound();
+  const existing = document.getElementById('correct-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'correct-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9996;overflow:hidden;pointer-events:none;';
+  document.body.appendChild(overlay);
+  const emojis = ['🌟','⭐','🎉','🌈','🍀','😊','🐣','🌸','🦋'];
+  const vw = window.innerWidth, vh = window.innerHeight;
+  for (let i = 0; i < 14; i++) {
+    const span = document.createElement('span');
+    span.textContent = emojis[i % emojis.length];
+    const size = Math.floor(Math.random() * 24 + 22);
+    const x = Math.random() * (vw - 60);
+    const y = Math.random() * (vh * 0.7) + vh * 0.1;
+    const delay = i * 90;
+    const dur = (1.8 + Math.random() * 1.2).toFixed(2);
+    span.style.cssText = `position:absolute;left:${x}px;top:${y}px;font-size:${size}px;animation:float-gentle ${dur}s ease-in-out ${delay}ms both;`;
+    overlay.appendChild(span);
+  }
+  setTimeout(() => {
+    overlay.style.transition = 'opacity 0.5s';
+    overlay.style.opacity = '0';
+    setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 500);
+  }, 2600);
+}
+
+function showHallAnimation() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[523.25,0],[659.25,.15],[783.99,.3],[1046.5,.48],[783.99,.63],[1046.5,.78]].forEach(([f,t]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.28, ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.35);
+      o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.4);
+    });
+  } catch(e) {}
+  const existing = document.getElementById('hall-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'hall-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9997;overflow:hidden;pointer-events:none;';
+  document.body.appendChild(overlay);
+  const cx = window.innerWidth / 2, cy = window.innerHeight * 0.38;
+  const trophy = document.createElement('div');
+  trophy.textContent = '🏆';
+  trophy.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;font-size:90px;line-height:1;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.7s cubic-bezier(.36,1.5,.6,1),opacity 0.3s;`;
+  overlay.appendChild(trophy);
+  setTimeout(() => { trophy.style.transform = 'translate(-50%,-50%) scale(1)'; trophy.style.opacity = '1'; }, 100);
+  const text = document.createElement('div');
+  text.textContent = '殿堂入り！';
+  text.style.cssText = `position:absolute;left:${cx}px;top:${cy+82}px;transform:translate(-50%,-50%) translateY(8px);font-size:28px;font-weight:900;color:#ffd166;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;opacity:0;transition:opacity 0.5s,transform 0.5s;animation:rainbow-glow 1.2s linear infinite;`;
+  overlay.appendChild(text);
+  setTimeout(() => { text.style.opacity = '1'; text.style.transform = 'translate(-50%,-50%)'; }, 700);
+  const spEls = ['✨','🌟','💫'].map(em => {
+    const sp = document.createElement('span');
+    sp.textContent = em;
+    sp.style.cssText = 'position:absolute;font-size:28px;opacity:0;transition:opacity 0.4s;';
+    overlay.appendChild(sp);
+    return sp;
+  });
+  setTimeout(() => spEls.forEach(sp => { sp.style.opacity = '1'; }), 900);
+  const orbitR = Math.min(90, window.innerWidth * 0.22);
+  let ang = 0;
+  const iv = setInterval(() => {
+    spEls.forEach((sp, i) => {
+      const a = (ang + i * 120) * Math.PI / 180;
+      sp.style.left = (cx + orbitR * Math.cos(a) - 14) + 'px';
+      sp.style.top = (cy + orbitR * Math.sin(a) - 14) + 'px';
+    });
+    ang += 2.5;
+  }, 16);
+  setTimeout(() => {
+    clearInterval(iv);
+    overlay.style.transition = 'opacity 0.7s';
+    overlay.style.opacity = '0';
+    setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 700);
+  }, 3800);
+}
+
+function showFearAnimation(callback) {
+  const existing = document.getElementById('fear-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'fear-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;overflow:hidden;pointer-events:none;background:rgba(20,0,0,0.3);';
+  document.body.appendChild(overlay);
+  const chars = ['👹','🐍','👻','😤','💀','🕷️'];
+  const vw = window.innerWidth, vh = window.innerHeight;
+  for (let i = 0; i < 18; i++) {
+    const span = document.createElement('span');
+    span.textContent = chars[i % chars.length];
+    const size = Math.floor(Math.random() * 48 + 28);
+    const sx = Math.random() * (vw - 80), sy = Math.random() * (vh - 80);
+    span.style.cssText = `position:absolute;left:${sx}px;top:${sy}px;font-size:${size}px;opacity:0;transition:all ${(0.4+Math.random()*0.8).toFixed(2)}s cubic-bezier(.2,1.4,.8,1);`;
+    overlay.appendChild(span);
+    const d = i * 55;
+    setTimeout(() => {
+      span.style.opacity = '1';
+      span.style.left = (Math.random() * (vw - 80)) + 'px';
+      span.style.top = (Math.random() * (vh - 80)) + 'px';
+      span.style.transform = `rotate(${Math.random()*360-180}deg) scale(${(0.7+Math.random()*1.8).toFixed(2)})`;
+    }, d);
+    setTimeout(() => { span.style.opacity = '0'; }, d + 1600);
+  }
+  setTimeout(() => {
+    if (overlay.parentNode) overlay.remove();
+    if (callback) callback();
+  }, 2900);
 }
 
 function resetForWeakRetry(wordStr) {
