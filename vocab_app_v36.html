@@ -1992,6 +1992,7 @@ function checkAnswer() {
     renderLetterBoxes(typed.toLowerCase(), correct);
     document.getElementById('card-answer-wrap').classList.add('visible');
     state.correct++;
+    const wasAlreadyCorrect = hasEverBeenCorrect(wordStr);
     const justEnteredHall = recordCorrect(wordStr);
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = false;
@@ -2009,12 +2010,12 @@ function checkAnswer() {
     }
 
     if (!state.isHall) {
-      doSpellOut(wordStr);
+      if (!wasAlreadyCorrect) doSpellOut(wordStr);
       const rb = document.getElementById('replay-btn'); if(rb) rb.style.display='inline-block';
     }
 
     const spellHL = document.getElementById('spell-highlight-area');
-    if (spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
+    if (!wasAlreadyCorrect && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
@@ -2023,6 +2024,7 @@ function checkAnswer() {
 
   } else if (state.isWeak) {
     // 特訓モード: 正解するまでリトライ
+    const wasAlreadyCorrectW = hasEverBeenCorrect(wordStr);
     recordWrong(wordStr, word['意味'], typed);
     state.weakWrongCount++;
     state.wrong++;
@@ -2030,7 +2032,7 @@ function checkAnswer() {
     renderLetterBoxes(typed.toLowerCase(), correct);
     document.getElementById('card-answer-wrap').classList.add('visible');
     const spellHL = document.getElementById('spell-highlight-area');
-    if (spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
+    if (!wasAlreadyCorrectW && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = true;
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
@@ -2069,11 +2071,12 @@ function checkAnswer() {
     document.getElementById('card-answer-wrap').classList.add('visible');
     state.wrong++; state.wrongWords.push(word);
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい！';
+    const wasAlreadyCorrectN = hasEverBeenCorrect(wordStr);
     recordWrong(wordStr, word['意味'], typed);
     const spellHL = document.getElementById('spell-highlight-area');
-    if (spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
+    if (!wasAlreadyCorrectN && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
-    doSpellOut(wordStr);
+    if (!wasAlreadyCorrectN) doSpellOut(wordStr);
     const rb = document.getElementById('replay-btn'); if(rb) rb.style.display='inline-block';
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
@@ -2155,6 +2158,7 @@ function doSpellOut(word) {
 function revealAnswer() {
   const word = state.deck[state.current];
   const wordStr = word['単語'];
+  const wasAlreadyCorrectR = hasEverBeenCorrect(wordStr);
   stopTimer(); state.answered = true;
   document.getElementById('card-answer-wrap').classList.add('visible');
   renderLetterBoxes('', wordStr.toLowerCase());
@@ -2164,9 +2168,9 @@ function revealAnswer() {
   document.getElementById('feedback-area').className = 'feedback-area wrong';
   document.getElementById('feedback-area').textContent = state.isWeak ? '答えを見たよ！もう一度挑戦しよう' : '答えを確認して書き直してみよう';
   const spellHL = document.getElementById('spell-highlight-area');
-  if (spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
+  if (!wasAlreadyCorrectR && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
   if (!state.isHall) {
-    doSpellOut(wordStr);
+    if (!wasAlreadyCorrectR) doSpellOut(wordStr);
     const rb2 = document.getElementById('replay-btn'); if(rb2) rb2.style.display='inline-block';
   }
   if (state.isWeak) {
@@ -3767,6 +3771,9 @@ function isWeakWord(word) {
 function isHallWord(word) {
   return getWordStatus(word).hall === true;
 }
+function hasEverBeenCorrect(word) {
+  return getWordStatus(word).everCorrect === true;
+}
 
 function recordCorrect(word) {
   const ws = getWordStatus(word);
@@ -3774,6 +3781,7 @@ function recordCorrect(word) {
   ws.streak = (ws.streak||0) + 1;
   const justEnteredHall = !ws.hall && ws.streak >= 3;
   if (justEnteredHall) ws.hall = true;
+  ws.everCorrect = true;
   setWordStatus(word, ws);
   localStorage.setItem('total_questions', (parseInt(localStorage.getItem('total_questions')||'0')+1));
   localStorage.setItem('total_correct', (parseInt(localStorage.getItem('total_correct')||'0')+1));
