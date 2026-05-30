@@ -279,6 +279,12 @@
   #training-result-area { display:none; text-align:center; font-size:18px; font-weight:900; padding:6px 0; animation:bounce .5s ease; }
   #training-result-area.training-win { color:var(--accent3); }
   #training-result-area.hall-keep { color:var(--accent3); font-size:14px; }
+  #typing-challenge-area { display:none; flex-direction:column; gap:10px; background:rgba(255,107,107,.08); border:1px solid rgba(255,107,107,.3); border-radius:10px; padding:12px; }
+  #typing-challenge-msg { font-size:14px; font-weight:800; color:var(--accent); text-align:center; font-family:'Noto Sans JP',sans-serif; }
+  #typing-challenge-counter { font-size:32px; font-weight:900; color:var(--accent2); text-align:center; letter-spacing:2px; }
+  #challenge-input { flex:1; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:8px; color:#fff; font-size:16px; padding:10px 14px; outline:none; }
+  #challenge-feedback { min-height:18px; text-align:center; font-size:13px; font-weight:700; color:var(--accent); font-family:'Noto Sans JP',sans-serif; }
+  .challenge-submit-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 16px; font-size:18px; font-weight:700; cursor:pointer; }
   .home-badge-row { display:none; flex-direction:row; gap:10px; width:100%; max-width:480px; }
   .home-badge { flex:1; padding:12px 8px; background:var(--card); border-radius:14px; text-align:center; cursor:pointer; border:2px solid transparent; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .home-badge.weak-badge-card { border-color:rgba(255,107,107,.35); }
@@ -377,6 +383,14 @@
       <div class="mode-arrow">›</div>
     </div>
   </div>
+  <!-- 今日の続き -->
+  <div id="today-resume-area" style="display:none;width:100%;max-width:480px;">
+    <button onclick="startResume()" style="width:100%;background:rgba(6,214,160,0.12);border:1.5px solid rgba(6,214,160,0.4);border-radius:12px;padding:12px 16px;color:var(--accent3);font-size:14px;font-weight:800;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:space-between;">
+      <span id="today-resume-info">今日の続きから再開</span>
+      <span style="font-size:18px;">›</span>
+    </button>
+  </div>
+
   <!-- パーソナライズバッジ -->
   <div class="home-badge-row" id="home-badge-row">
     <div class="home-badge weak-badge-card" onclick="startWeakOnlyMode()">
@@ -574,6 +588,15 @@
     <div id="spell-highlight-area"></div>
     <div id="training-result-area"></div>
     <div class="feedback-area" id="feedback-area"></div>
+    <div id="typing-challenge-area">
+      <div id="typing-challenge-msg"></div>
+      <div id="typing-challenge-counter">0/5</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="challenge-input" placeholder="スペルを打とう" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkChallengeInput()">
+        <button class="challenge-submit-btn" onclick="checkChallengeInput()">→</button>
+      </div>
+      <div id="challenge-feedback"></div>
+    </div>
   </div>
   <div style="display:flex;justify-content:center;margin-top:-4px;">
     <button id="replay-btn" onclick="replaySpellOut()" style="display:none;padding:8px 20px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button>
@@ -1064,6 +1087,7 @@
         <div class="rec-stat-label">連続学習日</div>
       </div>
     </div>
+    <div id="rec-source-progress" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
   </div>
 
   <!-- 殿堂入り -->
@@ -1073,10 +1097,10 @@
     <div id="rec-hall-list"></div>
   </div>
 
-  <!-- 苦手単語 -->
+  <!-- よく間違えるランキング -->
   <div class="rec-section">
-    <div class="rec-title" style="color:var(--accent);">苦手単語 <span id="rec-weak-count" style="font-size:20px;margin-left:6px;">0</span>語</div>
-    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">大きい文字ほどよく間違えてる / タップで特訓</div>
+    <div class="rec-title" style="color:var(--accent);">よく間違えるランキング <span id="rec-weak-count" style="font-size:16px;margin-left:6px;color:var(--text-muted);">0語</span></div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">間違い回数が多い順 / タップで苦手単語特訓</div>
     <div id="rec-weak-list"></div>
   </div>
 
@@ -1088,9 +1112,16 @@
 
   <!-- 手薄単元 -->
   <div class="rec-section">
-    <div class="rec-title" style="color:var(--accent2);">手薄な単元（練習5回未満）</div>
+    <div class="rec-title" style="color:var(--accent2);">手薄な単元</div>
     <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">練習回数が少ない単元 / 重点的に練習しよう</div>
     <div id="rec-unit-list"></div>
+  </div>
+
+  <!-- 毎日の記録 -->
+  <div class="rec-section">
+    <div class="rec-title" style="color:var(--accent2);">毎日の記録</div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">日ごとの達成率 / 続けた分だけ積み上がる</div>
+    <div id="rec-daily-log"></div>
   </div>
 
   <!-- リセット -->
@@ -1895,6 +1926,7 @@ function startFlash() {
   if (!state.deck.length) state.deck = baseDeck;
   state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
   recordUnitPractice();
+  saveTodayDeck(state.deck);
   showScreen('flash-screen');
   loadCard();
 }
@@ -1953,6 +1985,8 @@ function loadCard() {
   if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
   const trainRes = document.getElementById('training-result-area');
   if (trainRes) { trainRes.textContent = ''; trainRes.style.display = 'none'; trainRes.className = ''; }
+  const challengeArea = document.getElementById('typing-challenge-area');
+  if (challengeArea) challengeArea.style.display = 'none';
   const skipBtn = document.querySelector('.action-btn.btn-skip');
   if (skipBtn) skipBtn.disabled = false;
 
@@ -2014,10 +2048,15 @@ function checkAnswer() {
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = false;
 
+    const needChallenge = state.isWeak && state.weakWrongCount >= 3;
+    const challengeCount = state.weakWrongCount >= 4 ? 10 : 5;
+
     if (state.isWeak) {
       fb.className = 'feedback-area correct'; fb.textContent = '正解！';
-      const tr = document.getElementById('training-result-area');
-      if (tr) { tr.textContent = 'やった！特訓クリア！'; tr.style.display = 'block'; tr.className = 'training-win'; }
+      if (!needChallenge) {
+        const tr = document.getElementById('training-result-area');
+        if (tr) { tr.textContent = 'やった！特訓クリア！'; tr.style.display = 'block'; tr.className = 'training-win'; }
+      }
     } else if (state.isHall) {
       fb.className = 'feedback-area correct'; fb.textContent = '正解！';
       const tr = document.getElementById('training-result-area');
@@ -2034,15 +2073,18 @@ function checkAnswer() {
     const spellHL = document.getElementById('spell-highlight-area');
     if (!wasAlreadyCorrect && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
-    document.getElementById('next-btn').style.display = 'block';
+    if (!needChallenge) document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
-    if (justEnteredHall) { showHallAnimation(); } else if (state.wrongThisCard > 0 || state.weakWrongCount > 0) { showCorrectAnimation(); }
+    if (justEnteredHall) { showHallAnimation(); }
+    else if (state.weakWrongCount >= 4) { showCelebrationStamps(); }
+    else if (state.wrongThisCard > 0 || state.weakWrongCount > 0) { showCorrectAnimation(); }
+    if (needChallenge) setTimeout(() => startTypingChallenge(wordStr, challengeCount), 1400);
 
   } else if (state.isWeak) {
     // 特訓モード: 正解するまでリトライ
     const wasAlreadyCorrectW = hasEverBeenCorrect(wordStr);
-    recordWrong(wordStr, word['意味'], typed);
+    recordWrong(wordStr, word['意味'], typed, word);
     state.weakWrongCount++;
     state.wrong++;
     if (!state.wrongWords.find(w => w['単語'] === wordStr)) state.wrongWords.push(word);
@@ -2056,41 +2098,37 @@ function checkAnswer() {
     updateHomeBadges();
 
     if (state.weakWrongCount >= 4) {
-      // 4回目以降 → 飛び散って集まる＋10回高速連打
-      fb.className = 'feedback-area wrong'; fb.textContent = 'ドン！！！！！';
+      // 4回目以降 → 飛び散って集まる
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb.textContent = '';
-        showScatterAnimation(wordStr, typed, () => resetForWeakRetry(wordStr));
-      }, 350);
+        showFearAnimation(wordStr, typed, () => resetForWeakRetry(wordStr));
+      }, 150);
     } else if (state.weakWrongCount >= 3) {
-      // 3回目 → ドン震え＋5回高速連打
-      fb.className = 'feedback-area wrong'; fb.textContent = 'ドン!!!!!';
+      // 3回目 → ドン震え
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb.textContent = '';
         showDonShakeAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 350);
+      }, 150);
     } else if (state.weakWrongCount >= 2) {
       // 2回目 → ドン大きく
-      fb.className = 'feedback-area wrong'; fb.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb.textContent = '';
-        showDonAnimation(() => resetForWeakRetry(wordStr));
-      }, 300);
+        showDonAnimation(wordStr, () => resetForWeakRetry(wordStr));
+      }, 150);
     } else {
-      // 1回目 → トンと出る
-      fb.className = 'feedback-area wrong'; fb.textContent = 'トン';
+      // 1回目 → トン
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb.textContent = '';
-        showTonAnimation(() => resetForWeakRetry(wordStr));
-      }, 300);
+        showTonAnimation(wordStr, () => resetForWeakRetry(wordStr));
+      }, 150);
     }
 
   } else {
@@ -2103,7 +2141,7 @@ function checkAnswer() {
     state.wrongThisCard++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい！';
     const wasAlreadyCorrectN = hasEverBeenCorrect(wordStr);
-    recordWrong(wordStr, word['意味'], typed);
+    recordWrong(wordStr, word['意味'], typed, word);
     const spellHL = document.getElementById('spell-highlight-area');
     if (!wasAlreadyCorrectN && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
@@ -2112,6 +2150,51 @@ function checkAnswer() {
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
+  }
+}
+
+// ===== タイピングチャレンジ（3回以上間違えた後の強化練習）=====
+let challengeWord = '', challengeTarget = 0, challengeDone = 0;
+
+function startTypingChallenge(word, count) {
+  challengeWord = word;
+  challengeTarget = count;
+  challengeDone = 0;
+  const area = document.getElementById('typing-challenge-area');
+  const msg = document.getElementById('typing-challenge-msg');
+  const counter = document.getElementById('typing-challenge-counter');
+  const inp = document.getElementById('challenge-input');
+  const fb = document.getElementById('challenge-feedback');
+  if (!area) return;
+  if (msg) msg.textContent = count === 5 ? 'もう一度！高速で5回打ってみよう！' : '高速で10回打ってみよう！';
+  if (counter) counter.textContent = `0 / ${count}`;
+  if (inp) { inp.value = ''; inp.disabled = false; }
+  if (fb) { fb.textContent = ''; }
+  area.style.display = 'flex';
+  setTimeout(() => { if (inp) inp.focus(); }, 100);
+}
+
+function checkChallengeInput() {
+  const inp = document.getElementById('challenge-input');
+  const counter = document.getElementById('typing-challenge-counter');
+  const fb = document.getElementById('challenge-feedback');
+  const area = document.getElementById('typing-challenge-area');
+  const tr = document.getElementById('training-result-area');
+  if (!inp || inp.disabled) return;
+  const typed = inp.value.trim().toLowerCase();
+  if (typed === challengeWord.toLowerCase()) {
+    challengeDone++;
+    if (counter) counter.textContent = `${challengeDone} / ${challengeTarget}`;
+    inp.value = '';
+    if (fb) { fb.textContent = ''; }
+    if (challengeDone >= challengeTarget) {
+      if (area) area.style.display = 'none';
+      if (tr) { tr.textContent = 'やった！特訓クリア！'; tr.style.display = 'block'; tr.className = 'training-win'; }
+      document.getElementById('next-btn').style.display = 'block';
+    }
+  } else {
+    if (fb) { fb.textContent = 'もう一度！'; }
+    inp.select();
   }
 }
 
@@ -2193,7 +2276,7 @@ function revealAnswer() {
   stopTimer(); state.answered = true;
   document.getElementById('card-answer-wrap').classList.add('visible');
   renderLetterBoxes('', wordStr.toLowerCase());
-  recordWrong(wordStr, word['意味'], '');
+  recordWrong(wordStr, word['意味'], '', word);
   state.wrong++; state.wrongWords.push(word);
   state.wrongThisCard++;
   const wc3 = document.getElementById('flash-wrong-count'); if(wc3) wc3.textContent = '✗ ' + state.wrong;
@@ -2212,37 +2295,33 @@ function revealAnswer() {
     document.getElementById('next-btn').style.display = 'none';
     const fb2 = document.getElementById('feedback-area');
     if (state.weakWrongCount >= 4) {
-      fb2.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb2.textContent = '';
-        showScatterAnimation(wordStr, '', () => resetForWeakRetry(wordStr));
-      }, 350);
+        showFearAnimation(wordStr, '', () => resetForWeakRetry(wordStr));
+      }, 150);
     } else if (state.weakWrongCount >= 3) {
-      fb2.textContent = 'ドン!!!!!';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb2.textContent = '';
         showDonShakeAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 350);
+      }, 150);
     } else if (state.weakWrongCount >= 2) {
-      fb2.textContent = 'ドン！！！！！';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb2.textContent = '';
-        showDonAnimation(() => resetForWeakRetry(wordStr));
-      }, 300);
+        showDonAnimation(wordStr, () => resetForWeakRetry(wordStr));
+      }, 150);
     } else {
-      fb2.textContent = 'トン';
       setTimeout(() => {
         document.getElementById('card-answer-wrap').classList.remove('visible');
         if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
         fb2.textContent = '';
-        showTonAnimation(() => resetForWeakRetry(wordStr));
-      }, 300);
+        showTonAnimation(wordStr, () => resetForWeakRetry(wordStr));
+      }, 150);
     }
   } else {
     document.getElementById('next-btn').style.display = 'block';
@@ -2254,7 +2333,7 @@ function skipCard() {
   if (state.isWeak && !state.answered) return;
   stopTimer(); state.history.push(state.current); state.skipped++; state.current++; loadCard();
 }
-function nextCard() { stopTimer(); state.history.push(state.current); state.current++; loadCard(); }
+function nextCard() { stopTimer(); state.history.push(state.current); state.current++; saveTodayProgress(); loadCard(); }
 function backCard() {
   if (!state.history.length) return;
   state.current = state.history.pop();
@@ -2278,8 +2357,14 @@ function showResult() {
   else {emoji='📚';title='もう一度チャレンジ！';}
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
+  // 今日のログを保存
+  const total = state.deck.length;
+  saveDailyLogEntry(getTodayStr(), total, total, pct);
+  localStorage.removeItem('today_deck');
+  localStorage.removeItem('today_pos');
   showScreen('result-screen');
   updateHomeBadges();
+  updateResumeBtn();
 }
 function retryWrong() {
   if (!state.wrongWords.length) { showScreen('settings-screen'); return; }
@@ -3841,11 +3926,39 @@ function recordCorrect(word) {
   return justEnteredHall;
 }
 
-function recordWrong(word, meaning, typedStr) {
+function getWordUnit(wordObj) {
+  if (!wordObj) return '';
+  const src = wordObj._source || '';
+  if (src === 'ミニラボ') return 'ミニラボ ' + (wordObj['出典_ミニラボ'] || '');
+  if (src === '英検5級') {
+    const s = wordObj['出典_英検5級'] || '';
+    const m = s.match(/No\.(\d+)/);
+    if (m) {
+      const no = parseInt(m[1]);
+      for (const g of ['1-25','26-50','51-75','76-100','101-125','126-150','151-175','176-200','201-225']) {
+        const [lo, hi] = g.split('-').map(Number);
+        if (no >= lo && no <= hi) return '英検5級 ' + g;
+      }
+    }
+    return '英検5級';
+  }
+  if (src === 'まぶたん') {
+    const no = getMabutanNum(wordObj);
+    for (const g of ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343']) {
+      const [lo, hi] = g.split('-').map(Number);
+      if (no >= lo && no <= hi) return 'まぶたん ' + g;
+    }
+    return 'まぶたん';
+  }
+  return src;
+}
+
+function recordWrong(word, meaning, typedStr, wordObj) {
   const ws = getWordStatus(word);
   ws.count = (ws.count||0) + 1;
   ws.streak = 0;
   ws.mistakeCount = (ws.mistakeCount||0) + 1;
+  if (wordObj) { ws.source = wordObj._source || ''; ws.unit = getWordUnit(wordObj); }
   setWordStatus(word, ws);
   const cm = getCharMistakes(word);
   const correct = word.toLowerCase();
@@ -4114,45 +4227,16 @@ function showHallAnimation() {
   }, 3800);
 }
 
-function showFearAnimation(callback) {
-  const existing = document.getElementById('fear-overlay');
-  if (existing) existing.remove();
-  const overlay = document.createElement('div');
-  overlay.id = 'fear-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;overflow:hidden;pointer-events:none;background:rgba(20,0,0,0.3);';
-  document.body.appendChild(overlay);
-  const chars = ['👹','🐍','👻','😤','💀','🕷️'];
-  const vw = window.innerWidth, vh = window.innerHeight;
-  for (let i = 0; i < 18; i++) {
-    const span = document.createElement('span');
-    span.textContent = chars[i % chars.length];
-    const size = Math.floor(Math.random() * 48 + 28);
-    const sx = Math.random() * (vw - 80), sy = Math.random() * (vh - 80);
-    span.style.cssText = `position:absolute;left:${sx}px;top:${sy}px;font-size:${size}px;opacity:0;transition:all ${(0.4+Math.random()*0.8).toFixed(2)}s cubic-bezier(.2,1.4,.8,1);`;
-    overlay.appendChild(span);
-    const d = i * 55;
-    setTimeout(() => {
-      span.style.opacity = '1';
-      span.style.left = (Math.random() * (vw - 80)) + 'px';
-      span.style.top = (Math.random() * (vh - 80)) + 'px';
-      span.style.transform = `rotate(${Math.random()*360-180}deg) scale(${(0.7+Math.random()*1.8).toFixed(2)})`;
-    }, d);
-    setTimeout(() => { span.style.opacity = '0'; }, d + 1600);
-  }
-  setTimeout(() => {
-    if (overlay.parentNode) overlay.remove();
-    if (callback) callback();
-  }, 2900);
-}
 
 // ===== 新しい苦手演出 =====
 
-function showTonAnimation(callback) {
+function showTonAnimation(word, callback) {
   const ov = document.createElement('div');
   ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;';
   const t = document.createElement('div');
-  t.textContent = 'トン';
-  t.style.cssText = "font-size:4rem;font-weight:900;color:#ff9f43;font-family:'Noto Sans JP',sans-serif;transform:scale(0.6);opacity:0;transition:transform 0.2s cubic-bezier(.36,2,.6,1),opacity 0.15s;text-shadow:0 0 20px rgba(255,159,67,0.6);";
+  t.textContent = word.toUpperCase();
+  const fs = Math.max(2, Math.min(4, 18 / Math.max(word.length, 1)));
+  t.style.cssText = `font-size:${fs}rem;font-weight:900;color:#ff9f43;font-family:'Nunito',sans-serif;letter-spacing:3px;transform:scale(0.6);opacity:0;transition:transform 0.2s cubic-bezier(.36,2,.6,1),opacity 0.15s;text-shadow:0 0 24px rgba(255,159,67,0.7);`;
   ov.appendChild(t); document.body.appendChild(ov);
   setTimeout(() => { t.style.transform = 'scale(1.25)'; t.style.opacity = '1'; }, 30);
   setTimeout(() => { t.style.transform = 'scale(1)'; }, 250);
@@ -4160,12 +4244,13 @@ function showTonAnimation(callback) {
   setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 950);
 }
 
-function showDonAnimation(callback) {
+function showDonAnimation(word, callback) {
   const ov = document.createElement('div');
   ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,30,0,0.06);transition:background 0.35s;';
   const t = document.createElement('div');
-  t.textContent = 'ドン！！！！！';
-  t.style.cssText = "font-size:5rem;font-weight:900;color:var(--accent);font-family:'Noto Sans JP',sans-serif;transform:scale(0.1);opacity:0;transition:transform 0.22s cubic-bezier(.36,2.2,.6,1),opacity 0.16s;text-shadow:0 0 40px rgba(255,107,107,0.9);";
+  t.textContent = word.toUpperCase();
+  const fs = Math.max(2.5, Math.min(5, 22 / Math.max(word.length, 1)));
+  t.style.cssText = `font-size:${fs}rem;font-weight:900;color:var(--accent);font-family:'Nunito',sans-serif;letter-spacing:4px;transform:scale(0.1);opacity:0;transition:transform 0.22s cubic-bezier(.36,2.2,.6,1),opacity 0.16s;text-shadow:0 0 50px rgba(255,107,107,0.95);`;
   ov.appendChild(t); document.body.appendChild(ov);
   setTimeout(() => { t.style.transform = 'scale(1.5)'; t.style.opacity = '1'; ov.style.background = 'rgba(255,30,0,0.14)'; }, 30);
   setTimeout(() => { t.style.transform = 'scale(1)'; ov.style.background = 'rgba(255,30,0,0)'; }, 270);
@@ -4177,14 +4262,12 @@ function showDonShakeAnimation(word, callback) {
   const ov = document.createElement('div');
   ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,30,0,0.1);';
   const t = document.createElement('div');
-  t.textContent = 'ドン!!!!!';
-  t.style.cssText = "font-size:5.5rem;font-weight:900;color:var(--accent);font-family:'Noto Sans JP',sans-serif;text-shadow:0 0 50px rgba(255,107,107,1);animation:don-shake 0.12s ease infinite;";
+  t.textContent = word.toUpperCase();
+  const fs = Math.max(2.5, Math.min(5.5, 24 / Math.max(word.length, 1)));
+  t.style.cssText = `font-size:${fs}rem;font-weight:900;color:var(--accent);font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 60px rgba(255,107,107,1);animation:don-shake 0.12s ease infinite;`;
   ov.appendChild(t); document.body.appendChild(ov);
-  setTimeout(() => { ov.style.transition = 'opacity 0.25s'; ov.style.opacity = '0'; }, 750);
-  setTimeout(() => {
-    if (ov.parentNode) ov.remove();
-    rapidSpellFlash(word, 5, 190, callback);
-  }, 1020);
+  setTimeout(() => { ov.style.transition = 'opacity 0.25s'; ov.style.opacity = '0'; }, 800);
+  setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 1050);
 }
 
 function rapidSpellFlash(word, times, msEach, callback) {
@@ -4203,44 +4286,374 @@ function rapidSpellFlash(word, times, msEach, callback) {
   flash();
 }
 
-function showScatterAnimation(word, typed, callback) {
+// ===== かわいいスタンプ演出（4回以上間違えた後に正解） =====
+function showCelebrationStamps() {
+  if (!document.getElementById('kawaii-kf')) {
+    const sk = document.createElement('style');
+    sk.id = 'kawaii-kf';
+    sk.textContent = `
+      @keyframes kawaiiPop {
+        0%   { transform: translate(-50%,-50%) scale(0) rotate(-20deg); opacity:0; }
+        60%  { transform: translate(-50%,-50%) scale(1.25) rotate(8deg); opacity:1; }
+        80%  { transform: translate(-50%,-50%) scale(0.92) rotate(-4deg); opacity:1; }
+        100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
+      }
+      @keyframes kawaiiText {
+        0%   { transform: translate(-50%,-50%) scale(0) rotate(-5deg); opacity:0; }
+        65%  { transform: translate(-50%,-50%) scale(1.15) rotate(3deg); opacity:1; }
+        100% { transform: translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
+      }
+    `;
+    document.head.appendChild(sk);
+  }
+
   const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;overflow:hidden;pointer-events:none;';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9995;overflow:hidden;pointer-events:none;';
   document.body.appendChild(ov);
+
+  const stamps = ['🌸','🎉','⭐','🌈','🎊','🎈','🌟','💖','✨','🎀','🦋','🌺','🍀','🎵','💫','🎨','🌻','🍭','🎡','🌙'];
   const vw = window.innerWidth, vh = window.innerHeight;
-  const letters = word.toUpperCase().split('');
-  const lw = Math.min(46, Math.floor(vw * 0.88 / Math.max(letters.length, 1)));
-  const totalW = letters.length * lw;
-  const startX = (vw - totalW) / 2;
-  const cy = vh * 0.44;
-  const spans = letters.map((ch, i) => {
-    const s = document.createElement('span');
-    s.textContent = ch;
-    const isWrong = typed && typed[i] ? typed[i].toLowerCase() !== word[i].toLowerCase() : true;
-    s.style.cssText = `position:absolute;width:${lw}px;text-align:center;font-size:${Math.min(3, lw * 0.065)}rem;font-weight:900;font-family:'Nunito',sans-serif;color:${isWrong ? 'var(--accent)' : 'var(--accent2)'};left:${startX + i * lw}px;top:${cy}px;transition:all 0.5s cubic-bezier(.2,1.3,.8,1);`;
-    ov.appendChild(s);
-    return { el: s, fx: startX + i * lw };
+
+  // 画面フラッシュ（淡いピンク）
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:absolute;inset:0;background:rgba(255,180,220,0.35);opacity:1;transition:opacity 0.5s;';
+  ov.appendChild(flash);
+  setTimeout(() => { flash.style.opacity = '0'; }, 80);
+
+  // 中央バースト（放射状に広がる）
+  for (let i = 0; i < 16; i++) {
+    const sp = document.createElement('span');
+    sp.textContent = stamps[i % stamps.length];
+    const sz = 28 + Math.random() * 28;
+    const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.4;
+    const dist = 70 + Math.random() * 110;
+    sp.style.cssText = `position:absolute;left:${vw/2}px;top:${vh*0.44}px;font-size:${sz}px;opacity:0;transform:translate(-50%,-50%) scale(0);`;
+    ov.appendChild(sp);
+    const d = 40 + i * 28;
+    setTimeout(() => {
+      sp.style.transition = `all 0.65s cubic-bezier(.1,1.7,.45,.9)`;
+      sp.style.opacity = '1';
+      sp.style.left  = (vw/2 + Math.cos(angle) * dist) + 'px';
+      sp.style.top   = (vh*0.44 + Math.sin(angle) * dist) + 'px';
+      sp.style.transform = `translate(-50%,-50%) scale(1) rotate(${Math.random()*200-100}deg)`;
+    }, d);
+    setTimeout(() => {
+      sp.style.transition = 'opacity 0.45s, transform 0.45s';
+      sp.style.opacity = '0';
+      sp.style.transform = `translate(-50%,-50%) scale(1.5) rotate(${Math.random()*360}deg)`;
+    }, d + 850 + Math.random() * 400);
+  }
+
+  // 降り注ぐスタンプ（画面全体にランダム落下）
+  for (let i = 0; i < 34; i++) {
+    const sp = document.createElement('span');
+    sp.textContent = stamps[Math.floor(Math.random() * stamps.length)];
+    const sz = 20 + Math.random() * 32;
+    const x = Math.random() * (vw + 60) - 30;
+    const startDelay = Math.random() * 1600;
+    const dur = 1100 + Math.random() * 1200;
+    const driftX = Math.random() * 70 - 35;
+    const rot = Math.random() * 360 - 180;
+    sp.style.cssText = `position:absolute;left:${x}px;top:-${sz+10}px;font-size:${sz}px;opacity:0;`;
+    ov.appendChild(sp);
+    setTimeout(() => {
+      sp.style.transition = `top ${dur}ms cubic-bezier(.25,.75,.5,1), left ${dur}ms ease, opacity 0.3s, transform ${dur}ms linear`;
+      sp.style.top = (vh + 50) + 'px';
+      sp.style.left = (x + driftX) + 'px';
+      sp.style.opacity = '1';
+      sp.style.transform = `rotate(${rot}deg)`;
+      setTimeout(() => { sp.style.opacity = '0'; }, dur - 320);
+    }, startDelay);
+  }
+
+  // 中央の大きいメインスタンプ（🎊）
+  const big = document.createElement('div');
+  big.textContent = '🎊';
+  big.style.cssText = `position:absolute;left:${vw/2}px;top:${vh*0.4}px;font-size:96px;animation:kawaiiPop 0.55s cubic-bezier(.2,1.8,.5,.9) 0.08s both;`;
+  ov.appendChild(big);
+  setTimeout(() => { big.style.transition = 'opacity 0.4s,transform 0.4s'; big.style.opacity = '0'; big.style.transform = 'translate(0,0) scale(1.3)'; }, 1700);
+
+  // 「すごい！」テキスト
+  const txt = document.createElement('div');
+  txt.textContent = 'すごい！';
+  txt.style.cssText = `position:absolute;left:${vw/2}px;top:${vh*0.4 + 70}px;font-size:28px;font-weight:900;color:#ff5fa0;font-family:'Noto Sans JP',sans-serif;text-shadow:0 2px 16px rgba(255,100,160,0.8),0 0 40px rgba(255,100,160,0.4);white-space:nowrap;animation:kawaiiText 0.5s cubic-bezier(.2,1.8,.5,.9) 0.25s both;`;
+  ov.appendChild(txt);
+  setTimeout(() => { txt.style.transition = 'opacity 0.4s'; txt.style.opacity = '0'; }, 1900);
+
+  // 小さい追加スタンプが中央周辺でぴょんぴょん跳ねる
+  const nearStamps = ['💖','⭐','🌸','✨','🌟'];
+  nearStamps.forEach((em, i) => {
+    const sp = document.createElement('span');
+    sp.textContent = em;
+    const angle2 = (i / nearStamps.length) * Math.PI * 2 + 0.3;
+    const r = 38 + Math.random() * 20;
+    sp.style.cssText = `position:absolute;left:${vw/2 + Math.cos(angle2)*r}px;top:${vh*0.4 + Math.sin(angle2)*r}px;font-size:26px;opacity:0;transform:translate(-50%,-50%) scale(0);`;
+    ov.appendChild(sp);
+    setTimeout(() => {
+      sp.style.transition = 'all 0.4s cubic-bezier(.1,2,.5,.8)';
+      sp.style.opacity = '1';
+      sp.style.transform = 'translate(-50%,-50%) scale(1)';
+    }, 220 + i * 80);
+    setTimeout(() => {
+      sp.style.transition = 'opacity 0.3s';
+      sp.style.opacity = '0';
+    }, 1500 + i * 60);
   });
+
+  setTimeout(() => { if (ov.parentNode) ov.remove(); }, 3200);
+}
+
+function showFearAnimation(word, typed, callback) {
+  // 恐怖演出（4回以上間違え）
+  if (!document.getElementById('fear-kf')) {
+    const sk = document.createElement('style');
+    sk.id = 'fear-kf';
+    sk.textContent = `
+      @keyframes fearGrowShake {
+        0%   {transform:translate(-50%,-50%) scale(0.08) rotate(0deg);}
+        4%   {transform:translate(calc(-50% - 6px),calc(-50% + 3px)) scale(0.16) rotate(3.5deg);}
+        8%   {transform:translate(calc(-50% + 7px),calc(-50% - 4px)) scale(0.26) rotate(-3deg);}
+        12%  {transform:translate(calc(-50% - 7px),calc(-50% + 4px)) scale(0.37) rotate(4deg);}
+        16%  {transform:translate(calc(-50% + 8px),calc(-50% - 3px)) scale(0.48) rotate(-3.5deg);}
+        20%  {transform:translate(calc(-50% - 8px),calc(-50% + 4px)) scale(0.58) rotate(4deg);}
+        24%  {transform:translate(calc(-50% + 9px),calc(-50% - 4px)) scale(0.67) rotate(-4deg);}
+        28%  {transform:translate(calc(-50% - 9px),calc(-50% + 5px)) scale(0.76) rotate(4.5deg);}
+        32%  {transform:translate(calc(-50% + 9px),calc(-50% - 4px)) scale(0.84) rotate(-4deg);}
+        36%  {transform:translate(calc(-50% - 10px),calc(-50% + 5px)) scale(0.91) rotate(4.5deg);}
+        40%  {transform:translate(calc(-50% + 10px),calc(-50% - 5px)) scale(0.98) rotate(-4deg);}
+        44%  {transform:translate(calc(-50% - 10px),calc(-50% + 5px)) scale(1.06) rotate(4.5deg);}
+        48%  {transform:translate(calc(-50% + 11px),calc(-50% - 5px)) scale(1.14) rotate(-4.5deg);}
+        52%  {transform:translate(calc(-50% - 11px),calc(-50% + 5px)) scale(1.22) rotate(4.5deg);}
+        56%  {transform:translate(calc(-50% + 11px),calc(-50% - 5px)) scale(1.30) rotate(-4deg);}
+        60%  {transform:translate(calc(-50% - 10px),calc(-50% + 5px)) scale(1.38) rotate(4deg);}
+        64%  {transform:translate(calc(-50% + 10px),calc(-50% - 4px)) scale(1.47) rotate(-4deg);}
+        68%  {transform:translate(calc(-50% - 9px),calc(-50% + 5px)) scale(1.56) rotate(4deg);}
+        72%  {transform:translate(calc(-50% + 9px),calc(-50% - 4px)) scale(1.65) rotate(-3.5deg);}
+        76%  {transform:translate(calc(-50% - 8px),calc(-50% + 4px)) scale(1.73) rotate(3.5deg);}
+        80%  {transform:translate(calc(-50% + 8px),calc(-50% - 4px)) scale(1.80) rotate(-3deg);}
+        84%  {transform:translate(calc(-50% - 7px),calc(-50% + 3px)) scale(1.87) rotate(3deg);}
+        88%  {transform:translate(calc(-50% + 6px),calc(-50% - 3px)) scale(1.92) rotate(-2.5deg);}
+        92%  {transform:translate(calc(-50% - 5px),calc(-50% + 3px)) scale(1.97) rotate(2deg);}
+        96%  {transform:translate(calc(-50% + 4px),calc(-50% - 2px)) scale(2.00) rotate(-1deg);}
+        100% {transform:translate(-50%,-50%) scale(2.0) rotate(0deg);}
+      }
+      @keyframes fearBloom {
+        0%   {transform:translate(-50%,-50%) scale(1.8); opacity:1;}
+        55%  {transform:translate(-50%,-50%) scale(5.5); opacity:0.7;}
+        100% {transform:translate(-50%,-50%) scale(12); opacity:0;}
+      }
+      @keyframes wrongShake {
+        0%,100%{transform:translate(-50%,-50%) translateX(0);}
+        15%   {transform:translate(-50%,-50%) translateX(-8px);}
+        30%   {transform:translate(-50%,-50%) translateX(8px);}
+        45%   {transform:translate(-50%,-50%) translateX(-8px);}
+        60%   {transform:translate(-50%,-50%) translateX(8px);}
+        75%   {transform:translate(-50%,-50%) translateX(-5px);}
+        90%   {transform:translate(-50%,-50%) translateX(5px);}
+      }
+    `;
+    document.head.appendChild(sk);
+  }
+
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9994;overflow:hidden;pointer-events:none;background:rgba(0,0,0,0);';
+  document.body.appendChild(ov);
+
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const wordUp = word.toUpperCase();
+  const letters = wordUp.split('');
+  const lw = Math.min(54, Math.floor(vw * 0.88 / Math.max(letters.length, 1)));
+  const startX = (vw - lw * letters.length) / 2;
+  const cy = vh * 0.44;
+  // Phase1はより大きく・赤く
+  const fs1 = Math.max(2.5, Math.min(5.5, 24 / Math.max(word.length, 1)));
+
+  // フェーズ1: 暗転 + 真っ赤なスペルが震えながらどんどん大きく迫ってくる (0〜1600ms)
+  setTimeout(() => { ov.style.transition = 'background 0.45s'; ov.style.background = 'rgba(0,0,0,0.92)'; }, 20);
+  const growDiv = document.createElement('div');
+  growDiv.textContent = wordUp;
+  growDiv.style.cssText = `position:absolute;top:50%;left:50%;white-space:nowrap;font-size:${fs1}rem;font-weight:900;color:#ff0000;font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 20px #ff0000,0 0 60px rgba(255,0,0,0.9),0 0 120px rgba(255,0,0,0.5);animation:fearGrowShake 1.55s ease forwards;`;
+  ov.appendChild(growDiv);
+
+  // フェーズ2: 爆発・飛び散る (1600ms〜)
   setTimeout(() => {
-    spans.forEach(s => {
-      s.el.style.left = (Math.random() * vw * 0.8 + vw * 0.1 - lw / 2) + 'px';
-      s.el.style.top = (Math.random() * vh * 0.75 + vh * 0.1) + 'px';
-      s.el.style.transform = `rotate(${Math.random()*360-180}deg) scale(${0.3 + Math.random()*1.7})`;
-      s.el.style.opacity = '0.75';
+    growDiv.remove();
+    const spans = letters.map((ch, i) => {
+      const sp = document.createElement('span');
+      sp.textContent = ch;
+      const wrong = typed && i < typed.length && typed[i].toLowerCase() !== word[i].toLowerCase();
+      const spFs = Math.max(1.6, Math.min(3.4, lw * 0.075));
+      sp.style.cssText = `position:absolute;width:${lw}px;text-align:center;line-height:1;font-size:${spFs}rem;font-weight:900;font-family:'Nunito',sans-serif;color:${wrong ? '#ff2020' : '#ff6060'};left:${startX + i*lw}px;top:${cy - lw*0.35}px;text-shadow:0 0 16px currentColor;`;
+      ov.appendChild(sp);
+      return { el: sp, fx: startX + i*lw, fy: cy - lw*0.35 };
     });
-  }, 50);
-  setTimeout(() => {
-    spans.forEach(s => {
-      s.el.style.transition = 'all 0.6s cubic-bezier(.2,1,.6,1)';
-      s.el.style.left = s.fx + 'px'; s.el.style.top = cy + 'px';
-      s.el.style.transform = 'rotate(0deg) scale(1)'; s.el.style.opacity = '1';
-      s.el.style.color = 'var(--accent2)';
-    });
-  }, 760);
-  setTimeout(() => {
-    if (ov.parentNode) ov.remove();
-    rapidSpellFlash(word, 10, 110, callback);
-  }, 1550);
+    setTimeout(() => {
+      spans.forEach(s => {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 0.32 + Math.random() * 0.42;
+        s.el.style.transition = 'all 0.38s cubic-bezier(.1,1.8,.4,.5)';
+        s.el.style.left = (vw/2 + Math.cos(angle)*vw*dist - lw/2) + 'px';
+        s.el.style.top  = (vh/2 + Math.sin(angle)*vh*dist) + 'px';
+        s.el.style.transform = `rotate(${Math.random()*360-180}deg) scale(${0.15+Math.random()*1.2})`;
+        s.el.style.opacity = '0.05';
+      });
+    }, 20);
+
+    // フェーズ3: 暗闇からゆっくり集まってくる (500ms〜)
+    setTimeout(() => {
+      spans.forEach(s => {
+        s.el.style.transition = 'all 1.05s cubic-bezier(0.04, 0.88, 0.22, 1)';
+        s.el.style.left = s.fx + 'px';
+        s.el.style.top  = s.fy + 'px';
+        s.el.style.transform = 'rotate(0deg) scale(1)';
+        s.el.style.opacity = '1';
+        s.el.style.color = 'var(--accent2)';
+        s.el.style.textShadow = '0 0 30px rgba(255,209,102,0.9)';
+      });
+    }, 500);
+
+    // フェーズ4: 完成した文字が画面いっぱいに迫ってくる (1700ms〜)
+    setTimeout(() => {
+      spans.forEach(s => s.el.remove());
+      const bloomDiv = document.createElement('div');
+      bloomDiv.textContent = wordUp;
+      bloomDiv.style.cssText = `position:absolute;top:50%;left:50%;white-space:nowrap;font-size:${fs1}rem;font-weight:900;color:var(--accent2);font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 50px rgba(255,209,102,0.95),0 0 120px rgba(255,180,50,0.5);animation:fearBloom 0.65s cubic-bezier(.35,0,.85,.5) forwards;`;
+      ov.appendChild(bloomDiv);
+    }, 1700);
+
+    // フェーズ5: 間違えた箇所だけ真っ赤・正しい箇所は暗く・画面いっぱい (2480ms〜)
+    setTimeout(() => {
+      const hasTyped = typed && typed.trim().length > 0;
+      const fs5 = Math.max(2.8, Math.min(6.5, 28 / Math.max(word.length, 1)));
+      const charHtml = wordUp.split('').map((ch, i) => {
+        const isWrong = !hasTyped
+          || (i < typed.length ? typed[i].toLowerCase() !== word[i].toLowerCase() : true);
+        return isWrong
+          ? `<span style="color:#ff0000;text-shadow:0 0 30px #ff0000,0 0 70px rgba(255,0,0,0.8);">${ch}</span>`
+          : `<span style="color:rgba(255,255,255,0.18);">${ch}</span>`;
+      }).join('');
+      const endDiv = document.createElement('div');
+      endDiv.innerHTML = charHtml;
+      endDiv.style.cssText = `position:absolute;top:50%;left:50%;white-space:nowrap;font-size:${fs5}rem;font-weight:900;font-family:'Nunito',sans-serif;letter-spacing:5px;opacity:0;transition:opacity 0.22s;animation:wrongShake 0.55s ease 0.25s 2;`;
+      ov.appendChild(endDiv);
+      ov.style.transition = 'background 0.18s'; ov.style.background = 'rgba(18,0,0,0.96)';
+      setTimeout(() => { endDiv.style.opacity = '1'; }, 30);
+      setTimeout(() => { endDiv.style.opacity = '0'; ov.style.transition = 'background 0.5s'; ov.style.background = 'rgba(0,0,0,0)'; }, 1000);
+    }, 2480);
+
+    // コールバック (3700ms〜)
+    setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 3700);
+  }, 1600);
+}
+
+// ===== 今日の進捗管理 =====
+
+function getTodayStr() {
+  return new Date().toLocaleDateString('ja-JP');
+}
+
+function checkDateReset() {
+  const today = getTodayStr();
+  const saved = localStorage.getItem('today_date');
+  if (saved && saved !== today) {
+    // 日付が変わった→前日分をログに保存してリセット
+    const deckRaw = localStorage.getItem('today_deck');
+    const pos = parseInt(localStorage.getItem('today_pos') || '0');
+    if (deckRaw) {
+      try {
+        const deck = JSON.parse(deckRaw);
+        const total = deck.length;
+        const pct = total > 0 ? Math.round(pos / total * 100) : 0;
+        saveDailyLogEntry(saved, total, pos, pct);
+      } catch {}
+    }
+    localStorage.removeItem('today_deck');
+    localStorage.removeItem('today_pos');
+    localStorage.removeItem('today_correct');
+    localStorage.removeItem('today_wrong');
+  }
+  localStorage.setItem('today_date', today);
+}
+
+function saveTodayDeck(deck) {
+  const compact = deck.map(w => ({w: w['単語'], s: w._source || ''}));
+  localStorage.setItem('today_deck', JSON.stringify(compact));
+  localStorage.setItem('today_pos', '0');
+  localStorage.setItem('today_correct', '0');
+  localStorage.setItem('today_wrong', '0');
+  localStorage.setItem('today_date', getTodayStr());
+}
+
+function saveTodayProgress() {
+  localStorage.setItem('today_pos', String(state.current));
+  localStorage.setItem('today_correct', String(state.correct));
+  localStorage.setItem('today_wrong', String(state.wrong));
+}
+
+function getTodaySession() {
+  const today = getTodayStr();
+  if (localStorage.getItem('today_date') !== today) return null;
+  const deckRaw = localStorage.getItem('today_deck');
+  if (!deckRaw) return null;
+  try {
+    const deck = JSON.parse(deckRaw);
+    const pos = parseInt(localStorage.getItem('today_pos') || '0');
+    const correct = parseInt(localStorage.getItem('today_correct') || '0');
+    const wrong = parseInt(localStorage.getItem('today_wrong') || '0');
+    return {deck, pos, correct, wrong};
+  } catch { return null; }
+}
+
+function rebuildDeckFromSaved(compact) {
+  const allWords = [
+    ...MINILABO.map(w => ({...w, _source:'ミニラボ'})),
+    ...EIKEN.map(w => ({...w, _source:'英検5級'})),
+    ...MABUTAN.map(w => ({...w, _source:'まぶたん'})),
+    ...loadOriginalWords().map(w => ({...w, _source:'オリジナル'})),
+  ];
+  const byKey = {};
+  allWords.forEach(w => { byKey[w['単語'] + '|' + w._source] = w; });
+  return compact.map(({w, s}) => byKey[w+'|'+s] || byKey[w+'|ミニラボ'] || byKey[w+'|英検5級'] || byKey[w+'|まぶたん'] || null).filter(Boolean);
+}
+
+function startResume() {
+  const session = getTodaySession();
+  if (!session || !session.deck.length) return;
+  const deck = rebuildDeckFromSaved(session.deck);
+  if (!deck.length) { alert('前回のデータを読み込めませんでした。'); return; }
+  state.deck = deck;
+  state.current = Math.min(session.pos, state.deck.length - 1);
+  state.correct = session.correct;
+  state.wrong = session.wrong;
+  state.skipped = 0; state.wrongWords = []; state.history = [];
+  showScreen('flash-screen');
+  loadCard();
+}
+
+function saveDailyLogEntry(date, total, done, pct) {
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem('daily_log') || '[]'); } catch {}
+  log = log.filter(e => e.date !== date);
+  log.unshift({date, total, done, pct});
+  localStorage.setItem('daily_log', JSON.stringify(log.slice(0, 30)));
+}
+
+function getDailyLog() {
+  try { return JSON.parse(localStorage.getItem('daily_log') || '[]'); } catch { return []; }
+}
+
+function updateResumeBtn() {
+  const session = getTodaySession();
+  const area = document.getElementById('today-resume-area');
+  if (!area) return;
+  if (session && session.deck.length && session.pos > 0 && session.pos < session.deck.length) {
+    const pct = Math.round(session.pos / session.deck.length * 100);
+    area.style.display = 'block';
+    const info = document.getElementById('today-resume-info');
+    if (info) info.textContent = `今日の続き: ${session.pos}/${session.deck.length}問 (${pct}%)`;
+  } else {
+    area.style.display = 'none';
+  }
 }
 
 // ===== 単元選択の保存・復元 =====
@@ -4360,12 +4773,17 @@ function renderRecords() {
   document.getElementById('rec-total-q').textContent = totalQ;
   document.getElementById('rec-pct').textContent = totalQ > 0 ? pct+'%' : '-%';
   document.getElementById('rec-streak').textContent = streak + '日';
-  document.getElementById('rec-hall-count').textContent = hallWords.length;
-  document.getElementById('rec-weak-count').textContent = weakWords.length;
 
+  // 殿堂入り（重複なし）
   const hallList = document.getElementById('rec-hall-list');
-  if (hallWords.length) {
-    hallList.innerHTML = hallWords.map(w =>
+  const seenHall = new Set();
+  const uniqueHall = hallWords.filter(w => {
+    if (seenHall.has(w['単語'])) return false;
+    seenHall.add(w['単語']); return true;
+  });
+  document.getElementById('rec-hall-count').textContent = uniqueHall.length;
+  if (uniqueHall.length) {
+    hallList.innerHTML = uniqueHall.map(w =>
       `<div class="rec-item" onclick="speakWord('${w['単語'].replace(/'/g,"\\'")}')">
         <span class="rec-word">${w['単語']}</span>
         <span class="rec-meaning">${w['意味']}</span>
@@ -4375,23 +4793,35 @@ function renderRecords() {
     hallList.innerHTML = '<div class="rec-empty">まだ殿堂入りはありません（3回連続正解で入れます）</div>';
   }
 
+  // よく間違えるランキング（mistakeCount降順）
   const weakList = document.getElementById('rec-weak-list');
-  if (weakWords.length) {
-    weakList.innerHTML = weakWords.map(w =>
-      `<div class="rec-item" onclick="startSingleWordTraining('${w['単語'].replace(/'/g,"\\'")}')">
-        <div style="display:flex;flex-direction:column;gap:2px;flex:1;">
-          ${renderSpellHighlight(w['単語'])}
-          <span class="rec-meaning">${w['意味']}</span>
+  const rankedWeak = [...weakWords].sort((a, b) => {
+    const ma = getWordStatus(a['単語']).mistakeCount || 0;
+    const mb = getWordStatus(b['単語']).mistakeCount || 0;
+    return mb - ma;
+  });
+  document.getElementById('rec-weak-count').textContent = rankedWeak.length + '語';
+  if (rankedWeak.length) {
+    weakList.innerHTML = rankedWeak.map((w, i) => {
+      const mc = getWordStatus(w['単語']).mistakeCount || 0;
+      return `<div class="rec-item" onclick="startWeakOnlyMode()" style="cursor:pointer;">
+        <span style="font-size:12px;color:var(--text-muted);font-weight:700;min-width:22px;">${i+1}.</span>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;letter-spacing:1px;">${w['単語'].toUpperCase()}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${w['意味']}</div>
         </div>
-      </div>`
-    ).join('');
+        <span style="font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;">${mc}回</span>
+      </div>`;
+    }).join('');
   } else {
     weakList.innerHTML = '<div class="rec-empty">苦手単語はありません！すごい！</div>';
   }
 
+  // 最近間違えた単語（直近7語）
   const recentList = document.getElementById('rec-recent-list');
-  if (recentMistakes.length) {
-    recentList.innerHTML = recentMistakes.map(m =>
+  const recentShow = recentMistakes.slice(0, 7);
+  if (recentShow.length) {
+    recentList.innerHTML = recentShow.map(m =>
       `<div class="rec-item">
         <span class="rec-word">${m.word}</span>
         <span class="rec-meaning">${m.meaning}</span>
@@ -4402,29 +4832,125 @@ function renderRecords() {
     recentList.innerHTML = '<div class="rec-empty">まだ記録がありません</div>';
   }
 
-  // 単元別練習回数（手薄単元を表示）
+  // 全単語中のクリア済み進捗
+  const srcProgressEl = document.getElementById('rec-source-progress');
+  if (srcProgressEl) {
+    const sources = [
+      { label: 'ミニラボ', data: typeof MINILABO !== 'undefined' ? MINILABO : [], total: 166 },
+      { label: '英検5級', data: typeof EIKEN !== 'undefined' ? EIKEN : [], total: 107 },
+      { label: 'まぶたん', data: typeof MABUTAN !== 'undefined' ? MABUTAN : [], total: 343 },
+    ];
+    let grandDone = 0, grandTotal = 0;
+    const rows = sources.map(src => {
+      const done = src.data.filter(w => hasEverBeenCorrect(w['単語'])).length;
+      const total = src.total;
+      grandDone += done; grandTotal += total;
+      const pct = total > 0 ? Math.round(done / total * 100) : 0;
+      const barW = pct;
+      return `<div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:700;">${src.label}</span>
+          <span style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${done}/${total}語クリア済み <span style="color:var(--accent3);">${pct}%</span></span>
+        </div>
+        <div style="height:4px;background:var(--surface);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${barW}%;background:var(--accent3);border-radius:2px;transition:width 0.4s;"></div>
+        </div>
+      </div>`;
+    });
+    const totalPct = grandTotal > 0 ? Math.round(grandDone / grandTotal * 100) : 0;
+    rows.push(`<div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid var(--surface);">
+      <span style="font-size:13px;font-weight:700;color:var(--accent2);">合計</span>
+      <span style="font-size:12px;color:var(--accent2);font-weight:700;">${grandDone}/${grandTotal}語クリア済み ${totalPct}%</span>
+    </div>`);
+    srcProgressEl.innerHTML = rows.join('');
+  }
+
+  // 単元別練習回数（手薄・未着手を判定）
   const unitRows = [];
   ['Unit1','Unit2','Unit3','Unit4','Unit5','Unit6','Unit7','Unit8','Unit9','Unit10'].forEach(u => {
     const cnt = parseInt(localStorage.getItem('practice_ml_'+u)||'0');
-    unitRows.push({name:'ミニラボ '+u, cnt});
+    unitRows.push({name:'ミニラボ '+u, cnt, key:'ml_'+u});
   });
-  [['1-25','26-50','51-75','76-100','101-125','126-150','151-175','176-200','201-225']].flat().forEach(g => {
+  ['1-25','26-50','51-75','76-100','101-125','126-150','151-175','176-200','201-225'].forEach(g => {
     const cnt = parseInt(localStorage.getItem('practice_ek_'+g)||'0');
-    unitRows.push({name:'英検 '+g, cnt});
+    unitRows.push({name:'英検 '+g, cnt, key:'ek_'+g});
   });
-  unitRows.sort((a,b) => a.cnt - b.cnt);
-  const thin = unitRows.filter(x => x.cnt < 5).slice(0, 6);
+  ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343'].forEach(g => {
+    const cnt = parseInt(localStorage.getItem('practice_mb_'+g)||'0');
+    unitRows.push({name:'まぶたん '+g, cnt, key:'mb_'+g});
+  });
+
   const unitEl = document.getElementById('rec-unit-list');
   if (unitEl) {
-    if (thin.length) {
-      unitEl.innerHTML = thin.map(x =>
-        `<div class="rec-item" style="cursor:default;">
-          <span class="rec-word" style="font-size:13px;">${x.name}</span>
-          <span class="rec-meaning">${x.cnt}回</span>
-        </div>`
-      ).join('');
+    const allZero = unitRows.every(x => x.cnt === 0);
+    if (allZero) {
+      unitEl.innerHTML = '';
     } else {
-      unitEl.innerHTML = '<div class="rec-empty">全単元バランスよく練習できています！</div>';
+      const practiced = unitRows.filter(x => x.cnt > 0);
+      const avgCnt = practiced.reduce((s,x) => s+x.cnt, 0) / practiced.length;
+      // 各unitにステータスをつける
+      const classified = unitRows.map((u, i) => {
+        if (u.cnt === 0) {
+          const prevDone = i > 0 && unitRows[i-1].cnt > 0;
+          const nextDone = i < unitRows.length-1 && unitRows[i+1].cnt > 0;
+          return {...u, status: (prevDone && nextDone) ? '手薄' : '未着手'};
+        } else if (practiced.length > 1 && u.cnt < avgCnt * 0.5) {
+          return {...u, status: '手薄'};
+        }
+        return null;
+      }).filter(Boolean);
+
+      if (classified.length) {
+        // 連続する同ソースをまとめてグループ化
+        const groups = [];
+        classified.forEach(u => {
+          const parts = u.name.split(' ');
+          const src = parts[0], unit = parts.slice(1).join(' ');
+          const last = groups[groups.length-1];
+          if (last && last.src === src) {
+            last.lastUnit = unit; last.totalCnt += u.cnt; last.count++;
+            if (u.status !== '未着手') last.hasThin = true;
+          } else {
+            groups.push({src, firstUnit: unit, lastUnit: unit, totalCnt: u.cnt, count: 1, hasThin: u.status !== '未着手'});
+          }
+        });
+        const topGroups = groups.slice(0, 3);
+        unitEl.innerHTML = topGroups.map(g => {
+          const range = g.count > 1 ? `${g.firstUnit}〜${g.lastUnit}` : g.firstUnit;
+          const avg = g.count > 0 ? Math.round(g.totalCnt / g.count) : 0;
+          const isUntouched = !g.hasThin;
+          const msg = isUntouched ? 'まだ挑戦していない範囲' : `この範囲の練習が少ない（平均${avg}回）`;
+          const color = isUntouched ? 'var(--text-muted)' : 'var(--accent)';
+          return `<div class="rec-item" style="cursor:default;flex-direction:column;align-items:flex-start;gap:2px;">
+            <span class="rec-word" style="font-size:14px;">${g.src} ${range}</span>
+            <span style="font-size:11px;color:${color};font-family:'Noto Sans JP',sans-serif;">${msg}</span>
+          </div>`;
+        }).join('');
+      } else {
+        unitEl.innerHTML = '<div class="rec-empty">全単元バランスよく練習できています！</div>';
+      }
+    }
+  }
+
+  // 毎日の記録
+  const dailyLog = getDailyLog();
+  const logEl = document.getElementById('rec-daily-log');
+  if (logEl) {
+    if (dailyLog.length) {
+      logEl.innerHTML = dailyLog.map(e => {
+        const bar = Math.round(e.pct / 10);
+        const filled = '■'.repeat(bar) + '□'.repeat(10 - bar);
+        return `<div class="rec-item" style="cursor:default;flex-direction:column;align-items:flex-start;gap:3px;">
+          <div style="display:flex;justify-content:space-between;width:100%;">
+            <span class="rec-word" style="font-size:13px;">${e.date}</span>
+            <span class="rec-meaning" style="color:${e.pct>=90?'var(--accent3)':e.pct>=70?'var(--accent2)':'var(--text-muted)'};">${e.pct}%</span>
+          </div>
+          <div style="font-size:11px;color:var(--accent2);letter-spacing:1px;font-family:'Nunito',sans-serif;">${filled}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${e.done}/${e.total}問</div>
+        </div>`;
+      }).join('');
+    } else {
+      logEl.innerHTML = '<div class="rec-empty">まだ記録がありません</div>';
     }
   }
 }
@@ -4459,12 +4985,14 @@ function resetAllRecords() {
 
 // ===== 初期化 =====
 document.addEventListener('DOMContentLoaded', () => {
+  checkDateReset();
   restoreUnitSelection();
   updateSourceUI();
   updateSelectedCount();
   renderOriginalList();
   updateOriginalCountLabel();
   updateHomeBadges();
+  updateResumeBtn();
 });
 </script>
 </body>
