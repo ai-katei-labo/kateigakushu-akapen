@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordSuck ビジネスプラン</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+JP:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --card: #1a1a28;
+  --border: #2a2a40;
+  --accent: #00ff88;
+  --accent2: #ffd166;
+  --accent3: #ff6b9d;
+  --text: #f0f0f8;
+  --text-muted: #6b6b8a;
+  --text-dim: #3a3a55;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 背景グリッド */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 24px 100px;
+}
+
+/* ヘッダー */
+.hero {
+  text-align: center;
+  padding: 80px 0 60px;
+  position: relative;
+}
+
+.hero-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(56px, 12vw, 96px);
+  font-weight: 600;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+}
+
+.hero-sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  font-weight: 300;
+}
+
+.hero-tagline {
+  margin-top: 32px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--accent2);
+  opacity: 0.9;
+}
+
+/* セクション */
+.section {
+  margin-bottom: 64px;
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 32px;
+  line-height: 1.2;
+}
+
+/* コア機能 */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.feature-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color .3s, transform .3s;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+.feature-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.feature-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.feature-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* キラー機能 */
+.killer-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.killer-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: border-color .3s;
+}
+
+.killer-card:hover { border-color: var(--accent2); }
+
+.killer-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-dim);
+  line-height: 1;
+  min-width: 48px;
+}
+
+.killer-content h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--accent2);
+}
+
+.killer-content p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* プラン */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.plan-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  transition: all .3s;
+}
+
+.plan-card.featured {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(0,255,136,.08), var(--card));
+  transform: scale(1.03);
+}
+
+.plan-name {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.plan-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.plan-price span {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.plan-desc {
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.plan-features {
+  list-style: none;
+  text-align: left;
+}
+
+.plan-features li {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-features li::before {
+  content: '→';
+  color: var(--accent);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+/* 収益シミュレーション */
+.revenue-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.revenue-table th {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.revenue-table td {
+  padding: 16px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.revenue-table tr:hover td {
+  background: rgba(0,255,136,.03);
+}
+
+.revenue-highlight {
+  color: var(--accent);
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ロードマップ */
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.roadmap::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2), var(--accent3));
+}
+
+.roadmap-item {
+  display: flex;
+  gap: 32px;
+  padding: 24px 0 24px 56px;
+  position: relative;
+}
+
+.roadmap-dot {
+  position: absolute;
+  left: 12px;
+  top: 28px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+}
+
+.roadmap-item:nth-child(2) .roadmap-dot { border-color: var(--accent2); }
+.roadmap-item:nth-child(3) .roadmap-dot { border-color: var(--accent3); }
+.roadmap-item:nth-child(4) .roadmap-dot { border-color: #a78bfa; }
+
+.roadmap-time {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  white-space: nowrap;
+  min-width: 80px;
+  padding-top: 2px;
+}
+
+.roadmap-item:nth-child(2) .roadmap-time { color: var(--accent2); }
+.roadmap-item:nth-child(3) .roadmap-time { color: var(--accent3); }
+.roadmap-item:nth-child(4) .roadmap-time { color: #a78bfa; }
+
+.roadmap-content h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.roadmap-content p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* 強み */
+.strengths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.strength-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.strength-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.strength-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* フッター */
+.footer {
+  text-align: center;
+  padding: 60px 0 0;
+  border-top: 1px solid var(--border);
+}
+
+.footer-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-style: italic;
+  color: var(--accent2);
+  margin-bottom: 16px;
+}
+
+.footer-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  background: rgba(0,255,136,.1);
+  color: var(--accent);
+  border: 1px solid rgba(0,255,136,.2);
+  margin: 4px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ヒーロー -->
+  <div class="hero">
+    <div class="hero-label">Business Plan 2025</div>
+    <div class="hero-title">WordSuck</div>
+    <div class="hero-sub">どんな単語も吸い込むアプリ</div>
+    <div class="hero-tagline">「出会った英語を全部吸い込む」</div>
+  </div>
+
+  <!-- コア機能 -->
+  <div class="section">
+    <div class="section-label">Core Features</div>
+    <div class="section-title">核心機能</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📸</div>
+        <div class="feature-name">カメラ撮影→単語抽出</div>
+        <div class="feature-desc">教科書・過去問・GoodNotesのノートを撮影するだけで単語を自動抽出</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-name">AI自動意味付け</div>
+        <div class="feature-desc">文脈に合った意味＋例文を自動生成。辞書的な意味じゃなく使われ方がわかる</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-name">熟語の自動紐づけ</div>
+        <div class="feature-desc">lookを登録したらlook up・look forも自動追加。語彙ネットワークで覚える</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎧</div>
+        <div class="feature-name">聞き流しモード</div>
+        <div class="feature-desc">日本語→英語→スペルアウトを自動再生。BGM感覚で単語が身につく</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👨‍👩‍👧‍👦</div>
+        <div class="feature-name">家族共有</div>
+        <div class="feature-desc">1アカウントで子ども複数登録。兄の単語帳を弟も使える</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-name">学習履歴・正解率</div>
+        <div class="feature-desc">苦手単語を自動検出。データが溜まるほど価値が上がる</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- キラー機能 -->
+  <div class="section">
+    <div class="section-label">Killer Features</div>
+    <div class="section-title">他にはない強み</div>
+    <div class="killer-features">
+      <div class="killer-card">
+        <div class="killer-number">01</div>
+        <div class="killer-content">
+          <h3>GoodNotesから吸い込む</h3>
+          <p>GoodNotesで書いたノートをスクショするだけで単語帳が作れる。手書きした単語は記憶に残りやすく、そのまま反復練習できる。</p>
+        </div>
+      </div>
+      <div class="killer-card">
+        <div class="killer-number">02</div>
+        <div class="killer-content">
+          <h3>過去問が例文になる</h3>
+          <p>英検・TOEICの過去問から単語を抽出。本物の試験問題がそのまま例文になる。頻出度ランキングで効率よく学習できる。</p>
+        </div>
+      </div>
+      <div class="killer-card">
+        <div class="killer-number">03</div>
+        <div class="killer-content">
+          <h3>データがたまるほどやめられない</h3>
+          <p>子どもの成長記録・学習履歴・家族の単語帳が溜まっていく。1年使ったら絶対にやめられない。教育版Spotifyのロックイン設計。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- プラン -->
+  <div class="section">
+    <div class="section-label">Pricing</div>
+    <div class="section-title">料金プラン</div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">¥0</div>
+        <div class="plan-desc">まず試してみる</div>
+        <ul class="plan-features">
+          <li>収録済み単語帳</li>
+          <li>登録20語まで</li>
+          <li>基本フラッシュカード</li>
+        </ul>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-name">こどもプラン</div>
+        <div class="plan-price">¥500<span>/月</span></div>
+        <div class="plan-desc">1家族・子ども3人まで</div>
+        <ul class="plan-features">
+          <li>全機能使い放題</li>
+          <li>登録無制限</li>
+          <li>聞き流しモード</li>
+          <li>家族共有</li>
+          <li>学習履歴管理</li>
+          <li>AI自動意味付け</li>
+          <li>カメラ撮影→抽出</li>
+        </ul>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">英検プラン</div>
+        <div class="plan-price">¥500<span>/月</span></div>
+        <div class="plan-desc">英検5級〜準1級対応</div>
+        <ul class="plan-features">
+          <li>過去問から抽出</li>
+          <li>頻出度ランキング</li>
+          <li>級別単語帳</li>
+          <li>合格予測スコア</li>
+        </ul>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">TOEICプラン</div>
+        <div class="plan-price">¥980<span>/月</span></div>
+        <div class="plan-desc">社会人・大学生向け</div>
+        <ul class="plan-features">
+          <li>TOEIC対応単語</li>
+          <li>公式問題集から抽出</li>
+          <li>目標スコア管理</li>
+          <li>ビジネス英語</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 収益シミュレーション -->
+  <div class="section">
+    <div class="section-label">Revenue</div>
+    <div class="section-title">収益シミュレーション</div>
+    <table class="revenue-table">
+      <tr>
+        <th>ユーザー数</th>
+        <th>月額</th>
+        <th>月収</th>
+        <th>年収</th>
+      </tr>
+      <tr>
+        <td>100人</td>
+        <td>¥500</td>
+        <td class="revenue-highlight">¥50,000</td>
+        <td>¥600,000</td>
+      </tr>
+      <tr>
+        <td>500人</td>
+        <td>¥500</td>
+        <td class="revenue-highlight">¥250,000</td>
+        <td>¥3,000,000</td>
+      </tr>
+      <tr>
+        <td>1,000人</td>
+        <td>¥500</td>
+        <td class="revenue-highlight">¥500,000</td>
+        <td>¥6,000,000</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ロードマップ -->
+  <div class="section">
+    <div class="section-label">Roadmap</div>
+    <div class="section-title">ロードマップ</div>
+    <div class="roadmap">
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-time">今すぐ</div>
+        <div class="roadmap-content">
+          <h3>GitHub公開・note販売開始</h3>
+          <p>発表用バージョン完成。Instagramで開発ストーリーを発信。noteで有料販売スタート（¥300〜980）</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-time">3ヶ月後</div>
+        <div class="roadmap-content">
+          <h3>サブスク開始・AI機能追加</h3>
+          <p>カメラ撮影→単語抽出、AI自動意味付け、聞き流しモードを実装。月額500円プラン開始。</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-time">6ヶ月後</div>
+        <div class="roadmap-content">
+          <h3>PWA化・家族共有機能</h3>
+          <p>ホーム画面に追加できるアプリ化。家族アカウント対応。英検プラン追加。</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-dot"></div>
+        <div class="roadmap-time">1年後</div>
+        <div class="roadmap-content">
+          <h3>App Store / Google Play 公開</h3>
+          <p>iOS・Android正式リリース。TOEICプラン追加。全教科対応へ拡張。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 強み -->
+  <div class="section">
+    <div class="section-label">Strengths</div>
+    <div class="section-title">なぜ勝てるか</div>
+    <div class="strengths">
+      <div class="strength-card">
+        <h3>他にはない機能</h3>
+        <p>「撮影→AI→単語帳」の組み合わせは他にない。ChatGPTでも Duolingoでもできない。</p>
+      </div>
+      <div class="strength-card">
+        <h3>ブランドがある</h3>
+        <p>あかペンおかあさんとして発信基盤あり。「AIと一緒に作ったお母さん」ストーリーが刺さる。</p>
+      </div>
+      <div class="strength-card">
+        <h3>解約率が低い</h3>
+        <p>データが溜まるほどやめられない設計。子どもが卒業しても下の子が使い始める。</p>
+      </div>
+      <div class="strength-card">
+        <h3>スケールできる</h3>
+        <p>英語→他教科→他言語へ拡張可能。英検→TOEIC→ビジネス英語へターゲット拡大。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- タグ -->
+  <div style="text-align:center; margin-bottom: 48px;">
+    <span class="tag">#英語学習</span>
+    <span class="tag">#中学生</span>
+    <span class="tag">#AI単語帳</span>
+    <span class="tag">#英検対策</span>
+    <span class="tag">#家族で使える</span>
+    <span class="tag">#GoodNotes連携</span>
+    <span class="tag">#サブスク</span>
+    <span class="tag">#教育系アプリ</span>
+  </div>
+
+  <!-- フッター -->
+  <div class="footer">
+    <div class="footer-title">出会った英語を<br>全部吸い込む</div>
+    <div class="footer-sub">
+      あかペンおかあさん × AI<br>
+      家庭学習デザイン
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
