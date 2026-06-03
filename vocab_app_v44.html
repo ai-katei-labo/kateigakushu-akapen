@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WordSuck v41</title>
+<title>WordSuck v44</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap');
   :root {
@@ -317,6 +317,17 @@
   .rec-reset-btn:active { background:rgba(255,107,107,.1); }
   .rec-empty { text-align:center; color:var(--text-muted); font-size:13px; font-family:'Noto Sans JP',sans-serif; padding:8px; }
 
+  /* ===== 小学生英語 2段階カテゴリ ===== */
+  .sg-group { display:flex; flex-direction:column; gap:0; }
+  .sg-mid-header { display:flex; align-items:center; gap:4px; }
+  .sg-mid-btn { flex:1; text-align:left; padding:8px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .sg-mid-btn.active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.1); }
+  .sg-expand-btn { width:28px; height:28px; border-radius:8px; border:1px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s; }
+  .sg-expand-btn:hover { color:var(--text); }
+  .sg-sub-area { display:flex; flex-wrap:wrap; gap:4px; padding:6px 0 2px 16px; }
+  .sg-sub-btn { padding:5px 10px; border-radius:8px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:11px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .sg-sub-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+
   /* ===== 音声入力（Whisper） ===== */
   .voice-panel { display:none; flex-direction:column; align-items:center; gap:14px; padding:6px 0; }
   .voice-panel.active { display:flex; }
@@ -334,21 +345,28 @@
 <div id="app">
 
 <!-- USER SELECT -->
-<div id="user-select-screen" class="screen active" style="align-items:center;justify-content:center;gap:32px;padding:40px 24px;">
+<div id="user-select-screen" class="screen active" style="align-items:center;justify-content:center;gap:28px;padding:40px 24px;">
+  <div id="user-select-back-row" style="display:none;width:100%;max-width:400px;">
+    <button onclick="showScreen('home-screen')" style="background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;padding:4px 0;font-family:'Noto Sans JP',sans-serif;">‹ もどる</button>
+  </div>
   <div style="text-align:center;">
     <div class="logo-title" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">WordSuck</div>
     <div style="font-size:13px;color:var(--text-muted);margin-top:8px;font-family:'Noto Sans JP',sans-serif;">時は金なり — 1問の正解が1コイン</div>
   </div>
   <div style="font-size:22px;font-weight:900;color:var(--gold);font-family:'Noto Sans JP',sans-serif;letter-spacing:2px;">だれがやる？</div>
   <div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:400px;" id="user-btn-list"></div>
-  <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">ユーザー名は設定画面で変更できます</div>
+  <!-- 名前変更エリア -->
+  <div style="width:100%;max-width:400px;">
+    <button onclick="toggleUserNameEdit()" id="user-name-edit-toggle" style="background:none;border:none;color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;padding:4px 0;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;gap:4px;">名前を変える <span id="user-name-edit-arrow">▾</span></button>
+    <div id="user-name-edit-area" style="display:none;flex-direction:column;gap:10px;margin-top:12px;padding:16px;background:var(--card);border-radius:14px;border:1px solid rgba(212,175,55,.2);"></div>
+  </div>
 </div>
 
 <!-- HOME -->
 <div id="home-screen" class="screen">
   <div style="text-align:center;">
     <div class="logo-title">WordSuck</div>
-    <div id="home-user-bar" style="font-size:12px;color:var(--gold);font-family:'Noto Sans JP',sans-serif;margin-top:4px;cursor:pointer;" onclick="showScreen('user-select-screen')">▶ 切り替え</div>
+    <div id="home-user-bar" style="font-size:12px;color:var(--gold);font-family:'Noto Sans JP',sans-serif;margin-top:4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openUserSelectFromHome()">▶ 切り替え</div>
   </div>
   <div class="mode-cards">
     <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
@@ -378,8 +396,8 @@
     <div class="mode-card flash" onclick="goToTypingSettings()" style="border-color:#a78bfa;">
       <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_typing.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;"></div>
       <div style="flex:1;min-width:0;">
-        <div class="mode-name">英文タイピング</div>
-        <div class="mode-desc">日本語を見て英文を打つ</div>
+        <div class="mode-name">英文スピーキング</div>
+        <div class="mode-desc">日本語を見て英文を話す</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
@@ -536,16 +554,113 @@
         <div class="source-name">小学生英語</div>
         <div class="source-count">332語</div>
       </div>
-      <div class="unit-grid" id="shogakusei-grid" style="display:none;">
-        <button class="unit-btn unit-all-btn" onclick="selectAllShogakusei()">全選択</button>
-        <button class="unit-btn active" data-shogakusei="数・時間" onclick="toggleShogakusei(this)">数・時間</button>
-        <button class="unit-btn active" data-shogakusei="色・形" onclick="toggleShogakusei(this)">色・形</button>
-        <button class="unit-btn active" data-shogakusei="食べ物" onclick="toggleShogakusei(this)">食べ物</button>
-        <button class="unit-btn active" data-shogakusei="生き物" onclick="toggleShogakusei(this)">生き物</button>
-        <button class="unit-btn active" data-shogakusei="人・体" onclick="toggleShogakusei(this)">人・体</button>
-        <button class="unit-btn active" data-shogakusei="学校・町" onclick="toggleShogakusei(this)">学校・町</button>
-        <button class="unit-btn active" data-shogakusei="生活" onclick="toggleShogakusei(this)">生活</button>
-        <button class="unit-btn active" data-shogakusei="自然" onclick="toggleShogakusei(this)">自然</button>
+      <div id="shogakusei-grid" style="display:none;flex-direction:column;gap:6px;">
+        <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn" onclick="selectAllShogakusei()">全選択</button></div>
+        <!-- 数・時間 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)">数・時間</button>
+            <button class="sg-expand-btn" id="sg-exp-数・時間" onclick="toggleSgExpand('数・時間')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-数・時間">
+            <button class="sg-sub-btn active" data-sg-sub="数字" data-sg-parent="数・時間" onclick="toggleSgSub(this)">数字</button>
+            <button class="sg-sub-btn active" data-sg-sub="曜日" data-sg-parent="数・時間" onclick="toggleSgSub(this)">曜日</button>
+            <button class="sg-sub-btn active" data-sg-sub="月" data-sg-parent="数・時間" onclick="toggleSgSub(this)">月</button>
+            <button class="sg-sub-btn active" data-sg-sub="季節" data-sg-parent="数・時間" onclick="toggleSgSub(this)">季節</button>
+            <button class="sg-sub-btn active" data-sg-sub="時刻" data-sg-parent="数・時間" onclick="toggleSgSub(this)">時刻</button>
+          </div>
+        </div>
+        <!-- 食べ物 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)">食べ物</button>
+            <button class="sg-expand-btn" id="sg-exp-食べ物" onclick="toggleSgExpand('食べ物')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-食べ物">
+            <button class="sg-sub-btn active" data-sg-sub="果物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">果物</button>
+            <button class="sg-sub-btn active" data-sg-sub="野菜" data-sg-parent="食べ物" onclick="toggleSgSub(this)">野菜</button>
+            <button class="sg-sub-btn active" data-sg-sub="食べ物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">食べ物</button>
+            <button class="sg-sub-btn active" data-sg-sub="飲み物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">飲み物</button>
+          </div>
+        </div>
+        <!-- 生き物 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="生き物" onclick="toggleSgMidAll(this)">生き物</button>
+            <button class="sg-expand-btn" id="sg-exp-生き物" onclick="toggleSgExpand('生き物')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-生き物">
+            <button class="sg-sub-btn active" data-sg-sub="動物" data-sg-parent="生き物" onclick="toggleSgSub(this)">動物</button>
+            <button class="sg-sub-btn active" data-sg-sub="昆虫" data-sg-parent="生き物" onclick="toggleSgSub(this)">昆虫</button>
+            <button class="sg-sub-btn active" data-sg-sub="魚・海の生き物" data-sg-parent="生き物" onclick="toggleSgSub(this)">魚</button>
+            <button class="sg-sub-btn active" data-sg-sub="植物" data-sg-parent="生き物" onclick="toggleSgSub(this)">植物</button>
+          </div>
+        </div>
+        <!-- 人・体 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="人・体" onclick="toggleSgMidAll(this)">人・体</button>
+            <button class="sg-expand-btn" id="sg-exp-人・体" onclick="toggleSgExpand('人・体')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-人・体">
+            <button class="sg-sub-btn active" data-sg-sub="家族" data-sg-parent="人・体" onclick="toggleSgSub(this)">家族</button>
+            <button class="sg-sub-btn active" data-sg-sub="体" data-sg-parent="人・体" onclick="toggleSgSub(this)">体</button>
+            <button class="sg-sub-btn active" data-sg-sub="気持ち" data-sg-parent="人・体" onclick="toggleSgSub(this)">気持ち</button>
+            <button class="sg-sub-btn active" data-sg-sub="職業" data-sg-parent="人・体" onclick="toggleSgSub(this)">職業</button>
+          </div>
+        </div>
+        <!-- 学校・町 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)">学校・町</button>
+            <button class="sg-expand-btn" id="sg-exp-学校・町" onclick="toggleSgExpand('学校・町')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-学校・町">
+            <button class="sg-sub-btn active" data-sg-sub="学校" data-sg-parent="学校・町" onclick="toggleSgSub(this)">学校</button>
+            <button class="sg-sub-btn active" data-sg-sub="文房具" data-sg-parent="学校・町" onclick="toggleSgSub(this)">文房具</button>
+            <button class="sg-sub-btn active" data-sg-sub="町" data-sg-parent="学校・町" onclick="toggleSgSub(this)">町</button>
+            <button class="sg-sub-btn active" data-sg-sub="建物" data-sg-parent="学校・町" onclick="toggleSgSub(this)">建物</button>
+            <button class="sg-sub-btn active" data-sg-sub="乗り物" data-sg-parent="学校・町" onclick="toggleSgSub(this)">乗り物</button>
+          </div>
+        </div>
+        <!-- 生活 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="生活" onclick="toggleSgMidAll(this)">生活</button>
+            <button class="sg-expand-btn" id="sg-exp-生活" onclick="toggleSgExpand('生活')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-生活">
+            <button class="sg-sub-btn active" data-sg-sub="服" data-sg-parent="生活" onclick="toggleSgSub(this)">服</button>
+            <button class="sg-sub-btn active" data-sg-sub="持ち物" data-sg-parent="生活" onclick="toggleSgSub(this)">持ち物</button>
+            <button class="sg-sub-btn active" data-sg-sub="スポーツ" data-sg-parent="生活" onclick="toggleSgSub(this)">スポーツ</button>
+            <button class="sg-sub-btn active" data-sg-sub="遊び" data-sg-parent="生活" onclick="toggleSgSub(this)">遊び</button>
+            <button class="sg-sub-btn active" data-sg-sub="行事" data-sg-parent="生活" onclick="toggleSgSub(this)">行事</button>
+          </div>
+        </div>
+        <!-- 自然 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="自然" onclick="toggleSgMidAll(this)">自然</button>
+            <button class="sg-expand-btn" id="sg-exp-自然" onclick="toggleSgExpand('自然')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-自然">
+            <button class="sg-sub-btn active" data-sg-sub="天気" data-sg-parent="自然" onclick="toggleSgSub(this)">天気</button>
+            <button class="sg-sub-btn active" data-sg-sub="自然" data-sg-parent="自然" onclick="toggleSgSub(this)">自然</button>
+            <button class="sg-sub-btn active" data-sg-sub="国" data-sg-parent="自然" onclick="toggleSgSub(this)">国</button>
+            <button class="sg-sub-btn active" data-sg-sub="言語" data-sg-parent="自然" onclick="toggleSgSub(this)">言語</button>
+          </div>
+        </div>
+        <!-- 色・形 -->
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-sg-mid="色・形" onclick="toggleSgMidAll(this)">色・形</button>
+            <button class="sg-expand-btn" id="sg-exp-色・形" onclick="toggleSgExpand('色・形')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="sg-subs-色・形">
+            <button class="sg-sub-btn active" data-sg-sub="色" data-sg-parent="色・形" onclick="toggleSgSub(this)">色</button>
+            <button class="sg-sub-btn active" data-sg-sub="形" data-sg-parent="色・形" onclick="toggleSgSub(this)">形</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -569,12 +684,6 @@
       <button class="speed-btn active" data-speed="normal" onclick="selectSpeed(this)">ふつう</button>
       <button class="speed-btn" data-speed="fast" onclick="selectSpeed(this)">はやい</button>
     </div>
-  </div>
-
-  <!-- ユーザー名設定 -->
-  <div class="settings-section">
-    <div class="settings-label">ユーザー名</div>
-    <div id="user-name-settings" style="display:flex;flex-direction:column;gap:10px;"></div>
   </div>
 
   <button class="start-btn" onclick="startFlash()">スタート →</button>
@@ -836,7 +945,7 @@
   <div style="max-width:600px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;">
     <div id="typing-settings-header" class="screen-header">
       <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
-      <div class="screen-title">英文タイピング設定</div>
+      <div class="screen-title">英文スピーキング設定</div>
     </div>
     <div id="typing-quiz-header" class="flash-header" style="display:none;">
       <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
@@ -860,7 +969,6 @@
         <button class="unit-btn active" data-typing-unit="9" onclick="toggleTypingUnit(this)">Unit9</button>
         <button class="unit-btn active" data-typing-unit="10" onclick="toggleTypingUnit(this)">Unit10</button>
       </div>
-      <!-- ⑤ タイピングモード 速度設定 -->
       <div class="settings-label" style="margin-top:4px;">読み上げ速度</div>
       <div class="speed-btns">
         <button class="speed-btn active" data-typing-speed="normal" onclick="selectTypingSpeed(this)">ふつう</button>
@@ -873,18 +981,26 @@
       <div class="flashcard" style="min-height:120px;">
         <div class="card-source-badge" id="typing-unit-badge"></div>
         <div style="font-size:24px;font-weight:800;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;line-height:1.5;text-align:center;" id="typing-ja-text">...</div>
-        <div id="typing-word-underlines" style="display:none;text-align:center;padding:4px 0;line-height:2.2;"></div>
       </div>
-      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;">
-        <!-- ④ 記号プレビュー表示エリア -->
-        <div id="typing-symbol-hint" style="display:none;font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;text-align:center;padding:6px 12px;background:rgba(255,209,102,.07);border-radius:10px;border:1px solid rgba(255,209,102,.2);">
-          記号ヒント：<span id="typing-symbol-text" style="color:var(--accent2);font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:2px;"></span>
+      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center;">
+        <!-- マイク入力エリア -->
+        <div id="typing-mic-area" style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;">
+          <div style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;" id="typing-voice-status">ボタンを押して英文を話す</div>
+          <button class="mic-btn" id="typing-mic-btn" onclick="toggleTypingSpeakingRecording()">🎤</button>
+          <div style="font-size:28px;font-weight:900;color:var(--accent2);font-family:'Nunito',sans-serif;min-height:36px;" id="typing-voice-timer"></div>
         </div>
-        <textarea id="typing-input" rows="2" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="off" placeholder="英文を入力してEnterで確認" style="width:100%;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-family:'Nunito',sans-serif;padding:12px 16px;resize:none;outline:none;transition:border-color .2s;line-height:1.5;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'"></textarea>
-        <button onclick="checkTypingAnswer()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:white;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">確認 →</button>
-        <div id="typing-feedback" style="min-height:28px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;"></div>
+        <!-- OpenAI APIキー未設定時 -->
+        <div id="typing-openai-key-area" style="display:none;width:100%;flex-direction:column;gap:8px;padding:12px;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25);border-radius:14px;">
+          <div style="font-size:12px;color:var(--accent2);font-weight:700;font-family:'Noto Sans JP',sans-serif;">OpenAI APIキーを入力してください（音声認識用）</div>
+          <input type="password" id="typing-openai-key-input" class="ai-apikey-input" placeholder="sk-..." autocomplete="off" />
+          <div style="display:flex;gap:8px;">
+            <button class="ai-apikey-save" onclick="saveTypingOpenAIKey()">保存</button>
+            <button class="ai-apikey-clear" onclick="clearTypingOpenAIKey()">クリア</button>
+          </div>
+        </div>
+        <div id="typing-feedback" style="min-height:28px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;width:100%;"></div>
         <div style="text-align:center;"><button id="typing-replay-btn" onclick="replayTypingSentence()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button></div>
-        <div id="typing-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;">
+        <div id="typing-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;width:100%;">
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-family:'Noto Sans JP',sans-serif;">正解</div>
           <div id="typing-correct-text" style="font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;line-height:1.5;"></div>
         </div>
@@ -911,77 +1027,77 @@
         <!-- ミニラボ -->
         <div>
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;" onclick="toggleListenSourceGrid('ls-minilabo-grid')">
-            <input type="checkbox" class="source-checkbox" id="ls-chk-minilabo" checked onclick="event.stopPropagation();updateListenCount()">
+            <input type="checkbox" class="source-checkbox" id="ls-chk-minilabo" onclick="event.stopPropagation();updateListenCount()">
             <span style="font-size:15px;font-weight:800;">ミニラボ（教科書）</span>
             <span style="font-size:12px;color:var(--text-muted);">166語</span>
           </label>
           <div id="ls-minilabo-grid" class="unit-grid" style="padding-left:30px;">
             <button class="unit-btn unit-all-btn" onclick="selectAllLsMinilabo()">全選択</button>
-            <button class="unit-btn active" data-ls-ml="Unit1" onclick="toggleLsMinilabo(this)">Unit1</button>
-            <button class="unit-btn active" data-ls-ml="Unit2" onclick="toggleLsMinilabo(this)">Unit2</button>
-            <button class="unit-btn active" data-ls-ml="Unit3" onclick="toggleLsMinilabo(this)">Unit3</button>
-            <button class="unit-btn active" data-ls-ml="Unit4" onclick="toggleLsMinilabo(this)">Unit4</button>
-            <button class="unit-btn active" data-ls-ml="Unit5" onclick="toggleLsMinilabo(this)">Unit5</button>
-            <button class="unit-btn active" data-ls-ml="Unit6" onclick="toggleLsMinilabo(this)">Unit6</button>
-            <button class="unit-btn active" data-ls-ml="Unit7" onclick="toggleLsMinilabo(this)">Unit7</button>
-            <button class="unit-btn active" data-ls-ml="Unit8" onclick="toggleLsMinilabo(this)">Unit8</button>
-            <button class="unit-btn active" data-ls-ml="Unit9" onclick="toggleLsMinilabo(this)">Unit9</button>
-            <button class="unit-btn active" data-ls-ml="Unit10" onclick="toggleLsMinilabo(this)">Unit10</button>
+            <button class="unit-btn" data-ls-ml="Unit1" onclick="toggleLsMinilabo(this)">Unit1</button>
+            <button class="unit-btn" data-ls-ml="Unit2" onclick="toggleLsMinilabo(this)">Unit2</button>
+            <button class="unit-btn" data-ls-ml="Unit3" onclick="toggleLsMinilabo(this)">Unit3</button>
+            <button class="unit-btn" data-ls-ml="Unit4" onclick="toggleLsMinilabo(this)">Unit4</button>
+            <button class="unit-btn" data-ls-ml="Unit5" onclick="toggleLsMinilabo(this)">Unit5</button>
+            <button class="unit-btn" data-ls-ml="Unit6" onclick="toggleLsMinilabo(this)">Unit6</button>
+            <button class="unit-btn" data-ls-ml="Unit7" onclick="toggleLsMinilabo(this)">Unit7</button>
+            <button class="unit-btn" data-ls-ml="Unit8" onclick="toggleLsMinilabo(this)">Unit8</button>
+            <button class="unit-btn" data-ls-ml="Unit9" onclick="toggleLsMinilabo(this)">Unit9</button>
+            <button class="unit-btn" data-ls-ml="Unit10" onclick="toggleLsMinilabo(this)">Unit10</button>
           </div>
         </div>
         <div style="height:1px;background:var(--surface);"></div>
         <!-- 英検5級 -->
         <div>
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;" onclick="toggleListenSourceGrid('ls-eiken-grid')">
-            <input type="checkbox" class="source-checkbox" id="ls-chk-eiken" checked onclick="event.stopPropagation();updateListenCount()">
+            <input type="checkbox" class="source-checkbox" id="ls-chk-eiken" onclick="event.stopPropagation();updateListenCount()">
             <span style="font-size:15px;font-weight:800;">英検5級</span>
             <span style="font-size:12px;color:var(--text-muted);">107語</span>
           </label>
           <div id="ls-eiken-grid" class="unit-grid" style="padding-left:30px;">
             <button class="unit-btn unit-all-btn" onclick="selectAllLsEiken()">全選択</button>
-            <button class="unit-btn active" data-ls-eiken="1-25" onclick="toggleLsEiken(this)">1〜25</button>
-            <button class="unit-btn active" data-ls-eiken="26-50" onclick="toggleLsEiken(this)">26〜50</button>
-            <button class="unit-btn active" data-ls-eiken="51-75" onclick="toggleLsEiken(this)">51〜75</button>
-            <button class="unit-btn active" data-ls-eiken="76-100" onclick="toggleLsEiken(this)">76〜100</button>
-            <button class="unit-btn active" data-ls-eiken="101-125" onclick="toggleLsEiken(this)">101〜125</button>
-            <button class="unit-btn active" data-ls-eiken="126-150" onclick="toggleLsEiken(this)">126〜150</button>
-            <button class="unit-btn active" data-ls-eiken="151-175" onclick="toggleLsEiken(this)">151〜175</button>
-            <button class="unit-btn active" data-ls-eiken="176-200" onclick="toggleLsEiken(this)">176〜200</button>
-            <button class="unit-btn active" data-ls-eiken="201-225" onclick="toggleLsEiken(this)">201〜225</button>
+            <button class="unit-btn" data-ls-eiken="1-25" onclick="toggleLsEiken(this)">1〜25</button>
+            <button class="unit-btn" data-ls-eiken="26-50" onclick="toggleLsEiken(this)">26〜50</button>
+            <button class="unit-btn" data-ls-eiken="51-75" onclick="toggleLsEiken(this)">51〜75</button>
+            <button class="unit-btn" data-ls-eiken="76-100" onclick="toggleLsEiken(this)">76〜100</button>
+            <button class="unit-btn" data-ls-eiken="101-125" onclick="toggleLsEiken(this)">101〜125</button>
+            <button class="unit-btn" data-ls-eiken="126-150" onclick="toggleLsEiken(this)">126〜150</button>
+            <button class="unit-btn" data-ls-eiken="151-175" onclick="toggleLsEiken(this)">151〜175</button>
+            <button class="unit-btn" data-ls-eiken="176-200" onclick="toggleLsEiken(this)">176〜200</button>
+            <button class="unit-btn" data-ls-eiken="201-225" onclick="toggleLsEiken(this)">201〜225</button>
           </div>
         </div>
         <div style="height:1px;background:var(--surface);"></div>
         <!-- まぶたん -->
         <div>
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;" onclick="toggleListenSourceGrid('ls-mabutan-grid')">
-            <input type="checkbox" class="source-checkbox" id="ls-chk-mabutan" checked onclick="event.stopPropagation();updateListenCount()">
+            <input type="checkbox" class="source-checkbox" id="ls-chk-mabutan" onclick="event.stopPropagation();updateListenCount()">
             <span style="font-size:15px;font-weight:800;">まぶたん</span>
             <span style="font-size:12px;color:var(--text-muted);">343語</span>
           </label>
           <div id="ls-mabutan-grid" class="unit-grid" style="padding-left:30px;">
             <button class="unit-btn unit-all-btn" onclick="selectAllLsMabutan()">全選択</button>
-            <button class="unit-btn active" data-ls-mabutan="1-16" onclick="toggleLsMabutan(this)">1〜16</button>
-            <button class="unit-btn active" data-ls-mabutan="17-32" onclick="toggleLsMabutan(this)">17〜32</button>
-            <button class="unit-btn active" data-ls-mabutan="33-48" onclick="toggleLsMabutan(this)">33〜48</button>
-            <button class="unit-btn active" data-ls-mabutan="49-64" onclick="toggleLsMabutan(this)">49〜64</button>
-            <button class="unit-btn active" data-ls-mabutan="65-80" onclick="toggleLsMabutan(this)">65〜80</button>
-            <button class="unit-btn active" data-ls-mabutan="81-96" onclick="toggleLsMabutan(this)">81〜96</button>
-            <button class="unit-btn active" data-ls-mabutan="97-112" onclick="toggleLsMabutan(this)">97〜112</button>
-            <button class="unit-btn active" data-ls-mabutan="113-128" onclick="toggleLsMabutan(this)">113〜128</button>
-            <button class="unit-btn active" data-ls-mabutan="129-144" onclick="toggleLsMabutan(this)">129〜144</button>
-            <button class="unit-btn active" data-ls-mabutan="145-160" onclick="toggleLsMabutan(this)">145〜160</button>
-            <button class="unit-btn active" data-ls-mabutan="161-176" onclick="toggleLsMabutan(this)">161〜176</button>
-            <button class="unit-btn active" data-ls-mabutan="177-192" onclick="toggleLsMabutan(this)">177〜192</button>
-            <button class="unit-btn active" data-ls-mabutan="193-208" onclick="toggleLsMabutan(this)">193〜208</button>
-            <button class="unit-btn active" data-ls-mabutan="209-224" onclick="toggleLsMabutan(this)">209〜224</button>
-            <button class="unit-btn active" data-ls-mabutan="225-240" onclick="toggleLsMabutan(this)">225〜240</button>
-            <button class="unit-btn active" data-ls-mabutan="241-256" onclick="toggleLsMabutan(this)">241〜256</button>
-            <button class="unit-btn active" data-ls-mabutan="257-272" onclick="toggleLsMabutan(this)">257〜272</button>
-            <button class="unit-btn active" data-ls-mabutan="273-288" onclick="toggleLsMabutan(this)">273〜288</button>
-            <button class="unit-btn active" data-ls-mabutan="289-304" onclick="toggleLsMabutan(this)">289〜304</button>
-            <button class="unit-btn active" data-ls-mabutan="305-320" onclick="toggleLsMabutan(this)">305〜320</button>
-            <button class="unit-btn active" data-ls-mabutan="321-336" onclick="toggleLsMabutan(this)">321〜336</button>
-            <button class="unit-btn active" data-ls-mabutan="337-343" onclick="toggleLsMabutan(this)">337〜343</button>
+            <button class="unit-btn" data-ls-mabutan="1-16" onclick="toggleLsMabutan(this)">1〜16</button>
+            <button class="unit-btn" data-ls-mabutan="17-32" onclick="toggleLsMabutan(this)">17〜32</button>
+            <button class="unit-btn" data-ls-mabutan="33-48" onclick="toggleLsMabutan(this)">33〜48</button>
+            <button class="unit-btn" data-ls-mabutan="49-64" onclick="toggleLsMabutan(this)">49〜64</button>
+            <button class="unit-btn" data-ls-mabutan="65-80" onclick="toggleLsMabutan(this)">65〜80</button>
+            <button class="unit-btn" data-ls-mabutan="81-96" onclick="toggleLsMabutan(this)">81〜96</button>
+            <button class="unit-btn" data-ls-mabutan="97-112" onclick="toggleLsMabutan(this)">97〜112</button>
+            <button class="unit-btn" data-ls-mabutan="113-128" onclick="toggleLsMabutan(this)">113〜128</button>
+            <button class="unit-btn" data-ls-mabutan="129-144" onclick="toggleLsMabutan(this)">129〜144</button>
+            <button class="unit-btn" data-ls-mabutan="145-160" onclick="toggleLsMabutan(this)">145〜160</button>
+            <button class="unit-btn" data-ls-mabutan="161-176" onclick="toggleLsMabutan(this)">161〜176</button>
+            <button class="unit-btn" data-ls-mabutan="177-192" onclick="toggleLsMabutan(this)">177〜192</button>
+            <button class="unit-btn" data-ls-mabutan="193-208" onclick="toggleLsMabutan(this)">193〜208</button>
+            <button class="unit-btn" data-ls-mabutan="209-224" onclick="toggleLsMabutan(this)">209〜224</button>
+            <button class="unit-btn" data-ls-mabutan="225-240" onclick="toggleLsMabutan(this)">225〜240</button>
+            <button class="unit-btn" data-ls-mabutan="241-256" onclick="toggleLsMabutan(this)">241〜256</button>
+            <button class="unit-btn" data-ls-mabutan="257-272" onclick="toggleLsMabutan(this)">257〜272</button>
+            <button class="unit-btn" data-ls-mabutan="273-288" onclick="toggleLsMabutan(this)">273〜288</button>
+            <button class="unit-btn" data-ls-mabutan="289-304" onclick="toggleLsMabutan(this)">289〜304</button>
+            <button class="unit-btn" data-ls-mabutan="305-320" onclick="toggleLsMabutan(this)">305〜320</button>
+            <button class="unit-btn" data-ls-mabutan="321-336" onclick="toggleLsMabutan(this)">321〜336</button>
+            <button class="unit-btn" data-ls-mabutan="337-343" onclick="toggleLsMabutan(this)">337〜343</button>
           </div>
         </div>
         <div style="height:1px;background:var(--surface);"></div>
@@ -992,16 +1108,113 @@
             <span style="font-size:15px;font-weight:800;">小学生英語</span>
             <span style="font-size:12px;color:var(--text-muted);">332語</span>
           </label>
-          <div id="ls-shogakusei-grid" class="unit-grid" style="padding-left:30px;display:none;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsShogakusei()">全選択</button>
-            <button class="unit-btn active" data-ls-shogakusei="数・時間" onclick="toggleLsShogakusei(this)">数・時間</button>
-            <button class="unit-btn active" data-ls-shogakusei="色・形" onclick="toggleLsShogakusei(this)">色・形</button>
-            <button class="unit-btn active" data-ls-shogakusei="食べ物" onclick="toggleLsShogakusei(this)">食べ物</button>
-            <button class="unit-btn active" data-ls-shogakusei="生き物" onclick="toggleLsShogakusei(this)">生き物</button>
-            <button class="unit-btn active" data-ls-shogakusei="人・体" onclick="toggleLsShogakusei(this)">人・体</button>
-            <button class="unit-btn active" data-ls-shogakusei="学校・町" onclick="toggleLsShogakusei(this)">学校・町</button>
-            <button class="unit-btn active" data-ls-shogakusei="生活" onclick="toggleLsShogakusei(this)">生活</button>
-            <button class="unit-btn active" data-ls-shogakusei="自然" onclick="toggleLsShogakusei(this)">自然</button>
+          <div id="ls-shogakusei-grid" style="padding-left:16px;display:none;flex-direction:column;gap:6px;">
+            <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn" onclick="selectAllLsShogakusei()">全選択</button></div>
+            <!-- 数・時間 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="数・時間" onclick="toggleLsSgMidAll(this)">数・時間</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-数・時間" onclick="toggleLsSgExpand('数・時間')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-数・時間" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="数字" data-ls-sg-parent="数・時間" onclick="toggleLsSgSub(this)">数字</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="曜日" data-ls-sg-parent="数・時間" onclick="toggleLsSgSub(this)">曜日</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="月" data-ls-sg-parent="数・時間" onclick="toggleLsSgSub(this)">月</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="季節" data-ls-sg-parent="数・時間" onclick="toggleLsSgSub(this)">季節</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="時刻" data-ls-sg-parent="数・時間" onclick="toggleLsSgSub(this)">時刻</button>
+              </div>
+            </div>
+            <!-- 食べ物 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="食べ物" onclick="toggleLsSgMidAll(this)">食べ物</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-食べ物" onclick="toggleLsSgExpand('食べ物')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-食べ物" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="果物" data-ls-sg-parent="食べ物" onclick="toggleLsSgSub(this)">果物</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="野菜" data-ls-sg-parent="食べ物" onclick="toggleLsSgSub(this)">野菜</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="食べ物" data-ls-sg-parent="食べ物" onclick="toggleLsSgSub(this)">食べ物</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="飲み物" data-ls-sg-parent="食べ物" onclick="toggleLsSgSub(this)">飲み物</button>
+              </div>
+            </div>
+            <!-- 生き物 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="生き物" onclick="toggleLsSgMidAll(this)">生き物</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-生き物" onclick="toggleLsSgExpand('生き物')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-生き物" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="動物" data-ls-sg-parent="生き物" onclick="toggleLsSgSub(this)">動物</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="昆虫" data-ls-sg-parent="生き物" onclick="toggleLsSgSub(this)">昆虫</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="魚・海の生き物" data-ls-sg-parent="生き物" onclick="toggleLsSgSub(this)">魚</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="植物" data-ls-sg-parent="生き物" onclick="toggleLsSgSub(this)">植物</button>
+              </div>
+            </div>
+            <!-- 人・体 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="人・体" onclick="toggleLsSgMidAll(this)">人・体</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-人・体" onclick="toggleLsSgExpand('人・体')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-人・体" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="家族" data-ls-sg-parent="人・体" onclick="toggleLsSgSub(this)">家族</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="体" data-ls-sg-parent="人・体" onclick="toggleLsSgSub(this)">体</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="気持ち" data-ls-sg-parent="人・体" onclick="toggleLsSgSub(this)">気持ち</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="職業" data-ls-sg-parent="人・体" onclick="toggleLsSgSub(this)">職業</button>
+              </div>
+            </div>
+            <!-- 学校・町 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="学校・町" onclick="toggleLsSgMidAll(this)">学校・町</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-学校・町" onclick="toggleLsSgExpand('学校・町')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-学校・町" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="学校" data-ls-sg-parent="学校・町" onclick="toggleLsSgSub(this)">学校</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="文房具" data-ls-sg-parent="学校・町" onclick="toggleLsSgSub(this)">文房具</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="町" data-ls-sg-parent="学校・町" onclick="toggleLsSgSub(this)">町</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="建物" data-ls-sg-parent="学校・町" onclick="toggleLsSgSub(this)">建物</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="乗り物" data-ls-sg-parent="学校・町" onclick="toggleLsSgSub(this)">乗り物</button>
+              </div>
+            </div>
+            <!-- 生活 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="生活" onclick="toggleLsSgMidAll(this)">生活</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-生活" onclick="toggleLsSgExpand('生活')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-生活" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="服" data-ls-sg-parent="生活" onclick="toggleLsSgSub(this)">服</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="持ち物" data-ls-sg-parent="生活" onclick="toggleLsSgSub(this)">持ち物</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="スポーツ" data-ls-sg-parent="生活" onclick="toggleLsSgSub(this)">スポーツ</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="遊び" data-ls-sg-parent="生活" onclick="toggleLsSgSub(this)">遊び</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="行事" data-ls-sg-parent="生活" onclick="toggleLsSgSub(this)">行事</button>
+              </div>
+            </div>
+            <!-- 自然 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="自然" onclick="toggleLsSgMidAll(this)">自然</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-自然" onclick="toggleLsSgExpand('自然')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-自然" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="天気" data-ls-sg-parent="自然" onclick="toggleLsSgSub(this)">天気</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="自然" data-ls-sg-parent="自然" onclick="toggleLsSgSub(this)">自然</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="国" data-ls-sg-parent="自然" onclick="toggleLsSgSub(this)">国</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="言語" data-ls-sg-parent="自然" onclick="toggleLsSgSub(this)">言語</button>
+              </div>
+            </div>
+            <!-- 色・形 -->
+            <div class="sg-group">
+              <div class="sg-mid-header">
+                <button class="sg-mid-btn" data-ls-sg-mid="色・形" onclick="toggleLsSgMidAll(this)">色・形</button>
+                <button class="sg-expand-btn" id="ls-sg-exp-色・形" onclick="toggleLsSgExpand('色・形')">▸</button>
+              </div>
+              <div class="sg-sub-area" id="ls-sg-subs-色・形" style="display:none;">
+                <button class="sg-sub-btn" data-ls-sg-sub="色" data-ls-sg-parent="色・形" onclick="toggleLsSgSub(this)">色</button>
+                <button class="sg-sub-btn" data-ls-sg-sub="形" data-ls-sg-parent="色・形" onclick="toggleLsSgSub(this)">形</button>
+              </div>
+            </div>
           </div>
         </div>
         <div style="height:1px;background:var(--surface);"></div>
@@ -1012,7 +1225,14 @@
           <span style="font-size:12px;color:var(--text-muted);" id="ls-orig-count">0語</span>
         </label>
       </div>
-      <div class="selected-count" id="ls-selected-count">273語が選択されています</div>
+      <div class="selected-count" id="ls-selected-count">0語が選択されています</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">スペルアウト速度</div>
+      <div class="speed-btns">
+        <button class="speed-btn active" data-listen-speed="normal" onclick="selectListenSpelloutSpeed(this)">ふつう</button>
+        <button class="speed-btn" data-listen-speed="fast" onclick="selectListenSpelloutSpeed(this)">はやい</button>
+      </div>
     </div>
     <div class="settings-section">
       <div class="settings-label">単語間の間隔</div>
@@ -1252,12 +1472,33 @@ function selectUser(uid) {
   updateHomeBadges();
   updateResumeBtn();
   updateOriginalCountLabel();
-  renderUserNameSettings();
+  const backRow = document.getElementById('user-select-back-row');
+  if (backRow) backRow.style.display = 'none';
   showScreen('home-screen');
+}
+function openUserSelectFromHome() {
+  renderUserSelectScreen();
+  renderUserNameSettings();
+  const backRow = document.getElementById('user-select-back-row');
+  if (backRow) backRow.style.display = 'block';
+  const editArea = document.getElementById('user-name-edit-area');
+  if (editArea) editArea.style.display = 'none';
+  const arrow = document.getElementById('user-name-edit-arrow');
+  if (arrow) arrow.textContent = '▾';
+  showScreen('user-select-screen');
+}
+function toggleUserNameEdit() {
+  const area = document.getElementById('user-name-edit-area');
+  const arrow = document.getElementById('user-name-edit-arrow');
+  if (!area) return;
+  const isOpen = area.style.display === 'flex';
+  area.style.display = isOpen ? 'none' : 'flex';
+  if (arrow) arrow.textContent = isOpen ? '▾' : '▴';
+  if (!isOpen) renderUserNameSettings();
 }
 function renderUserNameSettings() {
   const names = getUserNames();
-  const el = document.getElementById('user-name-settings');
+  const el = document.getElementById('user-name-edit-area');
   if (!el) return;
   el.innerHTML = names.map((name, i) => `
     <div style="display:flex;gap:8px;align-items:center;">
@@ -2371,6 +2612,148 @@ const SHOGAKUSEI = parseCSV(SHOGAKUSEI_CSV);
 function shogakuseiInCategory(w, cat) { return (w['出典_小学生'] || '') === cat; }
 const SHOGAKUSEI_CATEGORIES = ['数・時間','色・形','食べ物','生き物','人・体','学校・町','生活','自然'];
 
+// 小学生英語 2段階カテゴリ定義
+const SG_SUBS = {
+  '数・時間': ['数字','曜日','月','季節','時刻'],
+  '食べ物': ['果物','野菜','食べ物','飲み物'],
+  '生き物': ['動物','昆虫','魚・海の生き物','植物'],
+  '人・体': ['家族','体','気持ち','職業'],
+  '学校・町': ['学校','文房具','町','建物','乗り物'],
+  '生活': ['服','持ち物','スポーツ','遊び','行事'],
+  '自然': ['天気','自然','国','言語'],
+  '色・形': ['色','形'],
+};
+const SG_WORD_SUBS = {
+  'zero':'数字','one':'数字','two':'数字','three':'数字','four':'数字','five':'数字',
+  'six':'数字','seven':'数字','eight':'数字','nine':'数字','ten':'数字','eleven':'数字',
+  'twelve':'数字','thirteen':'数字','fourteen':'数字','fifteen':'数字','sixteen':'数字',
+  'seventeen':'数字','eighteen':'数字','nineteen':'数字','twenty':'数字','thirty':'数字',
+  'forty':'数字','fifty':'数字','sixty':'数字','seventy':'数字','eighty':'数字',
+  'ninety':'数字','hundred':'数字','thousand':'数字','first':'数字','second':'数字','third':'数字',
+  'Sunday':'曜日','Monday':'曜日','Tuesday':'曜日','Wednesday':'曜日','Thursday':'曜日','Friday':'曜日','Saturday':'曜日',
+  'January':'月','February':'月','March':'月','April':'月','May':'月','June':'月',
+  'July':'月','August':'月','September':'月','October':'月','November':'月','December':'月',
+  'spring':'季節','summer':'季節','fall':'季節','winter':'季節',
+  'morning':'時刻','afternoon':'時刻','evening':'時刻','night':'時刻','today':'時刻',
+  'yesterday':'時刻','tomorrow':'時刻','week':'時刻','month':'時刻','year':'時刻',
+  'day':'時刻','hour':'時刻','minute':'時刻',
+  'apple':'果物','banana':'果物','grape':'果物','strawberry':'果物','watermelon':'果物',
+  'peach':'果物','lemon':'果物','pineapple':'果物',
+  'carrot':'野菜','potato':'野菜','onion':'野菜','tomato':'野菜','lettuce':'野菜',
+  'cucumber':'野菜','corn':'野菜','cabbage':'野菜','mushroom':'野菜','pumpkin':'野菜',
+  'rice':'食べ物','bread':'食べ物','meat':'食べ物','egg':'食べ物','soup':'食べ物',
+  'salad':'食べ物','sandwich':'食べ物','pizza':'食べ物','hamburger':'食べ物','sushi':'食べ物',
+  'noodles':'食べ物','curry':'食べ物','cake':'食べ物','cookie':'食べ物','candy':'食べ物',
+  'chocolate':'食べ物','breakfast':'食べ物','lunch':'食べ物','dinner':'食べ物',
+  'water':'飲み物','milk':'飲み物','juice':'飲み物','tea':'飲み物','coffee':'飲み物',
+  'dog':'動物','cat':'動物','bird':'動物','rabbit':'動物','horse':'動物','cow':'動物',
+  'pig':'動物','sheep':'動物','monkey':'動物','elephant':'動物','lion':'動物','tiger':'動物',
+  'bear':'動物','fox':'動物','deer':'動物','wolf':'動物','giraffe':'動物','panda':'動物',
+  'zebra':'動物','frog':'動物','snake':'動物',
+  'ant':'昆虫','bee':'昆虫','butterfly':'昆虫','dragonfly':'昆虫','grasshopper':'昆虫','caterpillar':'昆虫',
+  'shark':'魚・海の生き物','whale':'魚・海の生き物','dolphin':'魚・海の生き物','octopus':'魚・海の生き物',
+  'crab':'魚・海の生き物','shrimp':'魚・海の生き物','turtle':'魚・海の生き物',
+  'father':'家族','mother':'家族','brother':'家族','sister':'家族','grandfather':'家族',
+  'grandmother':'家族','uncle':'家族','aunt':'家族','baby':'家族','family':'家族','friend':'家族',
+  'head':'体','face':'体','eye':'体','ear':'体','nose':'体','mouth':'体','hand':'体',
+  'arm':'体','leg':'体','foot':'体','finger':'体','hair':'体','shoulder':'体',
+  'neck':'体','stomach':'体','knee':'体','back':'体',
+  'happy':'気持ち','sad':'気持ち','angry':'気持ち','surprised':'気持ち','scared':'気持ち',
+  'tired':'気持ち','hungry':'気持ち','excited':'気持ち','sick':'気持ち','fine':'気持ち',
+  'teacher':'職業','doctor':'職業','nurse':'職業','farmer':'職業','driver':'職業',
+  'cook':'職業','singer':'職業','pilot':'職業','scientist':'職業','firefighter':'職業',
+  'pencil':'文房具','eraser':'文房具','ruler':'文房具','scissors':'文房具','glue':'文房具',
+  'notebook':'文房具','book':'文房具','bag':'文房具','pen':'文房具','crayon':'文房具',
+  'school':'学校',
+  'hospital':'建物','library':'建物','restaurant':'建物','hotel':'建物','bank':'建物',
+  'theater':'建物','castle':'建物','temple':'建物',
+  'park':'町','store':'町','station':'町','museum':'町','zoo':'町',
+  'car':'乗り物','bus':'乗り物','train':'乗り物','bicycle':'乗り物','airplane':'乗り物',
+  'ship':'乗り物','taxi':'乗り物','truck':'乗り物','helicopter':'乗り物',
+  'shirt':'服','pants':'服','dress':'服','skirt':'服','jacket':'服','coat':'服',
+  'shoes':'服','boots':'服','hat':'服','socks':'服','uniform':'服',
+  'glasses':'持ち物','umbrella':'持ち物','watch':'持ち物','key':'持ち物','wallet':'持ち物','camera':'持ち物',
+  'soccer':'スポーツ','baseball':'スポーツ','basketball':'スポーツ','tennis':'スポーツ',
+  'swimming':'スポーツ','volleyball':'スポーツ','skiing':'スポーツ','cycling':'スポーツ',
+  'game':'遊び','toy':'遊び','doll':'遊び','music':'遊び','movie':'遊び','cooking':'遊び','dancing':'遊び',
+  'birthday':'行事','Christmas':'行事','Halloween':'行事','festival':'行事',
+  'vacation':'行事','holiday':'行事','graduation':'行事','party':'行事',
+  'sunny':'天気','cloudy':'天気','rainy':'天気','windy':'天気','snowy':'天気',
+  'hot':'天気','cold':'天気','warm':'天気','cool':'天気','thunder':'天気','rainbow':'天気','typhoon':'天気',
+  'mountain':'自然','river':'自然','sea':'自然','lake':'自然','forest':'自然',
+  'tree':'自然','flower':'自然','grass':'自然','sky':'自然','sun':'自然','moon':'自然',
+  'cloud':'自然','rain':'自然','snow':'自然','earth':'自然','stone':'自然',
+  'sand':'自然','island':'自然','volcano':'自然',
+  'Japan':'国','America':'国','England':'国','China':'国','Korea':'国','France':'国',
+  'Germany':'国','Italy':'国','Australia':'国','Brazil':'国','Canada':'国','India':'国',
+  'red':'色','blue':'色','yellow':'色','green':'色','orange':'色','purple':'色',
+  'pink':'色','white':'色','black':'色','brown':'色','gray':'色',
+  'circle':'形','square':'形','triangle':'形','rectangle':'形','star':'形',
+  'heart':'形','big':'形','small':'形','long':'形','short':'形','tall':'形','round':'形',
+};
+function sgWordMatchesSubs(w, selectedSubs) {
+  const wordStr = w['単語'] || '';
+  const sub = SG_WORD_SUBS[wordStr];
+  return sub ? selectedSubs.includes(sub) : false;
+}
+function getSelectedSgSubs(prefix) {
+  const attr = prefix ? `[data-ls-sg-sub]` : `[data-sg-sub]`;
+  return Array.from(document.querySelectorAll(attr + '.active')).map(b => prefix ? b.dataset.lsSgSub : b.dataset.sgSub);
+}
+// 中カテゴリボタンのアクティブ状態を同期
+function syncSgMidBtn(mid, prefix) {
+  const midAttr = prefix ? `[data-ls-sg-mid="${mid}"]` : `[data-sg-mid="${mid}"]`;
+  const subAttr = prefix ? `[data-ls-sg-parent="${mid}"]` : `[data-sg-parent="${mid}"]`;
+  const midBtn = document.querySelector(midAttr);
+  if (!midBtn) return;
+  const anyActive = Array.from(document.querySelectorAll(subAttr + '.active')).length > 0;
+  midBtn.classList.toggle('active', anyActive);
+}
+// 設定画面 展開/折りたたみ
+function toggleSgExpand(mid) {
+  const sub = document.getElementById('sg-subs-' + mid);
+  const btn = document.getElementById('sg-exp-' + mid);
+  if (!sub) return;
+  const open = sub.style.display === 'none' || sub.style.display === '';
+  sub.style.display = open ? 'flex' : 'none';
+  if (btn) btn.textContent = open ? '▾' : '▸';
+}
+function toggleSgSub(btn) {
+  btn.classList.toggle('active');
+  syncSgMidBtn(btn.dataset.sgParent, false);
+  saveUnitSelection(); updateSelectedCount();
+}
+function toggleSgMidAll(btn) {
+  const mid = btn.dataset.sgMid;
+  const subBtns = document.querySelectorAll(`[data-sg-parent="${mid}"]`);
+  const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
+  subBtns.forEach(b => b.classList.toggle('active', !allActive));
+  btn.classList.toggle('active', !allActive);
+  saveUnitSelection(); updateSelectedCount();
+}
+// 聞き流し画面 展開/折りたたみ
+function toggleLsSgExpand(mid) {
+  const sub = document.getElementById('ls-sg-subs-' + mid);
+  const btn = document.getElementById('ls-sg-exp-' + mid);
+  if (!sub) return;
+  const open = sub.style.display === 'none' || sub.style.display === '';
+  sub.style.display = open ? 'flex' : 'none';
+  if (btn) btn.textContent = open ? '▾' : '▸';
+}
+function toggleLsSgSub(btn) {
+  btn.classList.toggle('active');
+  syncSgMidBtn(btn.dataset.lsSgParent, true);
+  updateListenCount();
+}
+function toggleLsSgMidAll(btn) {
+  const mid = btn.dataset.lsSgMid;
+  const subBtns = document.querySelectorAll(`[data-ls-sg-parent="${mid}"]`);
+  const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
+  subBtns.forEach(b => b.classList.toggle('active', !allActive));
+  btn.classList.toggle('active', !allActive);
+  updateListenCount();
+}
+
 function getMabutanNum(w) {
   const s = w['出典_まぶたん'] || '';
   const m = s.match(/No\.(\d+)/);
@@ -2408,6 +2791,7 @@ function updateSourceUI() {
   document.getElementById('eiken-grid').style.display = eikenOn ? 'flex' : 'none';
   document.getElementById('mabutan-grid').style.display = mabutanOn ? 'flex' : 'none';
   document.getElementById('shogakusei-grid').style.display = shogakuseiOn ? 'flex' : 'none';
+  if (shogakuseiOn) document.getElementById('shogakusei-grid').style.flexDirection = 'column';
   updateOriginalCountLabel();
   saveUnitSelection();
   updateSelectedCount();
@@ -2415,8 +2799,6 @@ function updateSourceUI() {
 function toggleUnit(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
 function toggleEiken(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
 function toggleMabutan(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
-function toggleShogakusei(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
-
 function selectAllUnits() {
   const btns = document.querySelectorAll('#unit-grid button[data-unit]');
   const allActive = Array.from(btns).every(b => b.classList.contains('active'));
@@ -2436,9 +2818,10 @@ function selectAllMabutan() {
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllShogakusei() {
-  const btns = document.querySelectorAll('#shogakusei-grid button[data-shogakusei]');
-  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
-  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  const subBtns = document.querySelectorAll('[data-sg-sub]');
+  const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
+  subBtns.forEach(b => b.classList.toggle('active', !allActive));
+  Object.keys(SG_SUBS).forEach(mid => syncSgMidBtn(mid, false));
   saveUnitSelection(); updateSelectedCount();
 }
 
@@ -2450,12 +2833,12 @@ function buildDeck() {
   const selectedUnits = Array.from(document.querySelectorAll('#unit-grid button.active')).map(b => b.dataset.unit);
   const selectedEikenGroups = Array.from(document.querySelectorAll('#eiken-grid button.active')).map(b => b.dataset.eiken);
   const selectedMabutanGroups = Array.from(document.querySelectorAll('#mabutan-grid button.active')).map(b => b.dataset.mabutan);
-  const selectedShogakuseiCats = Array.from(document.querySelectorAll('#shogakusei-grid button.active')).map(b => b.dataset.shogakusei);
+  const selectedSgSubs = getSelectedSgSubs(false);
   const result = [];
   if (minilaboOn) MINILABO.filter(w => selectedUnits.includes(w['出典_ミニラボ'])).forEach(w => result.push({...w, _source: 'ミニラボ'}));
   if (eikenOn) EIKEN.filter(w => selectedEikenGroups.some(g => eikenInGroup(w, g))).forEach(w => result.push({...w, _source: '英検5級'}));
   if (mabutanOn) MABUTAN.filter(w => selectedMabutanGroups.some(g => mabutanInGroup(w, g))).forEach(w => result.push({...w, _source: 'まぶたん'}));
-  if (shogakuseiOn) SHOGAKUSEI.filter(w => selectedShogakuseiCats.some(c => shogakuseiInCategory(w, c))).forEach(w => result.push({...w, _source: '小学生英語'}));
+  if (shogakuseiOn) SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, selectedSgSubs)).forEach(w => result.push({...w, _source: '小学生英語'}));
   const origEl = document.getElementById('chk-original');
   if (origEl && origEl.checked) {
     loadOriginalWords().forEach(w => result.push({...w, _source: 'オリジナル'}));
@@ -2549,7 +2932,16 @@ function loadCard() {
 }
 
 const mainInput = document.getElementById('main-input');
-mainInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkAnswer(); });
+mainInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (state.answered) {
+      const nextBtn = document.getElementById('next-btn');
+      if (nextBtn && nextBtn.style.display !== 'none') nextCard();
+    } else {
+      checkAnswer();
+    }
+  }
+});
 function focusInput() { if (!state.answered) mainInput.focus(); }
 
 function renderLetterBoxes(typed, correct) {
@@ -2704,7 +3096,7 @@ function checkAnswer() {
     const spellHL = document.getElementById('spell-highlight-area');
     if (!wasAlreadyCorrectN && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
-    speakWord(wordStr);
+    doSpellOut(wordStr);
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
@@ -2797,13 +3189,10 @@ function selectSpeed(btn) {
 }
 
 function doSpellOut(word) {
-  const letters = word.toUpperCase().split('').join(' - ');
-  document.getElementById('spellout-text').textContent = letters;
-  document.getElementById('spellout-display').classList.add('visible');
-  if (!spelloutEnabled) return;
   if (!('speechSynthesis' in window)) return;
-  const rate = spelloutSpeed === 'slow' ? 0.7 : spelloutSpeed === 'fast' ? 1.3 : 1.0;
-  const letterRate = spelloutSpeed === 'slow' ? 0.55 : spelloutSpeed === 'fast' ? 1.1 : 0.85;
+  window.speechSynthesis.cancel();
+  const rate = spelloutSpeed === 'fast' ? 1.3 : 1.0;
+  const letterRate = spelloutSpeed === 'fast' ? 1.1 : 0.85;
   function getEnVoice() {
     const voices = window.speechSynthesis.getVoices();
     return voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en-')) || voices.find(v => v.lang.startsWith('en')) || null;
@@ -2818,7 +3207,7 @@ function doSpellOut(word) {
     window.speechSynthesis.speak(u);
   }
   function startSpeak() {
-    const items = [{ text: word, rate: rate }, ...word.split('').map(ch => ({ text: ch, rate: letterRate })), { text: word, rate: rate }];
+    const items = [{ text: word, rate }, ...word.split('').map(ch => ({ text: ch, rate: letterRate })), { text: word, rate }];
     speakChain(items, 0);
   }
   const voices = window.speechSynthesis.getVoices();
@@ -2843,7 +3232,7 @@ function revealAnswer() {
   document.getElementById('feedback-area').textContent = state.isWeak ? '答えを見たよ！もう一度挑戦しよう' : '答えを確認して書き直してみよう';
   const spellHL = document.getElementById('spell-highlight-area');
   if (!wasAlreadyCorrectR && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
-  speakWord(wordStr);
+  if (state.isWeak) { speakWord(wordStr); } else { doSpellOut(wordStr); }
   if (state.isWeak) {
     state.weakWrongCount++;
     const skipBtn = document.querySelector('.action-btn.btn-skip');
@@ -2970,7 +3359,12 @@ function loadStestCard() {
 }
 
 const stestInput = document.getElementById('stest-input');
-if (stestInput) stestInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkStestAnswer(); });
+if (stestInput) stestInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (stestInput.disabled) stestNext();
+    else checkStestAnswer();
+  }
+});
 
 function checkStestAnswer() {
   const inp = document.getElementById('stest-input');
@@ -3374,39 +3768,20 @@ function loadTypingCard() {
   document.getElementById('typing-progress-text').textContent = (typingCurrent+1) + '/' + typingDeck.length;
   document.getElementById('typing-unit-badge').textContent = 'Unit' + currentTypingSentence.unit;
   document.getElementById('typing-ja-text').textContent = currentTypingSentence.ja;
-  document.getElementById('typing-input').value = '';
   document.getElementById('typing-feedback').textContent = '';
   document.getElementById('typing-feedback').style.color = '';
   document.getElementById('typing-answer-display').style.display = 'none';
   document.getElementById('typing-next-btn').style.display = 'none';
   document.getElementById('typing-reveal-btn').style.display = 'block';
   document.getElementById('typing-replay-btn').style.display = 'none';
-  // 単語数下線ヒント
-  const wordUnderlines = document.getElementById('typing-word-underlines');
-  if (wordUnderlines) {
-    const words = currentTypingSentence.en.replace(/[.,?!'—\-:]/g, '').split(/\s+/).filter(w => w.length > 0);
-    wordUnderlines.innerHTML = words.map(w =>
-      `<span style="display:inline-block;border-bottom:2px solid rgba(167,169,190,.6);min-width:${w.length * 9 + 4}px;height:1em;margin:0 4px;vertical-align:bottom;"></span>`
-    ).join('');
-    wordUnderlines.style.display = 'block';
-  }
-  // ④ 記号ヒント表示
-  const symbols = extractSymbols(currentTypingSentence.en);
-  const hintEl = document.getElementById('typing-symbol-hint');
-  const hintText = document.getElementById('typing-symbol-text');
-  if (symbols.length > 0) {
-    const uniqueSymbols = [...new Set(symbols)];
-    hintText.textContent = uniqueSymbols.join('  ');
-    hintEl.style.display = 'block';
-  } else {
-    hintEl.style.display = 'none';
-  }
-  setTimeout(() => document.getElementById('typing-input').focus(), 150);
+  document.getElementById('typing-voice-status').textContent = 'ボタンを押して英文を話す';
+  document.getElementById('typing-voice-timer').textContent = '';
+  const micBtn = document.getElementById('typing-mic-btn');
+  if (micBtn) { micBtn.disabled = false; micBtn.classList.remove('recording'); }
+  const keyArea = document.getElementById('typing-openai-key-area');
+  if (keyArea && !localStorage.getItem('wordsuck_openai_api_key')) keyArea.style.display = 'flex';
+  else if (keyArea) keyArea.style.display = 'none';
 }
-
-document.getElementById('typing-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); checkTypingAnswer(); }
-});
 
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function buildTypingDiffHtml(typed, correct) {
@@ -3428,29 +3803,25 @@ function buildTypingDiffHtml(typed, correct) {
   return html;
 }
 
-function checkTypingAnswer() {
+function checkTypingAnswer(typed) {
   if (typingAnswered) return;
-  const typed = document.getElementById('typing-input').value.trim();
-  if (!typed) return;
+  if (!typed || !typed.trim()) return;
   typingAnswered = true;
   const correct = currentTypingSentence.en;
   const fb = document.getElementById('typing-feedback');
-
-  // ④ 段階採点：完全一致 / スペルOK（記号違い）/ まちがい
   if (typed.toLowerCase() === correct.toLowerCase()) {
     fb.textContent = '完璧！'; fb.style.color = '#06d6a0';
     document.getElementById('typing-correct-text').innerHTML = `<span style="color:#06d6a0">${escHtml(correct)}</span>`;
     document.getElementById('typing-answer-display').style.display = 'block';
   } else if (normalizeForCompare(typed) === normalizeForCompare(correct)) {
-    fb.textContent = '惜しい！記号に注意'; fb.style.color = 'var(--accent2)';
+    fb.textContent = '惜しい！'; fb.style.color = 'var(--accent2)';
     document.getElementById('typing-correct-text').innerHTML = buildTypingDiffHtml(typed, correct);
     document.getElementById('typing-answer-display').style.display = 'block';
   } else {
-    fb.textContent = 'まちがい！'; fb.style.color = 'var(--accent)';
+    fb.textContent = 'もう一度チャレンジ！'; fb.style.color = 'var(--accent)';
     document.getElementById('typing-correct-text').innerHTML = buildTypingDiffHtml(typed, correct);
     document.getElementById('typing-answer-display').style.display = 'block';
   }
-  const ul = document.getElementById('typing-word-underlines'); if(ul) ul.style.display = 'none';
   speakSentence(correct, null, typingSpeed);
   document.getElementById('typing-replay-btn').style.display = 'inline-block';
   document.getElementById('typing-next-btn').style.display = 'block';
@@ -3464,7 +3835,6 @@ function typingReveal() {
   document.getElementById('typing-answer-display').style.display = 'block';
   document.getElementById('typing-feedback').textContent = '答えを確認してね';
   document.getElementById('typing-feedback').style.color = 'var(--text-muted)';
-  const ul = document.getElementById('typing-word-underlines'); if(ul) ul.style.display = 'none';
   speakSentence(correct, null, typingSpeed);
   document.getElementById('typing-replay-btn').style.display = 'inline-block';
   document.getElementById('typing-next-btn').style.display = 'block';
@@ -3473,6 +3843,112 @@ function typingReveal() {
 function typingNext() { typingCurrent++; loadTypingCard(); }
 function typingSkip() { typingCurrent++; loadTypingCard(); }
 function replayTypingSentence() { if(currentTypingSentence) speakSentence(currentTypingSentence.en, null, typingSpeed); }
+
+// ===== 英文スピーキング 音声入力 =====
+let typingSpeakingRecorder = null;
+let typingSpeakingChunks = [];
+let typingSpeakingIsRecording = false;
+let typingSpeakingTimer = null;
+let typingSpeakingSeconds = 0;
+const TYPING_SPEAKING_MAX_SEC = 20;
+
+function saveTypingOpenAIKey() {
+  const key = document.getElementById('typing-openai-key-input').value.trim();
+  if (!key.startsWith('sk-')) { alert('APIキーは sk- から始まります'); return; }
+  localStorage.setItem('wordsuck_openai_api_key', key);
+  document.getElementById('typing-openai-key-input').value = '';
+  document.getElementById('typing-openai-key-area').style.display = 'none';
+}
+function clearTypingOpenAIKey() {
+  localStorage.removeItem('wordsuck_openai_api_key');
+  document.getElementById('typing-openai-key-area').style.display = 'flex';
+}
+
+async function toggleTypingSpeakingRecording() {
+  if (typingAnswered) return;
+  if (typingSpeakingIsRecording) { stopTypingSpeakingRecording(); return; }
+  if (!localStorage.getItem('wordsuck_openai_api_key')) {
+    document.getElementById('typing-openai-key-area').style.display = 'flex';
+    return;
+  }
+  await startTypingSpeakingRecording();
+}
+
+async function startTypingSpeakingRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    typingSpeakingChunks = [];
+    typingSpeakingSeconds = 0;
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+      : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+      : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+    typingSpeakingRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+    typingSpeakingRecorder.ondataavailable = e => { if (e.data.size > 0) typingSpeakingChunks.push(e.data); };
+    typingSpeakingRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); processTypingSpeakingVoice(); };
+    typingSpeakingRecorder.start(100);
+    typingSpeakingIsRecording = true;
+    document.getElementById('typing-mic-btn').classList.add('recording');
+    document.getElementById('typing-voice-status').textContent = '録音中... もう一度押して送信';
+    typingSpeakingTimer = setInterval(() => {
+      typingSpeakingSeconds++;
+      document.getElementById('typing-voice-timer').textContent = typingSpeakingSeconds + 's';
+      if (typingSpeakingSeconds >= TYPING_SPEAKING_MAX_SEC) stopTypingSpeakingRecording();
+    }, 1000);
+  } catch (e) {
+    document.getElementById('typing-voice-status').textContent = 'マイクが使えません: ' + e.message;
+  }
+}
+
+function stopTypingSpeakingRecording() {
+  if (!typingSpeakingIsRecording) return;
+  clearInterval(typingSpeakingTimer);
+  typingSpeakingIsRecording = false;
+  if (typingSpeakingRecorder && typingSpeakingRecorder.state !== 'inactive') typingSpeakingRecorder.stop();
+  document.getElementById('typing-mic-btn').classList.remove('recording');
+  document.getElementById('typing-voice-status').textContent = '変換中...';
+  document.getElementById('typing-voice-timer').textContent = '';
+}
+
+async function processTypingSpeakingVoice() {
+  const key = localStorage.getItem('wordsuck_openai_api_key');
+  if (!key || typingSpeakingChunks.length === 0) {
+    document.getElementById('typing-voice-status').textContent = 'ボタンを押して英文を話す';
+    return;
+  }
+  try {
+    const mimeType = typingSpeakingChunks[0]?.type || 'audio/webm';
+    const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+    const blob = new Blob(typingSpeakingChunks, { type: mimeType });
+    const formData = new FormData();
+    formData.append('file', blob, 'voice.' + ext);
+    formData.append('model', 'whisper-1');
+    formData.append('language', 'en');
+    const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key },
+      body: formData
+    });
+    if (!res.ok) {
+      const errMsg = res.status === 401 ? 'OpenAI APIキーが無効です' : 'エラー: ' + res.status;
+      document.getElementById('typing-voice-status').textContent = errMsg;
+      if (res.status === 401) {
+        localStorage.removeItem('wordsuck_openai_api_key');
+        document.getElementById('typing-openai-key-area').style.display = 'flex';
+      }
+      return;
+    }
+    const data = await res.json();
+    const text = data.text?.trim();
+    if (!text) {
+      document.getElementById('typing-voice-status').textContent = '聞き取れませんでした。もう一度。';
+      return;
+    }
+    document.getElementById('typing-voice-status').textContent = '「' + text + '」';
+    checkTypingAnswer(text);
+  } catch (e) {
+    document.getElementById('typing-voice-status').textContent = 'エラー: ' + e.message;
+  }
+}
 
 // ===== 英文暗記モード =====
 let smemDeck = [], smemCurrent = 0;
@@ -3575,7 +4051,7 @@ function speakSentence(text, onEndCallback, speedKey) {
 let listenDeck = [], listenCurrent = 0, listenPaused = false;
 let listenInterval = 'normal'; // short/normal/long
 let listenSpelloutEnabled = true;
-let listenSpelloutSpeed = 'slow';
+let listenSpelloutSpeed = 'normal';
 let listenTimeoutId = null;
 let listenType = 'word'; // 'word' or 'sentence'
 
@@ -3587,7 +4063,13 @@ function selectListenType(btn) {
 
 function toggleListenSourceGrid(gridId) {
   const grid = document.getElementById(gridId);
-  if (grid) grid.style.display = (grid.style.display === 'none') ? 'flex' : 'none';
+  if (!grid) return;
+  if (grid.style.display === 'none' || grid.style.display === '') {
+    grid.style.display = 'flex';
+    if (gridId === 'ls-shogakusei-grid') grid.style.flexDirection = 'column';
+  } else {
+    grid.style.display = 'none';
+  }
 }
 function toggleLsMinilabo(btn) {
   btn.classList.toggle('active');
@@ -3623,11 +4105,11 @@ function selectAllLsMabutan() {
   btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
   updateListenCount();
 }
-function toggleLsShogakusei(btn) { btn.classList.toggle('active'); updateListenCount(); }
 function selectAllLsShogakusei() {
-  const btns = document.querySelectorAll('[data-ls-shogakusei]');
-  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
-  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  const subBtns = document.querySelectorAll('[data-ls-sg-sub]');
+  const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
+  subBtns.forEach(b => b.classList.toggle('active', !allActive));
+  Object.keys(SG_SUBS).forEach(mid => syncSgMidBtn(mid, true));
   updateListenCount();
 }
 function updateListenCount() {
@@ -3646,8 +4128,8 @@ function updateListenCount() {
   }
   const lsChkSg = document.getElementById('ls-chk-shogakusei');
   if (lsChkSg && lsChkSg.checked) {
-    const cats = Array.from(document.querySelectorAll('[data-ls-shogakusei].active')).map(b => b.dataset.lsShogakusei);
-    count += SHOGAKUSEI.filter(w => cats.some(c => shogakuseiInCategory(w, c))).length;
+    const lsSubs = getSelectedSgSubs(true);
+    count += SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs)).length;
   }
   if (document.getElementById('ls-chk-original').checked) count += loadOriginalWords().length;
   const el = document.getElementById('ls-selected-count');
@@ -3694,8 +4176,8 @@ function buildListenDeck() {
   }
   const lsChkSg2 = document.getElementById('ls-chk-shogakusei');
   if (lsChkSg2 && lsChkSg2.checked) {
-    const cats = Array.from(document.querySelectorAll('[data-ls-shogakusei].active')).map(b => b.dataset.lsShogakusei);
-    SHOGAKUSEI.filter(w => cats.some(c => shogakuseiInCategory(w, c))).forEach(w => result.push({...w, _source:'小学生英語', _type:'word'}));
+    const lsSubs2 = getSelectedSgSubs(true);
+    SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs2)).forEach(w => result.push({...w, _source:'小学生英語', _type:'word'}));
   }
   if (document.getElementById('ls-chk-original').checked) loadOriginalWords().forEach(w => result.push({...w, _source:'オリジナル', _type:'word'}));
   if (listenType === 'sentence' && minilaboRanges.length > 0) {
@@ -3882,9 +4364,9 @@ function speakJapanese(text, onEnd) {
 
 function spellOutListen(word, onEnd, speedKey) {
   if (!('speechSynthesis' in window)) { if(onEnd) onEnd(); return; }
-  const sp = speedKey || listenSpelloutSpeed || 'slow';
-  const letterRate = sp === 'slow' ? 0.65 : sp === 'fast' ? 1.1 : 0.85;
-  const wordRate = sp === 'slow' ? 0.75 : sp === 'fast' ? 1.3 : 1.0;
+  const sp = speedKey || listenSpelloutSpeed || 'normal';
+  const letterRate = sp === 'fast' ? 1.1 : 0.75;
+  const wordRate = sp === 'fast' ? 1.3 : 0.9;
   const voices = window.speechSynthesis.getVoices();
   const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
   const items = [
@@ -4073,8 +4555,18 @@ const AI_MAX_TURNS = 5;
 
 // テキストを英語・日本語セグメントに分割する
 function splitForTTS(text) {
-  // マークダウン記号を除去
-  const cleaned = text.replace(/\*+/g, '').replace(/_+/g, '').trim();
+  // 記号・マークダウンを読み上げ向けに変換
+  const cleaned = text
+    .replace(/\*+/g, '')
+    .replace(/_+/g, '')
+    .replace(/[!！]+/g, ' ')
+    .replace(/[?？]+/g, ' ')
+    .replace(/[.,、。]+/g, ' ')
+    .replace(/["""''`]+/g, '')
+    .replace(/[-–—]+/g, ' ')
+    .replace(/[#@$%^&*()[\]{}<>|\\\/~]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   const segments = [];
 
   // 括弧で囲まれた部分と通常テキストを分離
@@ -4251,14 +4743,16 @@ function openAIChat(returnScreen) {
   aiReturnScreen = returnScreen || 'home-screen';
   aiHistory = [];
   aiTurnCount = 0;
-  aiSessionWords = (state.deck || [])
-    .map(w => w['英単語'] || w['単語'])
-    .filter(Boolean)
-    .slice(0, 12);
+  // sessionWordsは正解した単語オブジェクトの配列
+  const todayWords = sessionWords.length
+    ? sessionWords.map(w => w['英単語'] || w['単語']).filter(Boolean)
+    : (state.deck || []).map(w => w['英単語'] || w['単語']).filter(Boolean);
+  // 重複除去して最大12語
+  aiSessionWords = [...new Set(todayWords)].slice(0, 12);
 
   const wordsBar = document.getElementById('ai-words-bar');
   wordsBar.textContent = aiSessionWords.length
-    ? '今日の単語：' + aiSessionWords.join(' ・ ')
+    ? '今日覚えた単語：' + aiSessionWords.join(' ・ ')
     : '単語練習なしで自由に話そう！';
 
   document.getElementById('ai-chat-area').innerHTML = '';
@@ -4303,11 +4797,17 @@ function restartAIChat() {
 }
 
 function buildAISystemPrompt() {
+  const wordList = aiSessionWords.length ? aiSessionWords.join(', ') : '';
+  const wordNote = wordList
+    ? `ユーザーが今日学習した単語：${wordList}\nこれらの単語をなるべく使って自然な英会話をしてください。`
+    : '';
   return `あなたは小学生・中学生向けの英語会話の先生です。
+${wordNote}
 - ユーザーが日本語で話しかけてきたら、英語での言い方を教えてあげてください
 - ユーザーが英語で話しかけてきたら、英語で自然に会話を続けてください
 - 返答は短く・シンプルに。難しい単語は使わない
-- 日本語で質問されたときは、英語表現＋簡単な説明を日本語で添える`;
+- 日本語で質問されたときは、英語表現＋簡単な説明を日本語で添える
+- 記号（!?.,）は使わない。文末はそのまま終わらせる`.trim();
 }
 
 async function startAIConversation() {
@@ -5480,7 +5980,7 @@ function saveUnitSelection() {
       minilaboUnits: Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit),
       eikenUnits: Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken),
       mabutanUnits: Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan),
-      shogakuseiCats: Array.from(document.querySelectorAll('#shogakusei-grid [data-shogakusei].active')).map(b => b.dataset.shogakusei),
+      shogakuseiSubs: getSelectedSgSubs(false),
     };
     localStorage.setItem(up('unit_selection'), JSON.stringify(sel));
   } catch(e) {}
@@ -5511,10 +6011,11 @@ function restoreUnitSelection() {
         b.classList.toggle('active', sel.mabutanUnits.includes(b.dataset.mabutan));
       });
     }
-    if (sel.shogakuseiCats) {
-      document.querySelectorAll('#shogakusei-grid [data-shogakusei]').forEach(b => {
-        b.classList.toggle('active', sel.shogakuseiCats.includes(b.dataset.shogakusei));
+    if (sel.shogakuseiSubs) {
+      document.querySelectorAll('[data-sg-sub]').forEach(b => {
+        b.classList.toggle('active', sel.shogakuseiSubs.includes(b.dataset.sgSub));
       });
+      Object.keys(SG_SUBS).forEach(mid => syncSgMidBtn(mid, false));
     }
     updateSourceUI();
   } catch(e) {}
@@ -5540,8 +6041,8 @@ function recordUnitPractice() {
     });
   }
   if (document.getElementById('chk-shogakusei').checked) {
-    document.querySelectorAll('#shogakusei-grid [data-shogakusei].active').forEach(b => {
-      const k = up('practice_sg_' + b.dataset.shogakusei);
+    document.querySelectorAll('[data-sg-sub].active').forEach(b => {
+      const k = up('practice_sg_' + b.dataset.sgSub);
       localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
     });
   }
@@ -5705,9 +6206,9 @@ function renderRecords() {
     const cnt = parseInt(localStorage.getItem(up('practice_mb_'+g))||'0');
     unitRows.push({name:'まぶたん '+g, cnt, key:'mb_'+g});
   });
-  ['数・時間','色・形','食べ物','生き物','人・体','学校・町','生活','自然'].forEach(cat => {
-    const cnt = parseInt(localStorage.getItem(up('practice_sg_'+cat))||'0');
-    unitRows.push({name:'小学生 '+cat, cnt, key:'sg_'+cat});
+  Object.values(SG_SUBS).flat().forEach(sub => {
+    const cnt = parseInt(localStorage.getItem(up('practice_sg_'+sub))||'0');
+    if (cnt > 0) unitRows.push({name:'小学生 '+sub, cnt, key:'sg_'+sub});
   });
 
   const unitEl = document.getElementById('rec-unit-list');
@@ -6046,8 +6547,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateResumeBtn();
   renderUserNameSettings();
   // stest input イベント登録
-  const si = document.getElementById('stest-input');
-  if (si) si.addEventListener('keydown', e => { if(e.key==='Enter') checkStestAnswer(); });
+  // stest keydown は上部で登録済み
 });
 </script>
 </body>
