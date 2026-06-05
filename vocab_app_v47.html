@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WordSuck v44</title>
+<title>WordSuck v47</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap');
   :root {
@@ -339,6 +339,9 @@
   .voice-timer { font-size:28px; font-weight:900; color:var(--accent2); font-family:'Nunito',sans-serif; min-height:36px; text-align:center; }
   .voice-apikey-area { width:100%; display:flex; flex-direction:column; gap:8px; padding:12px; background:rgba(255,209,102,.07); border:1px solid rgba(255,209,102,.25); border-radius:14px; }
   .voice-apikey-area.hidden { display:none; }
+
+  /* ===== キラキラ演出 ===== */
+  @keyframes sparkle-fly { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-60px) scale(0.5)} }
 </style>
 </head>
 <body>
@@ -422,6 +425,22 @@
       <div style="flex:1;min-width:0;">
         <div class="mode-name">オリジナル登録</div>
         <div class="mode-desc" id="orig-home-count">自分の単語を追加する</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="openReviewTestSetup()" style="border-color:#f59e0b;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:6px;font-size:18px;flex-shrink:0;">📝</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">総復習テスト</div>
+        <div class="mode-desc">全単語からランダム出題</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="showScreen('records-screen');renderRecords();" style="border-color:var(--accent2);grid-column:1/-1;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent2),#ffb300);border-radius:6px;font-size:18px;flex-shrink:0;">📊</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">わたしの記録</div>
+        <div class="mode-desc">継続日数・苦手単語・正答率を見る</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
@@ -726,6 +745,12 @@
     <div id="spell-highlight-area"></div>
     <div id="training-result-area"></div>
     <div class="feedback-area" id="feedback-area"></div>
+    <div id="reveal-pronounce-area" style="display:none;flex-direction:column;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--surface);margin-top:4px;">
+      <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;" id="reveal-pronounce-status">声に出して言ってみよう</div>
+      <button class="mic-btn" id="reveal-mic-btn" onclick="toggleRevealRecording()" style="width:60px;height:60px;font-size:24px;">🎤</button>
+      <div style="font-size:18px;font-weight:900;color:var(--accent2);min-height:24px;" id="reveal-voice-timer"></div>
+      <div id="reveal-pronounce-result" style="display:none;font-size:13px;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:6px 10px;border-radius:10px;border:1px solid;"></div>
+    </div>
     <div id="typing-challenge-area">
       <div id="typing-challenge-msg"></div>
       <div id="typing-challenge-counter">0/5</div>
@@ -767,8 +792,8 @@
 <!-- SESSION END TEST SCREEN -->
 <div id="session-test-screen" class="screen" style="align-items:center;gap:16px;max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
   <div class="flash-header" style="width:100%;">
-    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
-    <div style="flex:1;text-align:center;font-size:15px;font-weight:800;color:var(--gold);font-family:'Noto Sans JP',sans-serif;">締めのテスト</div>
+    <div style="width:40px;"></div>
+    <div style="flex:1;text-align:center;font-size:15px;font-weight:800;color:var(--gold);font-family:'Noto Sans JP',sans-serif;">締めのテスト（全問解いて終了！）</div>
     <div class="progress-text" id="stest-progress-text">0/10</div>
   </div>
   <div style="width:100%;"><div class="progress-bar-wrap"><div class="progress-bar-fill" id="stest-progress-fill" style="width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));"></div></div></div>
@@ -934,6 +959,12 @@
         <div style="display:flex;gap:10px;width:100%;" id="smem-action-row">
           <button onclick="smemAgain()" class="action-btn" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
           <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;">覚えた！</button>
+        </div>
+        <div id="smem-speak-area" style="display:none;flex-direction:column;gap:8px;align-items:center;width:100%;padding-top:4px;border-top:1px solid var(--surface);">
+          <div style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;" id="smem-voice-status">発音練習する</div>
+          <button class="mic-btn" id="smem-mic-btn" onclick="toggleSmemRecording()">🎤</button>
+          <div style="font-size:22px;font-weight:900;color:var(--accent2);font-family:'Nunito',sans-serif;min-height:28px;" id="smem-voice-timer"></div>
+          <div id="smem-speak-result" style="display:none;font-size:13px;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:8px;border-radius:10px;border:1px solid;"></div>
         </div>
       </div>
     </div>
@@ -1371,6 +1402,79 @@
   </div>
 </div>
 
+<!-- REVIEW TEST SCREEN -->
+<div id="review-test-screen" class="screen" style="max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
+  <!-- 設定フェーズ -->
+  <div id="review-setup-area" style="display:flex;flex-direction:column;gap:16px;width:100%;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">総復習テスト</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">問題数を選ぶ</div>
+      <div style="display:flex;gap:8px;">
+        <button class="timer-btn" data-review-count="10" onclick="selectReviewCount(this)">10問</button>
+        <button class="timer-btn active" data-review-count="20" onclick="selectReviewCount(this)">20問</button>
+        <button class="timer-btn" data-review-count="50" onclick="selectReviewCount(this)">50問</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="timer-toggle">
+        <div class="toggle-info">
+          <div class="toggle-name">苦手単語を優先</div>
+          <div class="toggle-desc">ミスが多い単語を多めに出題する</div>
+        </div>
+        <button class="toggle-switch on" id="review-weak-toggle" onclick="this.classList.toggle('on');reviewWeakPriority=this.classList.contains('on');"></button>
+      </div>
+    </div>
+    <button onclick="startReviewTest()" class="start-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 8px 24px rgba(245,158,11,.4);">スタート →</button>
+  </div>
+  <!-- クイズフェーズ -->
+  <div id="review-quiz-area" style="display:none;flex-direction:column;gap:14px;width:100%;">
+    <div class="flash-header" style="width:100%;">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="review-progress-fill" style="width:0%;background:linear-gradient(90deg,#f59e0b,var(--accent2));"></div></div>
+      <div class="progress-text" id="review-progress-text">0/0</div>
+    </div>
+    <div class="flashcard" style="width:100%;min-height:140px;gap:10px;">
+      <div class="card-source-badge" id="review-source"></div>
+      <div class="card-meaning-main" id="review-meaning" style="font-size:34px;"></div>
+      <div class="card-answer-wrap" id="review-answer-wrap">
+        <div class="card-word-answer" id="review-word-answer" style="font-size:30px;"></div>
+      </div>
+    </div>
+    <div style="background:var(--card);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div class="letter-boxes" id="review-letter-boxes"></div>
+      <div class="text-input-row" id="review-input-row">
+        <input type="text" id="review-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="スペルを入力してEnter">
+        <button onclick="checkReviewAnswer()">確認</button>
+      </div>
+      <div class="feedback-area" id="review-feedback"></div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="action-btn btn-skip" onclick="reviewNext()">スキップ</button>
+        <button class="action-btn btn-next" id="review-next-btn" onclick="reviewNext()" style="display:none;">次へ →</button>
+      </div>
+    </div>
+  </div>
+  <!-- 結果フェーズ -->
+  <div id="review-result-area" style="display:none;flex-direction:column;align-items:center;gap:20px;width:100%;padding-top:40px;">
+    <div class="result-emoji" id="review-result-emoji">🎉</div>
+    <div class="result-title" id="review-result-title">おつかれさま！</div>
+    <div class="result-score-card">
+      <div class="score-big" id="review-score-pct">0%</div>
+      <div class="score-label">正答率</div>
+      <div class="score-detail">
+        <div class="score-item correct"><div class="score-num" id="review-correct-count">0</div><div class="score-desc">正解</div></div>
+        <div class="score-item wrong"><div class="score-num" id="review-wrong-count">0</div><div class="score-desc">まちがい</div></div>
+      </div>
+    </div>
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;">
+      <button class="result-btn primary" onclick="openReviewTestSetup()">もう一度</button>
+      <button class="result-btn secondary" onclick="showScreen('home-screen')">トップへ戻る</button>
+    </div>
+  </div>
+</div>
+
 <!-- RECORDS SCREEN -->
 <div id="records-screen" class="screen">
   <div class="screen-header">
@@ -1454,14 +1558,52 @@ function saveUserNames(names) {
 }
 function up(key) { return 'u' + currentUser + '_' + key; }
 
+function getUserStreakInfo(uid) {
+  const prefix = 'u' + uid + '_';
+  const today = new Date().toLocaleDateString('ja-JP');
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem(prefix + 'daily_log') || '[]'); } catch {}
+  if (!log.length) return { days: 0, rest: 0 };
+  const dates = log.map(e => e.date).filter(Boolean);
+  if (!dates.length) return { days: 0, rest: 0 };
+  let streak = 0;
+  let d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const ds = d.toLocaleDateString('ja-JP');
+    if (dates.includes(ds)) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  if (streak > 0) return { days: streak, rest: 0 };
+  const lastDateStr = dates[0];
+  const parts = lastDateStr.split('/');
+  if (parts.length < 3) return { days: 0, rest: 0 };
+  const lastD = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const todayD = new Date(); todayD.setHours(0,0,0,0);
+  const diffDays = Math.round((todayD - lastD) / (1000*60*60*24));
+  return { days: 0, rest: Math.max(0, diffDays) };
+}
+
 function renderUserSelectScreen() {
   const names = getUserNames();
   const list = document.getElementById('user-btn-list');
-  list.innerHTML = names.map((name, i) => `
-    <button onclick="selectUser(${i+1})" style="width:100%;padding:24px 24px;border-radius:20px;border:2px solid rgba(212,175,55,.5);background:var(--card);color:var(--text);font-size:22px;font-weight:900;font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(212,175,55,.1);" onpointerdown="this.style.transform='scale(.97)'" onpointerup="this.style.transform=''" onpointercancel="this.style.transform=''">
-      <span style="font-size:32px;color:var(--gold);">${['🥇','🥈','🥉'][i]}</span>
-      <span>${name}</span>
-    </button>`).join('');
+  list.innerHTML = names.map((name, i) => {
+    const uid = i + 1;
+    const info = getUserStreakInfo(uid);
+    let streakHtml = '';
+    if (info.days > 0) {
+      streakHtml = `<span style="font-size:13px;color:#1dd1a1;font-family:'Noto Sans JP',sans-serif;font-weight:700;">${info.days}日継続中！🔥</span>`;
+    } else if (info.rest > 0) {
+      streakHtml = `<span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${info.rest}日お休み中</span>`;
+    }
+    return `
+    <button onclick="selectUser(${uid})" style="width:100%;padding:20px 24px;border-radius:20px;border:2px solid rgba(212,175,55,.5);background:var(--card);color:var(--text);font-size:22px;font-weight:900;font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(212,175,55,.1);" onpointerdown="this.style.transform='scale(.97)'" onpointerup="this.style.transform=''" onpointercancel="this.style.transform=''">
+      <span style="font-size:32px;color:var(--gold);flex-shrink:0;">${['🥇','🥈','🥉'][i]}</span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">
+        <span>${name}</span>
+        ${streakHtml}
+      </div>
+    </button>`;
+  }).join('');
 }
 function selectUser(uid) {
   currentUser = uid;
@@ -2926,6 +3068,12 @@ function loadCard() {
   const skipBtn = document.querySelector('.action-btn.btn-skip');
   if (skipBtn) skipBtn.disabled = false;
 
+  const rpa = document.getElementById('reveal-pronounce-area');
+  if (rpa) rpa.style.display = 'none';
+  const rpm = document.getElementById('reveal-pronounce-result');
+  if (rpm) rpm.style.display = 'none';
+  revealRecorderCleanup();
+
   cardStartTime = Date.now();
   resetVoiceUI();
   if (voiceMode !== 'voice') setTimeout(() => mainInput.focus(), 150);
@@ -3270,6 +3418,20 @@ function revealAnswer() {
     }
   } else {
     document.getElementById('next-btn').style.display = 'block';
+    // 同じ問題をデッキの次の位置に再挿入
+    if (!word._repeated) {
+      state.deck.splice(state.current + 1, 0, {...word, _repeated: true});
+      const pt = document.getElementById('progress-text');
+      if (pt) pt.textContent = `${state.current+1}/${state.deck.length}`;
+    }
+    // 発音練習エリア表示
+    const rpa = document.getElementById('reveal-pronounce-area');
+    const rpm = document.getElementById('reveal-pronounce-result');
+    if (rpa) { rpa.style.display = 'flex'; }
+    if (rpm) { rpm.style.display = 'none'; }
+    const revMic = document.getElementById('reveal-mic-btn');
+    if (revMic) { revMic.disabled = false; revMic.classList.remove('recording'); }
+    document.getElementById('reveal-pronounce-status').textContent = '声に出して言ってみよう';
   }
   document.getElementById('reveal-btn').style.display = 'none';
   updateHomeBadges();
@@ -3313,9 +3475,7 @@ function showResult() {
 }
 
 function endSessionPrompt() {
-  if (state.deck.length === 0 || !confirm('終了して今日のテストをしますか？\n（いいえ：トップに戻る）')) {
-    showScreen('home-screen'); return;
-  }
+  if (state.deck.length === 0) { showScreen('home-screen'); return; }
   startSessionTest();
 }
 
@@ -3324,11 +3484,23 @@ let stestDeck = [], stestIndex = 0, stestCorrect = 0, stestTotal = 10;
 
 function startSessionTest() {
   saveSessionCoins();
-  const pool = sessionWords.length >= 5 ? sessionWords : getAllDataWords().slice(0, 20);
+  // 今日やった単語から最大5問
   const uniqueMap = {};
-  pool.forEach(w => { if (w && w['単語']) uniqueMap[w['単語']] = w; });
-  const unique = Object.values(uniqueMap);
-  stestDeck = unique.sort(() => Math.random()-.5).slice(0, Math.min(10, unique.length));
+  sessionWords.forEach(w => { if (w && w['単語']) uniqueMap[w['単語']] = w; });
+  const todayUnique = Object.values(uniqueMap).sort(() => Math.random()-.5).slice(0, 5);
+  const todayKeys = new Set(todayUnique.map(w => w['単語']));
+  // 苦手単語から最大5問（今日やった単語を除外）
+  const weakSorted = getWeakWordsFromData()
+    .filter(w => !todayKeys.has(w['単語']))
+    .sort((a, b) => {
+      const sumA = Object.values(getCharMistakes(a['単語'])).reduce((s,v) => s+v, 0);
+      const sumB = Object.values(getCharMistakes(b['単語'])).reduce((s,v) => s+v, 0);
+      return sumB - sumA;
+    }).slice(0, 5);
+  stestDeck = [...todayUnique, ...weakSorted].sort(() => Math.random()-.5);
+  if (!stestDeck.length) {
+    stestDeck = getAllDataWords().sort(() => Math.random()-.5).slice(0, 10);
+  }
   if (!stestDeck.length) { showDailyResults(); return; }
   stestIndex = 0; stestCorrect = 0; stestTotal = stestDeck.length;
   showScreen('session-test-screen');
@@ -3719,7 +3891,7 @@ function normalizeForCompare(text) {
 }
 
 // ===== タイピングモード =====
-let typingDeck = [], typingCurrent = 0, typingAnswered = false;
+let typingDeck = [], typingCurrent = 0, typingAnswered = false, typingAllCorrect = false;
 let currentTypingSentence = null;
 
 function selectAllTypingUnits() {
@@ -3762,6 +3934,7 @@ function loadTypingCard() {
     return;
   }
   typingAnswered = false;
+  typingAllCorrect = false;
   currentTypingSentence = typingDeck[typingCurrent];
   const pct = (typingCurrent / typingDeck.length) * 100;
   document.getElementById('typing-progress-fill').style.width = pct + '%';
@@ -3803,42 +3976,80 @@ function buildTypingDiffHtml(typed, correct) {
   return html;
 }
 
+function buildSentenceDiffHtml(typed, correct) {
+  const typedWords = normalizeForCompare(typed).split(/\s+/).filter(Boolean);
+  const correctRaw = correct.split(/\s+/);
+  const correctNorm = correctRaw.map(w => normalizeForCompare(w));
+  let html = '';
+  let allCorrect = true;
+  for (let i = 0; i < correctRaw.length; i++) {
+    const cw = correctNorm[i];
+    const tw = typedWords[i] || '';
+    const match = tw === cw;
+    if (!match) allCorrect = false;
+    if (i > 0) html += ' ';
+    html += `<span style="display:inline-block;padding:1px 5px;border-radius:5px;font-weight:${match?'700':'900'};color:${match?'#06d6a0':'#ff6b6b'};background:${match?'rgba(6,214,160,.12)':'rgba(255,107,107,.12)'};">${escHtml(correctRaw[i])}</span>`;
+  }
+  return { html, allCorrect };
+}
+
+function showSparkle(targetEl) {
+  const el = targetEl || document.body;
+  const rect = el.getBoundingClientRect ? el.getBoundingClientRect() : { top: 200, left: window.innerWidth / 2, width: 100 };
+  for (let i = 0; i < 8; i++) {
+    const s = document.createElement('div');
+    s.textContent = ['✨','⭐','🌟','💫'][i % 4];
+    s.style.cssText = `position:fixed;font-size:22px;pointer-events:none;z-index:9998;left:${rect.left + Math.random() * (rect.width || 100)}px;top:${rect.top}px;animation:sparkle-fly 1s ease forwards;animation-delay:${i*80}ms;`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1200 + i * 80);
+  }
+}
+
 function checkTypingAnswer(typed) {
-  if (typingAnswered) return;
+  if (typingAllCorrect) return;
   if (!typed || !typed.trim()) return;
-  typingAnswered = true;
   const correct = currentTypingSentence.en;
   const fb = document.getElementById('typing-feedback');
-  if (typed.toLowerCase() === correct.toLowerCase()) {
-    fb.textContent = '完璧！'; fb.style.color = '#06d6a0';
-    document.getElementById('typing-correct-text').innerHTML = `<span style="color:#06d6a0">${escHtml(correct)}</span>`;
-    document.getElementById('typing-answer-display').style.display = 'block';
-  } else if (normalizeForCompare(typed) === normalizeForCompare(correct)) {
-    fb.textContent = '惜しい！'; fb.style.color = 'var(--accent2)';
-    document.getElementById('typing-correct-text').innerHTML = buildTypingDiffHtml(typed, correct);
-    document.getElementById('typing-answer-display').style.display = 'block';
-  } else {
-    fb.textContent = 'もう一度チャレンジ！'; fb.style.color = 'var(--accent)';
-    document.getElementById('typing-correct-text').innerHTML = buildTypingDiffHtml(typed, correct);
-    document.getElementById('typing-answer-display').style.display = 'block';
-  }
+  const { html, allCorrect } = buildSentenceDiffHtml(typed, correct);
+
+  document.getElementById('typing-correct-text').innerHTML = html;
+  document.getElementById('typing-answer-display').style.display = 'block';
+  document.getElementById('typing-reveal-btn').style.display = 'none';
   speakSentence(correct, null, typingSpeed);
   document.getElementById('typing-replay-btn').style.display = 'inline-block';
-  document.getElementById('typing-next-btn').style.display = 'block';
-  document.getElementById('typing-reveal-btn').style.display = 'none';
+
+  if (allCorrect) {
+    typingAnswered = true;
+    typingAllCorrect = true;
+    fb.textContent = '完璧！'; fb.style.color = '#06d6a0';
+    document.getElementById('typing-next-btn').style.display = 'block';
+    document.getElementById('typing-voice-status').textContent = 'ボタンを押して英文を話す';
+    showSparkle(document.getElementById('typing-answer-display'));
+  } else {
+    typingAnswered = false;
+    fb.textContent = '赤い単語をもう一度！'; fb.style.color = '#ff6b6b';
+    document.getElementById('typing-next-btn').style.display = 'none';
+    document.getElementById('typing-voice-status').textContent = 'もう一度言ってみよう！';
+    const micBtn = document.getElementById('typing-mic-btn');
+    if (micBtn) { micBtn.disabled = false; micBtn.classList.remove('recording'); }
+  }
 }
 
 function typingReveal() {
-  typingAnswered = true;
+  typingAnswered = false;
+  typingAllCorrect = false;
   const correct = currentTypingSentence.en;
-  document.getElementById('typing-correct-text').innerHTML = `<span style="color:#06d6a0">${escHtml(correct)}</span>`;
+  document.getElementById('typing-correct-text').innerHTML = `<span style="color:var(--text-muted)">${escHtml(correct)}</span>`;
   document.getElementById('typing-answer-display').style.display = 'block';
-  document.getElementById('typing-feedback').textContent = '答えを確認してね';
-  document.getElementById('typing-feedback').style.color = 'var(--text-muted)';
+  document.getElementById('typing-feedback').textContent = '声に出して言ってみよう！';
+  document.getElementById('typing-feedback').style.color = 'var(--accent2)';
   speakSentence(correct, null, typingSpeed);
   document.getElementById('typing-replay-btn').style.display = 'inline-block';
   document.getElementById('typing-next-btn').style.display = 'block';
   document.getElementById('typing-reveal-btn').style.display = 'none';
+  document.getElementById('typing-voice-status').textContent = 'もう一度言ってみよう！';
+  const micBtn = document.getElementById('typing-mic-btn');
+  if (micBtn) { micBtn.disabled = false; micBtn.classList.remove('recording'); }
 }
 function typingNext() { typingCurrent++; loadTypingCard(); }
 function typingSkip() { typingCurrent++; loadTypingCard(); }
@@ -3865,7 +4076,7 @@ function clearTypingOpenAIKey() {
 }
 
 async function toggleTypingSpeakingRecording() {
-  if (typingAnswered) return;
+  if (typingAllCorrect) return;
   if (typingSpeakingIsRecording) { stopTypingSpeakingRecording(); return; }
   if (!localStorage.getItem('wordsuck_openai_api_key')) {
     document.getElementById('typing-openai-key-area').style.display = 'flex';
@@ -3950,6 +4161,115 @@ async function processTypingSpeakingVoice() {
   }
 }
 
+// ===== フラッシュカード 答えを見た後の発音練習 =====
+let revealIsRecording = false;
+let revealRecorder = null;
+let revealChunks = [];
+let revealSeconds = 0;
+let revealTimer = null;
+const REVEAL_MAX_SEC = 15;
+
+function revealRecorderCleanup() {
+  if (revealIsRecording && revealRecorder && revealRecorder.state !== 'inactive') revealRecorder.stop();
+  revealIsRecording = false;
+  clearInterval(revealTimer);
+}
+
+async function toggleRevealRecording() {
+  if (revealIsRecording) { stopRevealRecording(); return; }
+  if (!localStorage.getItem('wordsuck_openai_api_key')) {
+    document.getElementById('reveal-pronounce-status').textContent = 'OpenAI APIキーが必要です';
+    return;
+  }
+  await startRevealRecording();
+}
+
+async function startRevealRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    revealChunks = [];
+    revealSeconds = 0;
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+      : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+      : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+    revealRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+    revealRecorder.ondataavailable = e => { if (e.data.size > 0) revealChunks.push(e.data); };
+    revealRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); processRevealVoice(); };
+    revealRecorder.start(100);
+    revealIsRecording = true;
+    document.getElementById('reveal-mic-btn').classList.add('recording');
+    document.getElementById('reveal-pronounce-status').textContent = '録音中... もう一度押して送信';
+    revealTimer = setInterval(() => {
+      revealSeconds++;
+      document.getElementById('reveal-voice-timer').textContent = revealSeconds + 's';
+      if (revealSeconds >= REVEAL_MAX_SEC) stopRevealRecording();
+    }, 1000);
+  } catch (e) {
+    document.getElementById('reveal-pronounce-status').textContent = 'マイクが使えません: ' + e.message;
+  }
+}
+
+function stopRevealRecording() {
+  if (!revealIsRecording) return;
+  clearInterval(revealTimer);
+  revealIsRecording = false;
+  if (revealRecorder && revealRecorder.state !== 'inactive') revealRecorder.stop();
+  document.getElementById('reveal-mic-btn').classList.remove('recording');
+  document.getElementById('reveal-pronounce-status').textContent = '変換中...';
+  document.getElementById('reveal-voice-timer').textContent = '';
+}
+
+async function processRevealVoice() {
+  const key = localStorage.getItem('wordsuck_openai_api_key');
+  const word = state.deck[state.current];
+  if (!key || revealChunks.length === 0 || !word) {
+    document.getElementById('reveal-pronounce-status').textContent = '声に出して言ってみよう';
+    return;
+  }
+  try {
+    const mimeType = revealChunks[0]?.type || 'audio/webm';
+    const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+    const blob = new Blob(revealChunks, { type: mimeType });
+    const formData = new FormData();
+    formData.append('file', blob, 'voice.' + ext);
+    formData.append('model', 'whisper-1');
+    formData.append('language', 'en');
+    const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key },
+      body: formData
+    });
+    if (!res.ok) {
+      document.getElementById('reveal-pronounce-status').textContent = 'エラー: ' + res.status;
+      return;
+    }
+    const data = await res.json();
+    const text = (data.text || '').trim();
+    if (!text) { document.getElementById('reveal-pronounce-status').textContent = '聞き取れませんでした'; return; }
+    const correct = word['単語'] || '';
+    const resultEl = document.getElementById('reveal-pronounce-result');
+    resultEl.style.display = 'block';
+    const match = text.toLowerCase().replace(/[.,?!']/g, '') === correct.toLowerCase();
+    if (match) {
+      resultEl.textContent = '正解！よく言えた！';
+      resultEl.style.color = '#06d6a0';
+      resultEl.style.borderColor = '#06d6a0';
+      resultEl.style.background = 'rgba(6,214,160,.08)';
+      document.getElementById('reveal-pronounce-status').textContent = '次の問題で再チャレンジ！';
+      showSparkle(resultEl);
+    } else {
+      resultEl.textContent = '「' + text + '」← もう一度！';
+      resultEl.style.color = '#ff6b6b';
+      resultEl.style.borderColor = 'rgba(255,107,107,.4)';
+      resultEl.style.background = 'rgba(255,107,107,.07)';
+      document.getElementById('reveal-pronounce-status').textContent = 'もう一度言ってみよう';
+    }
+    document.getElementById('reveal-voice-timer').textContent = '';
+  } catch (e) {
+    document.getElementById('reveal-pronounce-status').textContent = 'エラー: ' + e.message;
+  }
+}
+
 // ===== 英文暗記モード =====
 let smemDeck = [], smemCurrent = 0;
 let currentSmemSentence = null;
@@ -3997,6 +4317,9 @@ function loadSmemCard() {
   document.getElementById('smem-status').textContent = '音声を聞いてね';
   document.getElementById('smem-replay-btn').style.display = 'none';
   document.getElementById('smem-action-row').style.display = 'none';
+  document.getElementById('smem-speak-area').style.display = 'none';
+  document.getElementById('smem-speak-result').style.display = 'none';
+  smemStopRecordingClean();
   setTimeout(() => {
     speakSentence(currentSmemSentence.en, () => {
       document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
@@ -4004,6 +4327,11 @@ function loadSmemCard() {
       document.getElementById('smem-status').textContent = '覚えた？';
       document.getElementById('smem-replay-btn').style.display = 'inline-block';
       document.getElementById('smem-action-row').style.display = 'flex';
+      document.getElementById('smem-speak-area').style.display = 'flex';
+      document.getElementById('smem-voice-status').textContent = '発音練習する';
+      document.getElementById('smem-voice-timer').textContent = '';
+      const smemMicBtn = document.getElementById('smem-mic-btn');
+      if (smemMicBtn) { smemMicBtn.disabled = false; smemMicBtn.classList.remove('recording'); }
     }, sentenceSpeed);
   }, 400);
 }
@@ -4015,6 +4343,9 @@ function smemAgain() {
   document.getElementById('smem-status').textContent = '音声を聞いてね';
   document.getElementById('smem-replay-btn').style.display = 'none';
   document.getElementById('smem-action-row').style.display = 'none';
+  document.getElementById('smem-speak-area').style.display = 'none';
+  document.getElementById('smem-speak-result').style.display = 'none';
+  smemStopRecordingClean();
   setTimeout(() => {
     speakSentence(currentSmemSentence.en, () => {
       document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
@@ -4022,8 +4353,124 @@ function smemAgain() {
       document.getElementById('smem-status').textContent = '覚えた？';
       document.getElementById('smem-replay-btn').style.display = 'inline-block';
       document.getElementById('smem-action-row').style.display = 'flex';
+      document.getElementById('smem-speak-area').style.display = 'flex';
+      document.getElementById('smem-voice-status').textContent = '発音練習する';
+      document.getElementById('smem-voice-timer').textContent = '';
+      const smemMicBtn = document.getElementById('smem-mic-btn');
+      if (smemMicBtn) { smemMicBtn.disabled = false; smemMicBtn.classList.remove('recording'); }
     }, sentenceSpeed);
   }, 300);
+}
+
+// ===== 英文暗記モード 発音練習 =====
+let smemIsRecording = false;
+let smemRecorder = null;
+let smemChunks = [];
+let smemSeconds = 0;
+let smemRecordTimer = null;
+const SMEM_MAX_SEC = 20;
+
+function smemStopRecordingClean() {
+  if (smemIsRecording && smemRecorder && smemRecorder.state !== 'inactive') {
+    smemRecorder.stop();
+  }
+  smemIsRecording = false;
+  clearInterval(smemRecordTimer);
+}
+
+async function toggleSmemRecording() {
+  if (smemIsRecording) { stopSmemRecording(); return; }
+  if (!localStorage.getItem('wordsuck_openai_api_key')) {
+    document.getElementById('smem-voice-status').textContent = 'OpenAI APIキーが必要です（音声認識用）';
+    return;
+  }
+  await startSmemRecording();
+}
+
+async function startSmemRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    smemChunks = [];
+    smemSeconds = 0;
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+      : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+      : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+    smemRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+    smemRecorder.ondataavailable = e => { if (e.data.size > 0) smemChunks.push(e.data); };
+    smemRecorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); processSmemVoice(); };
+    smemRecorder.start(100);
+    smemIsRecording = true;
+    document.getElementById('smem-mic-btn').classList.add('recording');
+    document.getElementById('smem-voice-status').textContent = '録音中... もう一度押して送信';
+    document.getElementById('smem-speak-result').style.display = 'none';
+    smemRecordTimer = setInterval(() => {
+      smemSeconds++;
+      document.getElementById('smem-voice-timer').textContent = smemSeconds + 's';
+      if (smemSeconds >= SMEM_MAX_SEC) stopSmemRecording();
+    }, 1000);
+  } catch (e) {
+    document.getElementById('smem-voice-status').textContent = 'マイクが使えません: ' + e.message;
+  }
+}
+
+function stopSmemRecording() {
+  if (!smemIsRecording) return;
+  clearInterval(smemRecordTimer);
+  smemIsRecording = false;
+  if (smemRecorder && smemRecorder.state !== 'inactive') smemRecorder.stop();
+  document.getElementById('smem-mic-btn').classList.remove('recording');
+  document.getElementById('smem-voice-status').textContent = '変換中...';
+  document.getElementById('smem-voice-timer').textContent = '';
+}
+
+async function processSmemVoice() {
+  const key = localStorage.getItem('wordsuck_openai_api_key');
+  if (!key || smemChunks.length === 0) {
+    document.getElementById('smem-voice-status').textContent = '発音練習する';
+    return;
+  }
+  try {
+    const mimeType = smemChunks[0]?.type || 'audio/webm';
+    const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+    const blob = new Blob(smemChunks, { type: mimeType });
+    const formData = new FormData();
+    formData.append('file', blob, 'voice.' + ext);
+    formData.append('model', 'whisper-1');
+    formData.append('language', 'en');
+    const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key },
+      body: formData
+    });
+    if (!res.ok) {
+      const errMsg = res.status === 401 ? 'OpenAI APIキーが無効です' : 'エラー: ' + res.status;
+      document.getElementById('smem-voice-status').textContent = errMsg;
+      if (res.status === 401) localStorage.removeItem('wordsuck_openai_api_key');
+      return;
+    }
+    const data = await res.json();
+    const text = data.text?.trim();
+    if (!text) { document.getElementById('smem-voice-status').textContent = '聞き取れませんでした。もう一度。'; return; }
+    const correct = currentSmemSentence?.en || '';
+    const resultEl = document.getElementById('smem-speak-result');
+    resultEl.style.display = 'block';
+    const { html, allCorrect } = buildSentenceDiffHtml(text, correct);
+    resultEl.innerHTML = html;
+    resultEl.style.color = '';
+    if (allCorrect) {
+      resultEl.style.borderColor = '#06d6a0';
+      resultEl.style.background = 'rgba(6,214,160,.08)';
+      document.getElementById('smem-voice-status').textContent = '完璧！✨';
+      showSparkle(resultEl);
+    } else {
+      resultEl.style.borderColor = 'rgba(255,107,107,.4)';
+      resultEl.style.background = 'rgba(255,107,107,.07)';
+      document.getElementById('smem-voice-status').textContent = '赤い単語をもう一度！';
+    }
+    document.getElementById('smem-voice-timer').textContent = '';
+  } catch (e) {
+    document.getElementById('smem-voice-status').textContent = 'エラー: ' + e.message;
+  }
 }
 
 // ⑤ 速度パラメータ対応の共通読み上げ関数
@@ -4129,7 +4576,7 @@ function updateListenCount() {
   const lsChkSg = document.getElementById('ls-chk-shogakusei');
   if (lsChkSg && lsChkSg.checked) {
     const lsSubs = getSelectedSgSubs(true);
-    count += SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs)).length;
+    count += lsSubs.length === 0 ? SHOGAKUSEI.length : SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs)).length;
   }
   if (document.getElementById('ls-chk-original').checked) count += loadOriginalWords().length;
   const el = document.getElementById('ls-selected-count');
@@ -4177,7 +4624,8 @@ function buildListenDeck() {
   const lsChkSg2 = document.getElementById('ls-chk-shogakusei');
   if (lsChkSg2 && lsChkSg2.checked) {
     const lsSubs2 = getSelectedSgSubs(true);
-    SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs2)).forEach(w => result.push({...w, _source:'小学生英語', _type:'word'}));
+    const sgFiltered = lsSubs2.length === 0 ? SHOGAKUSEI : SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs2));
+    sgFiltered.forEach(w => result.push({...w, _source:'小学生英語', _type:'word'}));
   }
   if (document.getElementById('ls-chk-original').checked) loadOriginalWords().forEach(w => result.push({...w, _source:'オリジナル', _type:'word'}));
   if (listenType === 'sentence' && minilaboRanges.length > 0) {
@@ -4250,22 +4698,26 @@ function playListenWord() {
       updateListenDisplay(word, 'en');
       speakWord(word['単語'], () => {
         if (listenPaused) return;
-        // Phase 3: スペルアウト（オン/オフ）
-        if (listenSpelloutEnabled) {
-          updateListenDisplay(word, 'spell');
-          spellOutListen(word['単語'], () => {
-            if (listenPaused) return;
+        // Phase 3: スペルアウト（200ms待ってから確実に開始）
+        listenTimeoutId = setTimeout(() => {
+          if (listenPaused) return;
+          if (listenSpelloutEnabled) {
+            window.speechSynthesis.cancel();
+            updateListenDisplay(word, 'spell');
+            spellOutListen(word['単語'], () => {
+              if (listenPaused) return;
+              pulse.classList.remove('playing');
+              listenTimeoutId = setTimeout(() => {
+                if (!listenPaused) { listenCurrent++; playListenWord(); }
+              }, getListenDelay());
+            });
+          } else {
             pulse.classList.remove('playing');
             listenTimeoutId = setTimeout(() => {
               if (!listenPaused) { listenCurrent++; playListenWord(); }
             }, getListenDelay());
-          });
-        } else {
-          pulse.classList.remove('playing');
-          listenTimeoutId = setTimeout(() => {
-            if (!listenPaused) { listenCurrent++; playListenWord(); }
-          }, getListenDelay());
-        }
+          }
+        }, 200);
       });
     }, 300);
   });
@@ -4327,15 +4779,18 @@ function speakEnglishText(text, rate, onEnd) {
 function speakWord(word, onEnd) {
   if (!('speechSynthesis' in window)) { if(onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
+  let _done = false;
+  const done = () => { if (!_done) { _done = true; if (onEnd) onEnd(); } };
   function doSpeak() {
     const u = new SpeechSynthesisUtterance(word);
     u.lang = 'en-US'; u.rate = 0.8; u.volume = 1.0;
     const voices = window.speechSynthesis.getVoices();
     const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
     if (v) u.voice = v;
-    u.onend = () => { if(onEnd) onEnd(); };
-    u.onerror = () => { if(onEnd) onEnd(); };
+    u.onend = done;
+    u.onerror = done;
     window.speechSynthesis.speak(u);
+    if (onEnd) setTimeout(done, Math.max(1800, word.length * 180 + 800));
   }
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) {
@@ -4346,15 +4801,18 @@ function speakWord(word, onEnd) {
 function speakJapanese(text, onEnd) {
   if (!('speechSynthesis' in window)) { if(onEnd) onEnd(); return; }
   window.speechSynthesis.cancel();
+  let _done = false;
+  const done = () => { if (!_done) { _done = true; if (onEnd) onEnd(); } };
   function doSpeak() {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP'; u.rate = 0.9; u.volume = 1.0;
     const voices = window.speechSynthesis.getVoices();
     const v = voices.find(v => v.lang === 'ja-JP') || voices.find(v => v.lang.startsWith('ja')) || null;
     if (v) u.voice = v;
-    u.onend = () => { if(onEnd) onEnd(); };
-    u.onerror = () => { if(onEnd) onEnd(); };
+    u.onend = done;
+    u.onerror = done;
     window.speechSynthesis.speak(u);
+    if (onEnd) setTimeout(done, Math.max(2000, text.length * 250 + 800));
   }
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) {
@@ -4375,12 +4833,15 @@ function spellOutListen(word, onEnd, speedKey) {
   ];
   function speakItem(idx) {
     if (idx >= items.length) { if(onEnd) onEnd(); return; }
+    let moved = false;
+    const next = () => { if (!moved) { moved = true; setTimeout(() => speakItem(idx + 1), 80); } };
     const u = new SpeechSynthesisUtterance(items[idx].text);
     u.lang = 'en-US'; u.rate = items[idx].rate; u.volume = 1.0;
     if (v) u.voice = v;
-    u.onend = () => setTimeout(() => speakItem(idx + 1), 60);
-    u.onerror = () => setTimeout(() => speakItem(idx + 1), 300);
+    u.onend = next;
+    u.onerror = () => { if (!moved) { moved = true; setTimeout(() => speakItem(idx + 1), 300); } };
     window.speechSynthesis.speak(u);
+    setTimeout(next, 900);
   }
   speakItem(0);
 }
@@ -4565,6 +5026,7 @@ function splitForTTS(text) {
     .replace(/["""''`]+/g, '')
     .replace(/[-–—]+/g, ' ')
     .replace(/[#@$%^&*()[\]{}<>|\\\/~]+/g, ' ')
+    .replace(/[（）「」『』【】〔〕〈〉《》]+/g, '')
     .replace(/\s+/g, ' ')
     .trim();
   const segments = [];
@@ -4601,30 +5063,42 @@ function splitForTTS(text) {
   return segments.filter(s => s.text.length > 0);
 }
 
+let aiTTSQueue = [];
+let aiTTSBusy = false;
+
 function speakAIResponse(text) {
   if (!aiSoundOn || !('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
+  aiTTSQueue.push(text);
+  if (!aiTTSBusy) _processAITTSQueue();
+}
 
+function stopAITTS() {
+  aiTTSQueue = [];
+  aiTTSBusy = false;
+  window.speechSynthesis.cancel();
+}
+
+function _processAITTSQueue() {
+  if (!aiTTSQueue.length || !aiSoundOn) { aiTTSBusy = false; return; }
+  aiTTSBusy = true;
+  const text = aiTTSQueue.shift();
   const segments = splitForTTS(text);
-  if (!segments.length) return;
+  if (!segments.length) { aiTTSBusy = false; _processAITTSQueue(); return; }
 
   function doSpeak() {
     const voices = window.speechSynthesis.getVoices();
     const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en')) || null;
     const jaVoice = voices.find(v => v.lang === 'ja-JP') || voices.find(v => v.lang.startsWith('ja')) || null;
-
     let i = 0;
     function next() {
-      if (i >= segments.length) return;
+      if (i >= segments.length) { aiTTSBusy = false; _processAITTSQueue(); return; }
       const seg = segments[i++];
       const u = new SpeechSynthesisUtterance(seg.text);
       if (seg.lang === 'ja') {
-        u.lang = 'ja-JP';
-        u.rate = 0.95;
+        u.lang = 'ja-JP'; u.rate = 0.95;
         if (jaVoice) u.voice = jaVoice;
       } else {
-        u.lang = 'en-US';
-        u.rate = 0.85;
+        u.lang = 'en-US'; u.rate = 0.85;
         if (enVoice) u.voice = enVoice;
       }
       u.volume = 1.0;
@@ -4637,10 +5111,7 @@ function speakAIResponse(text) {
 
   const voices = window.speechSynthesis.getVoices();
   if (voices.length === 0) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      doSpeak();
-    };
+    window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; doSpeak(); };
   } else {
     doSpeak();
   }
@@ -4655,12 +5126,12 @@ function toggleAISound() {
   } else {
     btn.textContent = '音声OFF';
     btn.classList.add('off');
-    window.speechSynthesis.cancel();
+    stopAITTS();
   }
 }
 
 function aiChatBack() {
-  window.speechSynthesis.cancel();
+  stopAITTS();
   showScreen(aiReturnScreen);
 }
 
@@ -4785,6 +5256,7 @@ function selectAILevel(btn) {
 }
 
 function restartAIChat() {
+  stopAITTS();
   aiHistory = [];
   aiTurnCount = 0;
   document.getElementById('ai-chat-area').innerHTML = '';
@@ -4797,28 +5269,47 @@ function restartAIChat() {
 }
 
 function buildAISystemPrompt() {
+  const levelMap = { elementary: '小学生', junior: '中学生', high: '高校生' };
+  const levelLabel = levelMap[aiLevel] || '中学生';
   const wordList = aiSessionWords.length ? aiSessionWords.join(', ') : '';
-  const wordNote = wordList
-    ? `ユーザーが今日学習した単語：${wordList}\nこれらの単語をなるべく使って自然な英会話をしてください。`
+  const wordInstruction = wordList
+    ? `今日の練習単語リスト: ${wordList}
+この単語を1個ずつ順番に使って会話を進めること。各単語について1〜2回やりとりする。`
     : '';
-  return `あなたは小学生・中学生向けの英語会話の先生です。
-${wordNote}
-- ユーザーが日本語で話しかけてきたら、英語での言い方を教えてあげてください
-- ユーザーが英語で話しかけてきたら、英語で自然に会話を続けてください
-- 返答は短く・シンプルに。難しい単語は使わない
-- 日本語で質問されたときは、英語表現＋簡単な説明を日本語で添える
-- 記号（!?.,）は使わない。文末はそのまま終わらせる`.trim();
+
+  return `あなたは${levelLabel}向けの英語会話の先生です。褒めて引っ張る先生スタイルで会話してください。
+
+${wordInstruction}
+
+会話ルール:
+- 必ず次の質問を投げかけて会話を引っ張ること（会話をリードするのはあなた）
+- 正解・英語で返事が来たら必ず褒めてから次の単語に誘導する（例：「すごい！じゃあ次は...について話そう」）
+- ユーザーが日本語で話しかけてきたら「〇〇 と言えばいいよ」の形式で英語表現を教えてから質問する
+- 返答は短くシンプルに（1〜2文）
+- 日本語訳は括弧内に（例：I like apples.（りんごが好き））
+- 合計5〜6回のやりとりで自然に終える
+- 最後の締めは必ず「今日はここまで！よくできました！」で締める
+- 記号（*、—、#）は使わない
+
+間違い指摘ルール（重要）:
+- 文法・表現のミスを見つけたら「ここが違う」だけでなく「なぜ違うか」も必ず短く説明する
+- 説明は子どもにもわかるやさしい日本語で1文以内
+- 形式例：「"I like eighty" より "I like the number eighty" の方が自然だよ。数字を話題にするときは "the number" をつけると英語らしくなるから！」
+- 指摘のあとは必ず正しい表現を使って会話を続けること`.trim();
 }
 
 async function startAIConversation() {
-  const greeting = 'Hi! Nice to meet you!（はじめまして！）';
+  const greeting = aiSessionWords.length
+    ? 'Hi！今日の単語で英会話しよう！（今日の単語を使って練習しよう！）'
+    : 'Hi！今日も英語で話してみよう！（Let\'s talk in English today！）';
   addBubble('ai', greeting);
   speakAIResponse(greeting);
   aiHistory.push({ role: 'assistant', content: greeting });
-  await callClaude([{
-    role: 'user',
-    content: 'Ask me your first question about a topic I like or enjoy, using one word from the vocabulary list. Do NOT ask my name. One short question only. No greeting again.'
-  }]);
+  const firstWord = aiSessionWords[0] || '';
+  const initialPrompt = firstWord
+    ? `Start the conversation by asking one simple question using the word "${firstWord}". For example, ask if they like it or have one. Keep it very short. Add Japanese translation in parentheses. Do NOT greet again.`
+    : `Start with one fun simple question to begin the conversation. Keep it short. Add Japanese translation in parentheses. Do NOT greet again.`;
+  await callClaude([{ role: 'user', content: initialPrompt }]);
 }
 
 function addBubble(type, text, isLoading) {
@@ -6532,6 +7023,160 @@ async function handleOCRPhoto(event) {
   }
 }
 
+// ===== スペースキーで次へ =====
+document.addEventListener('keydown', (e) => {
+  if (e.key !== ' ') return;
+  const focused = document.activeElement;
+  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
+  const activeScreen = document.querySelector('.screen.active');
+  if (!activeScreen) return;
+  if (activeScreen.id === 'flash-screen' && state.answered) {
+    e.preventDefault(); nextCard();
+  } else if (activeScreen.id === 'session-test-screen') {
+    const nb = document.getElementById('stest-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); stestNext(); }
+  } else if (activeScreen.id === 'review-test-screen') {
+    const nb = document.getElementById('review-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); reviewNext(); }
+  }
+});
+
+// ===== 総復習テスト =====
+let reviewDeck = [], reviewIndex = 0, reviewCorrect = 0, reviewWrong = 0;
+let reviewCount = 20, reviewWeakPriority = true;
+
+function selectReviewCount(btn) {
+  document.querySelectorAll('[data-review-count]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  reviewCount = parseInt(btn.dataset.reviewCount);
+}
+
+function openReviewTestSetup() {
+  showScreen('review-test-screen');
+  document.getElementById('review-setup-area').style.display = 'flex';
+  document.getElementById('review-quiz-area').style.display = 'none';
+  document.getElementById('review-result-area').style.display = 'none';
+}
+
+function startReviewTest() {
+  const allWords = getAllDataWords();
+  if (!allWords.length) { alert('単語データがありません。'); return; }
+  let pool;
+  if (reviewWeakPriority) {
+    const weakWords = allWords.filter(w => isWeakWord(w['単語']));
+    const others = allWords.filter(w => !isWeakWord(w['単語']));
+    // 弱い単語を3倍の重みで入れる
+    const weighted = [...weakWords, ...weakWords, ...weakWords, ...others];
+    pool = weighted.sort(() => Math.random() - 0.5);
+    // 重複除去しながら必要数取得
+    const seen = new Set();
+    reviewDeck = [];
+    for (const w of pool) {
+      if (!seen.has(w['単語'])) { seen.add(w['単語']); reviewDeck.push(w); }
+      if (reviewDeck.length >= reviewCount) break;
+    }
+  } else {
+    reviewDeck = allWords.sort(() => Math.random() - 0.5).slice(0, reviewCount);
+  }
+  if (!reviewDeck.length) { alert('条件に合う単語がありません。'); return; }
+  reviewIndex = 0; reviewCorrect = 0; reviewWrong = 0;
+  document.getElementById('review-setup-area').style.display = 'none';
+  document.getElementById('review-result-area').style.display = 'none';
+  document.getElementById('review-quiz-area').style.display = 'flex';
+  loadReviewCard();
+}
+
+function loadReviewCard() {
+  if (reviewIndex >= reviewDeck.length) { showReviewResult(); return; }
+  const word = reviewDeck[reviewIndex];
+  const pct = reviewIndex / reviewDeck.length * 100;
+  document.getElementById('review-progress-fill').style.width = pct + '%';
+  document.getElementById('review-progress-text').textContent = (reviewIndex+1) + '/' + reviewDeck.length;
+  document.getElementById('review-source').textContent = word._source || '';
+  document.getElementById('review-meaning').textContent = word['意味'];
+  document.getElementById('review-answer-wrap').classList.remove('visible');
+  document.getElementById('review-word-answer').textContent = word['単語'];
+  document.getElementById('review-feedback').className = 'feedback-area';
+  document.getElementById('review-feedback').textContent = '';
+  document.getElementById('review-next-btn').style.display = 'none';
+  document.getElementById('review-input-row').style.display = 'flex';
+  const inp = document.getElementById('review-input');
+  const boxes = document.getElementById('review-letter-boxes');
+  inp.value = ''; inp.disabled = false;
+  boxes.innerHTML = '';
+  const w = word['単語'];
+  for (let i = 0; i < w.length; i++) {
+    const b = document.createElement('div'); b.className = 'letter-box empty'; b.textContent = '_'; boxes.appendChild(b);
+  }
+  setTimeout(() => inp.focus(), 100);
+}
+
+function checkReviewAnswer() {
+  const inp = document.getElementById('review-input');
+  if (!inp || inp.disabled) return;
+  const typed = inp.value.trim();
+  if (!typed) return;
+  const word = reviewDeck[reviewIndex];
+  const correct = word['単語'].toLowerCase();
+  const isOk = typed.toLowerCase() === correct;
+  inp.disabled = true;
+  document.getElementById('review-answer-wrap').classList.add('visible');
+  const boxes = document.getElementById('review-letter-boxes');
+  boxes.innerHTML = '';
+  const maxLen = Math.max(typed.length, correct.length);
+  for (let i = 0; i < maxLen; i++) {
+    const b = document.createElement('div'); b.className = 'letter-box';
+    const tc = (typed[i]||'').toLowerCase(); const cc = (correct[i]||'').toLowerCase();
+    if (!typed[i]) { b.textContent = correct[i]; b.classList.add('wrong'); }
+    else if (!correct[i]) { b.textContent = typed[i]; b.classList.add('wrong'); }
+    else if (tc === cc) { b.textContent = typed[i]; b.classList.add('correct'); }
+    else { b.textContent = typed[i]; b.classList.add('wrong'); }
+    boxes.appendChild(b);
+  }
+  const fb = document.getElementById('review-feedback');
+  if (isOk) {
+    reviewCorrect++;
+    fb.className = 'feedback-area correct'; fb.textContent = '正解！';
+    // 単語ステータス更新
+    const ws = getWordStatus(word['単語']);
+    ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
+    if (ws.streak >= 3) ws.hall = true;
+    setWordStatus(word['単語'], ws);
+  } else {
+    reviewWrong++;
+    fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
+    const ws = getWordStatus(word['単語']);
+    ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
+    setWordStatus(word['単語'], ws);
+  }
+  speakWord(word['単語']);
+  document.getElementById('review-next-btn').style.display = 'block';
+  document.getElementById('review-input-row').style.display = 'none';
+}
+
+function reviewNext() {
+  reviewIndex++;
+  loadReviewCard();
+}
+
+function showReviewResult() {
+  document.getElementById('review-quiz-area').style.display = 'none';
+  const total = reviewCorrect + reviewWrong;
+  const pct = total > 0 ? Math.round(reviewCorrect / total * 100) : 0;
+  document.getElementById('review-score-pct').textContent = pct + '%';
+  document.getElementById('review-correct-count').textContent = reviewCorrect;
+  document.getElementById('review-wrong-count').textContent = reviewWrong;
+  let emoji = '😊', title = 'おつかれさま！';
+  if (pct >= 90) { emoji = '🏆'; title = '完璧！すごい！'; }
+  else if (pct >= 70) { emoji = '⭐'; title = 'よくできました！'; }
+  else if (pct >= 50) { emoji = '💪'; title = 'もう少し！'; }
+  else { emoji = '📚'; title = 'もう一度チャレンジ！'; }
+  document.getElementById('review-result-emoji').textContent = emoji;
+  document.getElementById('review-result-title').textContent = title;
+  document.getElementById('review-result-area').style.display = 'flex';
+  updateHomeBadges();
+}
+
 // ===== 初期化 =====
 document.addEventListener('DOMContentLoaded', () => {
   renderUserSelectScreen();
@@ -6546,8 +7191,15 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHomeBadges();
   updateResumeBtn();
   renderUserNameSettings();
-  // stest input イベント登録
-  // stest keydown は上部で登録済み
+
+  // review-input のイベント登録（DOM確定後）
+  const ri = document.getElementById('review-input');
+  if (ri) ri.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (ri.disabled) reviewNext();
+      else checkReviewAnswer();
+    }
+  });
 });
 </script>
 </body>
