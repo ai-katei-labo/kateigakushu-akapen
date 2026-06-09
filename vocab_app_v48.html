@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WordSuck v46</title>
+<title>WordSuck v48</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap');
   :root {
@@ -428,6 +428,22 @@
       </div>
       <div class="mode-arrow">›</div>
     </div>
+    <div class="mode-card flash" onclick="openReviewTestSetup()" style="border-color:#f59e0b;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:6px;font-size:18px;flex-shrink:0;">📝</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">総復習テスト</div>
+        <div class="mode-desc">全単語からランダム出題</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="showScreen('records-screen');renderRecords();" style="border-color:var(--accent2);grid-column:1/-1;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent2),#ffb300);border-radius:6px;font-size:18px;flex-shrink:0;">📊</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">わたしの記録</div>
+        <div class="mode-desc">継続日数・苦手単語・正答率を見る</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
   </div>
   <!-- 今日の続き -->
   <div id="today-resume-area" style="display:none;width:100%;max-width:480px;">
@@ -504,11 +520,7 @@
         <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)">26〜50</button>
         <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)">51〜75</button>
         <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)">76〜100</button>
-        <button class="unit-btn active" data-eiken="101-125" onclick="toggleEiken(this)">101〜125</button>
-        <button class="unit-btn active" data-eiken="126-150" onclick="toggleEiken(this)">126〜150</button>
-        <button class="unit-btn active" data-eiken="151-175" onclick="toggleEiken(this)">151〜175</button>
-        <button class="unit-btn active" data-eiken="176-200" onclick="toggleEiken(this)">176〜200</button>
-        <button class="unit-btn active" data-eiken="201-225" onclick="toggleEiken(this)">201〜225</button>
+        <button class="unit-btn active" data-eiken="101-107" onclick="toggleEiken(this)">101〜107</button>
       </div>
     </div>
 
@@ -672,10 +684,11 @@
     <!-- オリジナル -->
     <div class="source-block">
       <div class="source-header">
-        <input type="checkbox" class="source-checkbox" id="chk-original" onchange="updateSourceUI()">
+        <input type="checkbox" class="source-checkbox" id="chk-original" checked onchange="updateSourceUI()">
         <div class="source-name">オリジナル</div>
         <div class="source-count" id="original-count-label">0語</div>
       </div>
+      <div class="unit-grid" id="original-grid" style="display:none;padding-left:30px;"></div>
     </div>
     <div class="selected-count" id="selected-count">0語が選択されています</div>
   </div>
@@ -776,8 +789,8 @@
 <!-- SESSION END TEST SCREEN -->
 <div id="session-test-screen" class="screen" style="align-items:center;gap:16px;max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
   <div class="flash-header" style="width:100%;">
-    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
-    <div style="flex:1;text-align:center;font-size:15px;font-weight:800;color:var(--gold);font-family:'Noto Sans JP',sans-serif;">締めのテスト</div>
+    <div style="width:40px;"></div>
+    <div style="flex:1;text-align:center;font-size:15px;font-weight:800;color:var(--gold);font-family:'Noto Sans JP',sans-serif;">締めのテスト（全問解いて終了！）</div>
     <div class="progress-text" id="stest-progress-text">0/10</div>
   </div>
   <div style="width:100%;"><div class="progress-bar-wrap"><div class="progress-bar-fill" id="stest-progress-fill" style="width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));"></div></div></div>
@@ -1074,11 +1087,7 @@
             <button class="unit-btn" data-ls-eiken="26-50" onclick="toggleLsEiken(this)">26〜50</button>
             <button class="unit-btn" data-ls-eiken="51-75" onclick="toggleLsEiken(this)">51〜75</button>
             <button class="unit-btn" data-ls-eiken="76-100" onclick="toggleLsEiken(this)">76〜100</button>
-            <button class="unit-btn" data-ls-eiken="101-125" onclick="toggleLsEiken(this)">101〜125</button>
-            <button class="unit-btn" data-ls-eiken="126-150" onclick="toggleLsEiken(this)">126〜150</button>
-            <button class="unit-btn" data-ls-eiken="151-175" onclick="toggleLsEiken(this)">151〜175</button>
-            <button class="unit-btn" data-ls-eiken="176-200" onclick="toggleLsEiken(this)">176〜200</button>
-            <button class="unit-btn" data-ls-eiken="201-225" onclick="toggleLsEiken(this)">201〜225</button>
+            <button class="unit-btn" data-ls-eiken="101-107" onclick="toggleLsEiken(this)">101〜107</button>
           </div>
         </div>
         <div style="height:1px;background:var(--surface);"></div>
@@ -1234,11 +1243,14 @@
         </div>
         <div style="height:1px;background:var(--surface);"></div>
         <!-- オリジナル -->
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-          <input type="checkbox" class="source-checkbox" id="ls-chk-original" onchange="updateListenCount()">
-          <span style="font-size:15px;font-weight:800;">オリジナル</span>
-          <span style="font-size:12px;color:var(--text-muted);" id="ls-orig-count">0語</span>
-        </label>
+        <div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;">
+            <input type="checkbox" class="source-checkbox" id="ls-chk-original" onchange="updateListenCount()">
+            <span style="font-size:15px;font-weight:800;">オリジナル</span>
+            <span style="font-size:12px;color:var(--text-muted);" id="ls-orig-count">0語</span>
+          </label>
+          <div id="ls-original-grid" class="unit-grid" style="display:none;padding-left:30px;"></div>
+        </div>
       </div>
       <div class="selected-count" id="ls-selected-count">0語が選択されています</div>
     </div>
@@ -1341,6 +1353,7 @@
         Googleレンズでテキストをコピーして貼り付けてね！<br>
         <span style="color:var(--accent2);">英語（スペース）日本語</span> の形で1行ずつ
       </div>
+      <input type="text" id="orig-bulk-group" placeholder="グループ名（例：塾プリント1枚目・英検5級1〜25番）省略可" style="width:100%;padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
       <textarea id="orig-paste-area" placeholder="例：&#10;apple リンゴ&#10;dog イヌ&#10;cat ネコ" style="width:100%;height:120px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:14px;font-family:'Nunito',sans-serif;padding:12px;resize:none;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'"></textarea>
       <button onclick="parseAndPreview()" style="width:100%;padding:14px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent2),#ffb300);color:var(--bg);font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">読み取って確認する</button>
     </div>
@@ -1349,6 +1362,7 @@
       <div style="display:flex;flex-direction:column;gap:8px;">
         <input type="text" id="orig-word-input" placeholder="英単語 (例: apple)" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" style="padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-weight:700;font-family:'Nunito',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
         <input type="text" id="orig-meaning-input" placeholder="意味 (例: リンゴ)" style="padding:12px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:16px;font-family:'Noto Sans JP',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
+        <input type="text" id="orig-one-group" placeholder="グループ名（例：塾プリント1枚目）省略可" style="padding:10px 16px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:13px;font-family:'Noto Sans JP',sans-serif;outline:none;" onfocus="this.style.borderColor='var(--accent2)'" onblur="this.style.borderColor='var(--surface)'">
         <button onclick="toggleOrigOptions()" id="orig-options-toggle" style="text-align:left;padding:8px 4px;background:none;border:none;color:var(--text-muted);font-size:12px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;">＋ 詳細を追加（品詞・優先度）</button>
         <div id="orig-options" style="display:none;flex-direction:column;gap:8px;">
           <select id="orig-pos-select" style="padding:10px 14px;background:var(--surface);border:2px solid var(--surface);border-radius:14px;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;">
@@ -1383,6 +1397,79 @@
       <div id="preview-list" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;"></div>
     </div>
     <button onclick="registerPreview()" style="width:100%;padding:18px;background:linear-gradient(135deg,var(--accent3),#00b894);border:none;border-radius:var(--radius);color:var(--bg);font-size:18px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(6,214,160,.3);">これで登録する！</button>
+  </div>
+</div>
+
+<!-- REVIEW TEST SCREEN -->
+<div id="review-test-screen" class="screen" style="max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
+  <!-- 設定フェーズ -->
+  <div id="review-setup-area" style="display:flex;flex-direction:column;gap:16px;width:100%;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">総復習テスト</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">問題数を選ぶ</div>
+      <div style="display:flex;gap:8px;">
+        <button class="timer-btn" data-review-count="10" onclick="selectReviewCount(this)">10問</button>
+        <button class="timer-btn active" data-review-count="20" onclick="selectReviewCount(this)">20問</button>
+        <button class="timer-btn" data-review-count="50" onclick="selectReviewCount(this)">50問</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="timer-toggle">
+        <div class="toggle-info">
+          <div class="toggle-name">苦手単語を優先</div>
+          <div class="toggle-desc">ミスが多い単語を多めに出題する</div>
+        </div>
+        <button class="toggle-switch on" id="review-weak-toggle" onclick="this.classList.toggle('on');reviewWeakPriority=this.classList.contains('on');"></button>
+      </div>
+    </div>
+    <button onclick="startReviewTest()" class="start-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 8px 24px rgba(245,158,11,.4);">スタート →</button>
+  </div>
+  <!-- クイズフェーズ -->
+  <div id="review-quiz-area" style="display:none;flex-direction:column;gap:14px;width:100%;">
+    <div class="flash-header" style="width:100%;">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="review-progress-fill" style="width:0%;background:linear-gradient(90deg,#f59e0b,var(--accent2));"></div></div>
+      <div class="progress-text" id="review-progress-text">0/0</div>
+    </div>
+    <div class="flashcard" style="width:100%;min-height:140px;gap:10px;">
+      <div class="card-source-badge" id="review-source"></div>
+      <div class="card-meaning-main" id="review-meaning" style="font-size:34px;"></div>
+      <div class="card-answer-wrap" id="review-answer-wrap">
+        <div class="card-word-answer" id="review-word-answer" style="font-size:30px;"></div>
+      </div>
+    </div>
+    <div style="background:var(--card);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div class="letter-boxes" id="review-letter-boxes"></div>
+      <div class="text-input-row" id="review-input-row">
+        <input type="text" id="review-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="スペルを入力してEnter">
+        <button onclick="checkReviewAnswer()">確認</button>
+      </div>
+      <div class="feedback-area" id="review-feedback"></div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="action-btn btn-skip" onclick="reviewNext()">スキップ</button>
+        <button class="action-btn btn-next" id="review-next-btn" onclick="reviewNext()" style="display:none;">次へ →</button>
+      </div>
+    </div>
+  </div>
+  <!-- 結果フェーズ -->
+  <div id="review-result-area" style="display:none;flex-direction:column;align-items:center;gap:20px;width:100%;padding-top:40px;">
+    <div class="result-emoji" id="review-result-emoji">🎉</div>
+    <div class="result-title" id="review-result-title">おつかれさま！</div>
+    <div class="result-score-card">
+      <div class="score-big" id="review-score-pct">0%</div>
+      <div class="score-label">正答率</div>
+      <div class="score-detail">
+        <div class="score-item correct"><div class="score-num" id="review-correct-count">0</div><div class="score-desc">正解</div></div>
+        <div class="score-item wrong"><div class="score-num" id="review-wrong-count">0</div><div class="score-desc">まちがい</div></div>
+      </div>
+    </div>
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;">
+      <button class="result-btn primary" onclick="openReviewTestSetup()">もう一度</button>
+      <button class="result-btn secondary" onclick="showScreen('home-screen')">トップへ戻る</button>
+    </div>
   </div>
 </div>
 
@@ -1469,14 +1556,52 @@ function saveUserNames(names) {
 }
 function up(key) { return 'u' + currentUser + '_' + key; }
 
+function getUserStreakInfo(uid) {
+  const prefix = 'u' + uid + '_';
+  const today = new Date().toLocaleDateString('ja-JP');
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem(prefix + 'daily_log') || '[]'); } catch {}
+  if (!log.length) return { days: 0, rest: 0 };
+  const dates = log.map(e => e.date).filter(Boolean);
+  if (!dates.length) return { days: 0, rest: 0 };
+  let streak = 0;
+  let d = new Date();
+  for (let i = 0; i < 365; i++) {
+    const ds = d.toLocaleDateString('ja-JP');
+    if (dates.includes(ds)) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  if (streak > 0) return { days: streak, rest: 0 };
+  const lastDateStr = dates[0];
+  const parts = lastDateStr.split('/');
+  if (parts.length < 3) return { days: 0, rest: 0 };
+  const lastD = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const todayD = new Date(); todayD.setHours(0,0,0,0);
+  const diffDays = Math.round((todayD - lastD) / (1000*60*60*24));
+  return { days: 0, rest: Math.max(0, diffDays) };
+}
+
 function renderUserSelectScreen() {
   const names = getUserNames();
   const list = document.getElementById('user-btn-list');
-  list.innerHTML = names.map((name, i) => `
-    <button onclick="selectUser(${i+1})" style="width:100%;padding:24px 24px;border-radius:20px;border:2px solid rgba(212,175,55,.5);background:var(--card);color:var(--text);font-size:22px;font-weight:900;font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(212,175,55,.1);" onpointerdown="this.style.transform='scale(.97)'" onpointerup="this.style.transform=''" onpointercancel="this.style.transform=''">
-      <span style="font-size:32px;color:var(--gold);">${['🥇','🥈','🥉'][i]}</span>
-      <span>${name}</span>
-    </button>`).join('');
+  list.innerHTML = names.map((name, i) => {
+    const uid = i + 1;
+    const info = getUserStreakInfo(uid);
+    let streakHtml = '';
+    if (info.days > 0) {
+      streakHtml = `<span style="font-size:13px;color:#1dd1a1;font-family:'Noto Sans JP',sans-serif;font-weight:700;">${info.days}日継続中！🔥</span>`;
+    } else if (info.rest > 0) {
+      streakHtml = `<span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${info.rest}日お休み中</span>`;
+    }
+    return `
+    <button onclick="selectUser(${uid})" style="width:100%;padding:20px 24px;border-radius:20px;border:2px solid rgba(212,175,55,.5);background:var(--card);color:var(--text);font-size:22px;font-weight:900;font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-align:left;transition:all .2s;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(212,175,55,.1);" onpointerdown="this.style.transform='scale(.97)'" onpointerup="this.style.transform=''" onpointercancel="this.style.transform=''">
+      <span style="font-size:32px;color:var(--gold);flex-shrink:0;">${['🥇','🥈','🥉'][i]}</span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;">
+        <span>${name}</span>
+        ${streakHtml}
+      </div>
+    </button>`;
+  }).join('');
 }
 function selectUser(uid) {
   currentUser = uid;
@@ -1622,6 +1747,7 @@ function goToSettings() {
     startBtn.style.background = 'linear-gradient(135deg,var(--accent),#ff4757)';
     startBtn.style.boxShadow = '0 8px 24px rgba(255,107,107,.4)';
   }
+  renderOriginalGroupButtons();
 }
 function startSentenceMemory() {
   showScreen('sentence-memory-screen');
@@ -1821,114 +1947,113 @@ headache,頭痛,名,Unit10,🟢,hédèɪk
 fever,熱,名,Unit10,🟢,fíːvər`;
 
 const EIKEN_CSV = `単語,意味,品詞,出典_英検5級,優先度,発音記号
-teacher,先生,名,No.1-25,🔴,tíːtʃər
-brother,兄弟,名,No.1-25,🔴,brʌðər
-father,お父さん,名,No.1-25,🔴,fɑːðər
-animal,動物,名,No.1-25,🔴,ǽnɪml
-classroom,教室,名,No.1-25,🔴,klǽsruːm
-chair,椅子,名,No.1-25,🔴,tʃéər
-flower,花,名,No.1-25,🔴,fláʊər
-bird,鳥,名,No.1-25,🔴,bɜːrd
-friend,友達,名,No.1-25,🔴,frénd
-children,子どもたち,名,No.1-25,🔴,tʃɪldrən
-station,駅,名,No.26-50,🔴,stéɪʃn
-train,電車,名,No.26-50,🔴,tréɪn
-spring,春,名,No.26-50,🔴,sprɪŋ
-park,公園,名,No.26-50,🔴,pɑːrk
-room,部屋,名,No.26-50,🔴,ruːm
-math,数学,名,No.26-50,🔴,mæθ
-baseball,野球,名,No.26-50,🔴,béɪsbɔːl
-picture,絵・写真,名,No.26-50,🔴,píktʃər
-school,学校,名,No.26-50,🔴,skuːl
-girl,女の子,名,No.1-50,🔴,gɜːrl
-car,車,名,No.1-50,🔴,kɑːr
-family,家族,名,No.1-50,🔴,fǽməli
-movie,映画,名,No.1-50,🔴,múːvi
-textbook,教科書,名,No.1-50,🔴,tékstbʊk
-sister,姉妹,名,No.1-50,🔴,sɪstər
-mother,お母さん,名,No.1-50,🔴,mʌðər
-color,色,名,No.51-75,🔴,kʌlər
-buy,買う,動,No.51-75,🔴,báɪ
-birthday,誕生日,名,No.51-75,🔴,bɜːrθdèɪ
-come,来る,動,No.51-75,🔴,kʌm
-breakfast,朝食,名,No.51-75,🔴,brékfəst
-time,時間,名,No.51-75,🔴,táɪm
-cry,泣く,動,No.51-75,🔴,kráɪ
-cut,切る,動,No.51-75,🔴,kʌt
-begin,始める,動,No.51-75,🔴,bɪgín
-ask,尋ねる,動,No.51-75,🔴,æsk
-live,住む,動,No.76-100,🔴,lɪv
-eat,食べる,動,No.76-100,🔴,iːt
-hear,聞く,動,No.76-100,🔴,hɪər
-give,与える,動,No.76-100,🔴,gɪv
-find,見つける,動,No.76-100,🔴,fáɪnd
-enjoy,楽しむ,動,No.76-100,🔴,ɪndʒɔɪ
-have,持っている,動,No.76-100,🔴,hæv
-do,する,動,No.76-100,🔴,duː
-help,助ける,動,No.51-100,🔴,hélp
-get,得る,動,No.51-100,🔴,gét
-month,月,名,No.51-100,🔴,mʌnθ
-make,作る,動,No.51-100,🔴,méɪk
-music,音楽,名,No.51-100,🔴,mjúːzɪk
-listen,聞く,動,No.51-100,🔴,lísn
-meet,会う,動,No.51-100,🔴,míːt
-year,年,名,No.51-100,🔴,jɪər
-sing,歌う,動,No.101-125,🔴,sɪŋ
-read,読む,動,No.101-125,🔴,riːd
-think,考える,動,No.101-125,🔴,θɪŋk
-walk,歩く,動,No.101-125,🔴,wɔːk
-speak,話す,動,No.101-125,🔴,spíːk
-run,走る,動,No.101-125,🔴,rʌn
-study,勉強する,動,No.101-125,🔴,stʌdi
-see,見る,動,No.101-125,🔴,siː
-stand,立つ,動,No.101-125,🔴,stænd
-Chinese,中国の,形,No.126-150,🔴,tʃàɪníːz
-watch,見る,動,No.126-150,🔴,wɑtʃ
-easy,簡単な,形,No.126-150,🔴,íːzi
-famous,有名な,形,No.126-150,🔴,féɪməs
-cloudy,くもりの,形,No.126-150,🔴,kláʊdi
-cute,かわいい,形,No.126-150,🔴,kjúːt
-work,働く,動,No.126-150,🔴,wɜːrk
-wash,洗う,動,No.101-150,🔴,wɑʃ
-put,置く,動,No.101-150,🔴,pʊt
-take,取る,動,No.101-150,🔴,téɪk
-talk,話す,動,No.101-150,🔴,tɔːk
-want,〜したい,動,No.101-150,🔴,wɑnt
-cold,寒い,形,No.101-150,🔴,kóʊld
-all,すべての,形,No.101-150,🔴,ɔːl
-every,毎〜,形,No.101-150,🔴,évri
-delicious,おいしい,形,No.101-150,🔴,dɪlíʃəs
-many,たくさんの,形,No.151-175,🔴,méni
-high,高い,形,No.151-175,🔴,háɪ
-old,古い,形,No.151-175,🔴,óʊld
-Japanese,日本の,形,No.151-175,🔴,dʒæpəníːz
-new,新しい,形,No.151-175,🔴,njúː
-next,次の,形,No.151-175,🔴,nékst
-slow,遅い,形,No.176-200,🔴,slóʊ
-soft,柔らかい,形,No.176-200,🔴,sɔːft
-sad,悲しい,形,No.176-200,🔴,sæd
-tall,背が高い,形,No.176-200,🔴,tɔːl
-sick,病気の,形,No.176-200,🔴,sɪk
-tired,疲れた,形,No.176-200,🔴,táɪərd
-young,若い,形,No.176-200,🔴,jʌŋ
-always,いつも,副,No.176-200,🔴,ɔːlweɪz
-smart,賢い,形,No.176-200,🔴,smɑːrt
-little,少しの,形,No.151-200,🔴,lítl
-long,長い,形,No.151-200,🔴,lɔːŋ
-hungry,お腹がすいた,形,No.151-200,🔴,hʌŋgri
-pretty,きれいな,形,No.151-200,🔴,príti
-short,短い,形,No.151-200,🔴,ʃɔːrt
-sunny,晴れの,形,No.151-200,🔴,sʌni
-rainy,雨の,形,No.151-200,🔴,réɪni
-windy,風の強い,形,No.151-200,🔴,wíndi
-warm,暖かい,形,No.151-200,🔴,wɔːrm
-today,今日,副,No.201-225,🔴,tədéɪ
-please,どうか,副,No.201-225,🔴,plíːz
-well,よく,副,No.201-225,🔴,wél
-yesterday,昨日,副,No.201-225,🔴,jéstərdeɪ
-tonight,今夜,副,No.201-225,🔴,tənáɪt
-sure,確かに,副,No.201-225,🔴,ʃúər
-together,いっしょに,副,No.201-225,🔴,təgéðər`;
+teacher,先生,名,No.1,🔴,tíːtʃər
+brother,兄弟,名,No.2,🔴,brʌðər
+father,お父さん,名,No.3,🔴,fɑːðər
+animal,動物,名,No.4,🔴,ǽnɪml
+classroom,教室,名,No.5,🔴,klǽsruːm
+chair,椅子,名,No.6,🔴,tʃéər
+flower,花,名,No.7,🔴,fláʊər
+bird,鳥,名,No.8,🔴,bɜːrd
+friend,友達,名,No.9,🔴,frénd
+children,子どもたち,名,No.10,🔴,tʃɪldrən
+station,駅,名,No.11,🔴,stéɪʃn
+train,電車,名,No.12,🔴,tréɪn
+spring,春,名,No.13,🔴,sprɪŋ
+park,公園,名,No.14,🔴,pɑːrk
+room,部屋,名,No.15,🔴,ruːm
+math,数学,名,No.16,🔴,mæθ
+baseball,野球,名,No.17,🔴,béɪsbɔːl
+picture,絵・写真,名,No.18,🔴,píktʃər
+school,学校,名,No.19,🔴,skuːl
+girl,女の子,名,No.20,🔴,gɜːrl
+car,車,名,No.21,🔴,kɑːr
+family,家族,名,No.22,🔴,fǽməli
+movie,映画,名,No.23,🔴,múːvi
+textbook,教科書,名,No.24,🔴,tékstbʊk
+sister,姉妹,名,No.25,🔴,sɪstər
+mother,お母さん,名,No.26,🔴,mʌðər
+color,色,名,No.27,🔴,kʌlər
+buy,買う,動,No.28,🔴,báɪ
+birthday,誕生日,名,No.29,🔴,bɜːrθdèɪ
+come,来る,動,No.30,🔴,kʌm
+breakfast,朝食,名,No.31,🔴,brékfəst
+time,時間,名,No.32,🔴,táɪm
+cry,泣く,動,No.33,🔴,kráɪ
+cut,切る,動,No.34,🔴,kʌt
+begin,始める,動,No.35,🔴,bɪgín
+ask,尋ねる,動,No.36,🔴,æsk
+live,住む,動,No.37,🔴,lɪv
+eat,食べる,動,No.38,🔴,iːt
+hear,聞く,動,No.39,🔴,hɪər
+give,与える,動,No.40,🔴,gɪv
+find,見つける,動,No.41,🔴,fáɪnd
+enjoy,楽しむ,動,No.42,🔴,ɪndʒɔɪ
+have,持っている,動,No.43,🔴,hæv
+do,する,動,No.44,🔴,duː
+help,助ける,動,No.45,🔴,hélp
+get,得る,動,No.46,🔴,gét
+month,月,名,No.47,🔴,mʌnθ
+make,作る,動,No.48,🔴,méɪk
+music,音楽,名,No.49,🔴,mjúːzɪk
+listen,聞く,動,No.50,🔴,lísn
+meet,会う,動,No.51,🔴,míːt
+year,年,名,No.52,🔴,jɪər
+sing,歌う,動,No.53,🔴,sɪŋ
+read,読む,動,No.54,🔴,riːd
+think,考える,動,No.55,🔴,θɪŋk
+walk,歩く,動,No.56,🔴,wɔːk
+speak,話す,動,No.57,🔴,spíːk
+run,走る,動,No.58,🔴,rʌn
+study,勉強する,動,No.59,🔴,stʌdi
+see,見る,動,No.60,🔴,siː
+stand,立つ,動,No.61,🔴,stænd
+Chinese,中国の,形,No.62,🔴,tʃàɪníːz
+watch,見る,動,No.63,🔴,wɑtʃ
+easy,簡単な,形,No.64,🔴,íːzi
+famous,有名な,形,No.65,🔴,féɪməs
+cloudy,くもりの,形,No.66,🔴,kláʊdi
+cute,かわいい,形,No.67,🔴,kjúːt
+work,働く,動,No.68,🔴,wɜːrk
+wash,洗う,動,No.69,🔴,wɑʃ
+put,置く,動,No.70,🔴,pʊt
+take,取る,動,No.71,🔴,téɪk
+talk,話す,動,No.72,🔴,tɔːk
+want,〜したい,動,No.73,🔴,wɑnt
+cold,寒い,形,No.74,🔴,kóʊld
+all,すべての,形,No.75,🔴,ɔːl
+every,毎〜,形,No.76,🔴,évri
+delicious,おいしい,形,No.77,🔴,dɪlíʃəs
+many,たくさんの,形,No.78,🔴,méni
+high,高い,形,No.79,🔴,háɪ
+old,古い,形,No.80,🔴,óʊld
+Japanese,日本の,形,No.81,🔴,dʒæpəníːz
+new,新しい,形,No.82,🔴,njúː
+next,次の,形,No.83,🔴,nékst
+slow,遅い,形,No.84,🔴,slóʊ
+soft,柔らかい,形,No.85,🔴,sɔːft
+sad,悲しい,形,No.86,🔴,sæd
+tall,背が高い,形,No.87,🔴,tɔːl
+sick,病気の,形,No.88,🔴,sɪk
+tired,疲れた,形,No.89,🔴,táɪərd
+young,若い,形,No.90,🔴,jʌŋ
+always,いつも,副,No.91,🔴,ɔːlweɪz
+smart,賢い,形,No.92,🔴,smɑːrt
+little,少しの,形,No.93,🔴,lítl
+long,長い,形,No.94,🔴,lɔːŋ
+hungry,お腹がすいた,形,No.95,🔴,hʌŋgri
+pretty,きれいな,形,No.96,🔴,príti
+short,短い,形,No.97,🔴,ʃɔːrt
+sunny,晴れの,形,No.98,🔴,sʌni
+rainy,雨の,形,No.99,🔴,réɪni
+windy,風の強い,形,No.100,🔴,wíndi
+warm,暖かい,形,No.101,🔴,wɔːrm
+today,今日,副,No.102,🔴,tədéɪ
+please,どうか,副,No.103,🔴,plíːz
+well,よく,副,No.104,🔴,wél
+yesterday,昨日,副,No.105,🔴,jéstərdeɪ
+tonight,今夜,副,No.106,🔴,tənáɪt
+sure,確かに,副,No.107,🔴,ʃúər`;
 
 const MABUTAN_CSV = `単語,意味,品詞,出典_まぶたん,優先度
 boy,少年・男の子,名,No.1,🟡
@@ -2797,16 +2922,66 @@ let state = {
   history: [], wrongThisCard: 0,
 };
 
+function getOrigGroups() {
+  const words = loadOriginalWords();
+  const groups = [...new Set(words.map(w => w['_group'] || '').filter(g => g))];
+  return groups;
+}
+function renderOriginalGroupButtons() {
+  const grid = document.getElementById('original-grid');
+  if (!grid) return;
+  const groups = getOrigGroups();
+  const origOn = document.getElementById('chk-original') && document.getElementById('chk-original').checked;
+  if (!groups.length) { grid.style.display = 'none'; return; }
+  grid.style.display = origOn ? 'flex' : 'none';
+  const activeGroups = getSelectedOrigGroups();
+  grid.innerHTML = `<button class="unit-btn unit-all-btn" onclick="selectAllOrigGroups()">全選択</button>` +
+    groups.map(g => `<button class="unit-btn ${activeGroups.includes(g) ? 'active' : ''}" data-orig-group="${g}" onclick="toggleOrigGroup(this)">${g}</button>`).join('');
+}
+function renderLsOrigGroupButtons() {
+  const grid = document.getElementById('ls-original-grid');
+  if (!grid) return;
+  const groups = getOrigGroups();
+  const lsOn = document.getElementById('ls-chk-original') && document.getElementById('ls-chk-original').checked;
+  if (!groups.length) { grid.style.display = 'none'; return; }
+  grid.style.display = lsOn ? 'flex' : 'none';
+  grid.innerHTML = `<button class="unit-btn unit-all-btn" onclick="selectAllLsOrigGroups()">全選択</button>` +
+    groups.map(g => `<button class="unit-btn active" data-ls-orig-group="${g}" onclick="toggleLsOrigGroup(this)">${g}</button>`).join('');
+}
+function toggleOrigGroup(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
+function toggleLsOrigGroup(btn) { btn.classList.toggle('active'); updateListenCount(); }
+function selectAllOrigGroups() {
+  const btns = document.querySelectorAll('#original-grid [data-orig-group]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => b.classList.toggle('active', !allActive));
+  updateSelectedCount();
+}
+function selectAllLsOrigGroups() {
+  const btns = document.querySelectorAll('#ls-original-grid [data-ls-orig-group]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => b.classList.toggle('active', !allActive));
+  updateListenCount();
+}
+function getSelectedOrigGroups() {
+  return Array.from(document.querySelectorAll('#original-grid [data-orig-group].active')).map(b => b.dataset.origGroup);
+}
+function getSelectedLsOrigGroups() {
+  return Array.from(document.querySelectorAll('#ls-original-grid [data-ls-orig-group].active')).map(b => b.dataset.lsOrigGroup);
+}
+
 function updateSourceUI() {
   const minilaboOn = document.getElementById('chk-minilabo').checked;
   const eikenOn = document.getElementById('chk-eiken').checked;
   const mabutanOn = document.getElementById('chk-mabutan').checked;
   const shogakuseiOn = document.getElementById('chk-shogakusei').checked;
+  const origOn = document.getElementById('chk-original').checked;
   document.getElementById('unit-grid').style.display = minilaboOn ? 'flex' : 'none';
   document.getElementById('eiken-grid').style.display = eikenOn ? 'flex' : 'none';
   document.getElementById('mabutan-grid').style.display = mabutanOn ? 'flex' : 'none';
   document.getElementById('shogakusei-grid').style.display = shogakuseiOn ? 'flex' : 'none';
   if (shogakuseiOn) document.getElementById('shogakusei-grid').style.flexDirection = 'column';
+  const origGrid = document.getElementById('original-grid');
+  if (origGrid) origGrid.style.display = (origOn && getOrigGroups().length) ? 'flex' : 'none';
   updateOriginalCountLabel();
   saveUnitSelection();
   updateSelectedCount();
@@ -2856,7 +3031,12 @@ function buildDeck() {
   if (shogakuseiOn) SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, selectedSgSubs)).forEach(w => result.push({...w, _source: '小学生英語'}));
   const origEl = document.getElementById('chk-original');
   if (origEl && origEl.checked) {
-    loadOriginalWords().forEach(w => result.push({...w, _source: 'オリジナル'}));
+    const selectedOrigGrps = getSelectedOrigGroups();
+    const allOrig = loadOriginalWords();
+    const filteredOrig = selectedOrigGrps.length
+      ? allOrig.filter(w => selectedOrigGrps.includes(w['_group'] || ''))
+      : allOrig;
+    filteredOrig.forEach(w => result.push({...w, _source: 'オリジナル'}));
   }
   return result.sort(() => Math.random() - 0.5);
 }
@@ -3348,9 +3528,7 @@ function showResult() {
 }
 
 function endSessionPrompt() {
-  if (state.deck.length === 0 || !confirm('終了して今日のテストをしますか？\n（いいえ：トップに戻る）')) {
-    showScreen('home-screen'); return;
-  }
+  if (state.deck.length === 0) { showScreen('home-screen'); return; }
   startSessionTest();
 }
 
@@ -3359,11 +3537,23 @@ let stestDeck = [], stestIndex = 0, stestCorrect = 0, stestTotal = 10;
 
 function startSessionTest() {
   saveSessionCoins();
-  const pool = sessionWords.length >= 5 ? sessionWords : getAllDataWords().slice(0, 20);
+  // 今日やった単語から最大5問
   const uniqueMap = {};
-  pool.forEach(w => { if (w && w['単語']) uniqueMap[w['単語']] = w; });
-  const unique = Object.values(uniqueMap);
-  stestDeck = unique.sort(() => Math.random()-.5).slice(0, Math.min(10, unique.length));
+  sessionWords.forEach(w => { if (w && w['単語']) uniqueMap[w['単語']] = w; });
+  const todayUnique = Object.values(uniqueMap).sort(() => Math.random()-.5).slice(0, 5);
+  const todayKeys = new Set(todayUnique.map(w => w['単語']));
+  // 苦手単語から最大5問（今日やった単語を除外）
+  const weakSorted = getWeakWordsFromData()
+    .filter(w => !todayKeys.has(w['単語']))
+    .sort((a, b) => {
+      const sumA = Object.values(getCharMistakes(a['単語'])).reduce((s,v) => s+v, 0);
+      const sumB = Object.values(getCharMistakes(b['単語'])).reduce((s,v) => s+v, 0);
+      return sumB - sumA;
+    }).slice(0, 5);
+  stestDeck = [...todayUnique, ...weakSorted].sort(() => Math.random()-.5);
+  if (!stestDeck.length) {
+    stestDeck = getAllDataWords().sort(() => Math.random()-.5).slice(0, 10);
+  }
   if (!stestDeck.length) { showDailyResults(); return; }
   stestIndex = 0; stestCorrect = 0; stestTotal = stestDeck.length;
   showScreen('session-test-screen');
@@ -4423,6 +4613,8 @@ function selectAllLsShogakusei() {
   updateListenCount();
 }
 function updateListenCount() {
+  const lsOrigGrid = document.getElementById('ls-original-grid');
+  if (lsOrigGrid) lsOrigGrid.style.display = (document.getElementById('ls-chk-original').checked && getOrigGroups().length) ? 'flex' : 'none';
   let count = 0;
   if (document.getElementById('ls-chk-minilabo').checked) {
     const ranges = Array.from(document.querySelectorAll('[data-ls-ml].active')).map(b => b.dataset.lsMl);
@@ -4441,7 +4633,11 @@ function updateListenCount() {
     const lsSubs = getSelectedSgSubs(true);
     count += lsSubs.length === 0 ? SHOGAKUSEI.length : SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs)).length;
   }
-  if (document.getElementById('ls-chk-original').checked) count += loadOriginalWords().length;
+  if (document.getElementById('ls-chk-original').checked) {
+    const selLsGrps = getSelectedLsOrigGroups();
+    const allLs = loadOriginalWords();
+    count += selLsGrps.length ? allLs.filter(w => selLsGrps.includes(w['_group'] || '')).length : allLs.length;
+  }
   const el = document.getElementById('ls-selected-count');
   if (el) el.textContent = count + '語が選択されています';
 }
@@ -4490,7 +4686,14 @@ function buildListenDeck() {
     const sgFiltered = lsSubs2.length === 0 ? SHOGAKUSEI : SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, lsSubs2));
     sgFiltered.forEach(w => result.push({...w, _source:'小学生英語', _type:'word'}));
   }
-  if (document.getElementById('ls-chk-original').checked) loadOriginalWords().forEach(w => result.push({...w, _source:'オリジナル', _type:'word'}));
+  if (document.getElementById('ls-chk-original').checked) {
+    const selLsOrigGrps = getSelectedLsOrigGroups();
+    const allLsOrig = loadOriginalWords();
+    const filtLsOrig = selLsOrigGrps.length
+      ? allLsOrig.filter(w => selLsOrigGrps.includes(w['_group'] || ''))
+      : allLsOrig;
+    filtLsOrig.forEach(w => result.push({...w, _source:'オリジナル', _type:'word'}));
+  }
   if (listenType === 'sentence' && minilaboRanges.length > 0) {
     const unitNums = minilaboRanges.map(r => parseInt(r.replace('Unit',''))).filter(n => !isNaN(n));
     SENTENCE_DATA.filter(s => unitNums.includes(s.unit)).forEach(s => result.push({...s, _source:'英文', _type:'sentence'}));
@@ -4561,22 +4764,26 @@ function playListenWord() {
       updateListenDisplay(word, 'en');
       speakWord(word['単語'], () => {
         if (listenPaused) return;
-        // Phase 3: スペルアウト（オン/オフ）
-        if (listenSpelloutEnabled) {
-          updateListenDisplay(word, 'spell');
-          spellOutListen(word['単語'], () => {
-            if (listenPaused) return;
+        // Phase 3: スペルアウト（200ms待ってから確実に開始）
+        listenTimeoutId = setTimeout(() => {
+          if (listenPaused) return;
+          if (listenSpelloutEnabled) {
+            window.speechSynthesis.cancel();
+            updateListenDisplay(word, 'spell');
+            spellOutListen(word['単語'], () => {
+              if (listenPaused) return;
+              pulse.classList.remove('playing');
+              listenTimeoutId = setTimeout(() => {
+                if (!listenPaused) { listenCurrent++; playListenWord(); }
+              }, getListenDelay());
+            });
+          } else {
             pulse.classList.remove('playing');
             listenTimeoutId = setTimeout(() => {
               if (!listenPaused) { listenCurrent++; playListenWord(); }
             }, getListenDelay());
-          });
-        } else {
-          pulse.classList.remove('playing');
-          listenTimeoutId = setTimeout(() => {
-            if (!listenPaused) { listenCurrent++; playListenWord(); }
-          }, getListenDelay());
-        }
+          }
+        }, 200);
       });
     }, 300);
   });
@@ -4755,6 +4962,8 @@ function updateOriginalCountLabel() {
   if (lsEl) lsEl.textContent = words.length + '語';
   const home = document.getElementById('orig-home-count');
   if (home && words.length > 0) home.textContent = `登録済み: ${words.length}語`;
+  renderOriginalGroupButtons();
+  renderLsOrigGroupButtons();
 }
 function renderOriginalList() {
   const words = loadOriginalWords();
@@ -4765,14 +4974,31 @@ function renderOriginalList() {
   if (!words.length) { if(list) list.innerHTML = ''; if(empty) empty.style.display = 'block'; return; }
   if(empty) empty.style.display = 'none';
   if (!list) return;
-  list.innerHTML = words.map((w, i) => `
+  list.innerHTML = words.map((w, i) => {
+    const grp = w['_group'] || '';
+    const grpBadge = grp ? `<span style="font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(212,175,55,.15);color:var(--accent2);margin-left:4px;">${grp}</span>` : '';
+    return `
     <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--surface);border-radius:12px;">
-      <div style="flex:1;">
-        <div style="font-size:14px;font-weight:700;">${w['単語']}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${w['単語']}${grpBadge}</div>
         <div style="font-size:12px;color:var(--text-muted);">${w['意味']}</div>
       </div>
+      <button onclick="editOrigGroup(${i})" style="padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:var(--card);color:var(--text-muted);font-size:11px;cursor:pointer;">GL</button>
       <button onclick="deleteOriginal(${i})" style="padding:4px 10px;border-radius:8px;border:none;background:rgba(255,107,107,.2);color:var(--accent);font-size:12px;cursor:pointer;">削除</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+function editOrigGroup(idx) {
+  const words = loadOriginalWords();
+  const w = words[idx];
+  const current = w['_group'] || '';
+  const newGroup = prompt(`「${w['単語']}」のグループ名を入力してね（空欄でグループなし）`, current);
+  if (newGroup === null) return;
+  w['_group'] = newGroup.trim();
+  saveOriginalWords(words);
+  renderOriginalList();
+  renderOriginalGroupButtons();
+  updateSelectedCount();
 }
 function deleteOriginal(idx) {
   const words = loadOriginalWords();
@@ -4780,6 +5006,7 @@ function deleteOriginal(idx) {
   saveOriginalWords(words);
   renderOriginalList();
   updateOriginalCountLabel();
+  renderOriginalGroupButtons();
   updateSelectedCount();
 }
 function clearAllOriginal() {
@@ -4787,6 +5014,7 @@ function clearAllOriginal() {
   saveOriginalWords([]);
   renderOriginalList();
   updateOriginalCountLabel();
+  renderOriginalGroupButtons();
   updateSelectedCount();
 }
 
@@ -4809,26 +5037,30 @@ function addOneOriginal() {
   const meaning = document.getElementById('orig-meaning-input').value.trim();
   if (!word || !meaning) { alert('単語と意味を入力してね'); return; }
   const pos = document.getElementById('orig-pos-select').value;
+  const group = (document.getElementById('orig-one-group').value || '').trim();
   const words = loadOriginalWords();
-  words.push({ '単語': word, '意味': meaning, '品詞': pos, '優先度': selectedOrigPrio });
+  words.push({ '単語': word, '意味': meaning, '品詞': pos, '優先度': selectedOrigPrio, '_group': group });
   saveOriginalWords(words);
   document.getElementById('orig-word-input').value = '';
   document.getElementById('orig-meaning-input').value = '';
   renderOriginalList();
   updateOriginalCountLabel();
+  renderOriginalGroupButtons();
   updateSelectedCount();
   alert('登録したよ！');
 }
 
 let previewData = [];
+let previewGroup = '';
 function parseAndPreview() {
   const text = document.getElementById('orig-paste-area').value;
+  previewGroup = (document.getElementById('orig-bulk-group').value || '').trim();
   const lines = text.trim().split('\n').filter(l => l.trim());
   previewData = lines.map(line => {
     const parts = line.trim().split(/\s+/);
     const word = parts[0] || '';
     const meaning = parts.slice(1).join(' ') || '';
-    return { '単語': word, '意味': meaning, '品詞': '', '優先度': '🟡' };
+    return { '単語': word, '意味': meaning, '品詞': '', '優先度': '🟡', '_group': previewGroup };
   }).filter(w => w['単語'] && w['意味']);
   if (!previewData.length) { alert('読み取れませんでした。形式を確認してね。'); return; }
   const list = document.getElementById('preview-list');
@@ -4847,8 +5079,10 @@ function registerPreview() {
   showScreen('original-screen');
   renderOriginalList();
   updateOriginalCountLabel();
+  renderOriginalGroupButtons();
   updateSelectedCount();
   document.getElementById('orig-paste-area').value = '';
+  document.getElementById('orig-bulk-group').value = '';
   alert(`${previewData.length}語を登録したよ！`);
   previewData = [];
 }
@@ -5148,7 +5382,13 @@ ${wordInstruction}
 - 日本語訳は括弧内に（例：I like apples.（りんごが好き））
 - 合計5〜6回のやりとりで自然に終える
 - 最後の締めは必ず「今日はここまで！よくできました！」で締める
-- 記号（*、—、#）は使わない`.trim();
+- 記号（*、—、#）は使わない
+
+間違い指摘ルール（重要）:
+- 文法・表現のミスを見つけたら「ここが違う」だけでなく「なぜ違うか」も必ず短く説明する
+- 説明は子どもにもわかるやさしい日本語で1文以内
+- 形式例：「"I like eighty" より "I like the number eighty" の方が自然だよ。数字を話題にするときは "the number" をつけると英語らしくなるから！」
+- 指摘のあとは必ず正しい表現を使って会話を続けること`.trim();
 }
 
 async function startAIConversation() {
@@ -5574,7 +5814,7 @@ function getWordUnit(wordObj) {
     const m = s.match(/No\.(\d+)/);
     if (m) {
       const no = parseInt(m[1]);
-      for (const g of ['1-25','26-50','51-75','76-100','101-125','126-150','151-175','176-200','201-225']) {
+      for (const g of ['1-25','26-50','51-75','76-100','101-107']) {
         const [lo, hi] = g.split('-').map(Number);
         if (no >= lo && no <= hi) return '英検5級 ' + g;
       }
@@ -6325,6 +6565,7 @@ function saveUnitSelection() {
       eikenUnits: Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken),
       mabutanUnits: Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan),
       shogakuseiSubs: getSelectedSgSubs(false),
+      origGroups: getSelectedOrigGroups(),
     };
     localStorage.setItem(up('unit_selection'), JSON.stringify(sel));
   } catch(e) {}
@@ -6360,6 +6601,12 @@ function restoreUnitSelection() {
         b.classList.toggle('active', sel.shogakuseiSubs.includes(b.dataset.sgSub));
       });
       Object.keys(SG_SUBS).forEach(mid => syncSgMidBtn(mid, false));
+    }
+    renderOriginalGroupButtons();
+    if (sel.origGroups) {
+      document.querySelectorAll('#original-grid [data-orig-group]').forEach(b => {
+        b.classList.toggle('active', sel.origGroups.includes(b.dataset.origGroup));
+      });
     }
     updateSourceUI();
   } catch(e) {}
@@ -6542,7 +6789,7 @@ function renderRecords() {
     const cnt = parseInt(localStorage.getItem(up('practice_ml_'+u))||'0');
     unitRows.push({name:'ミニラボ '+u, cnt, key:'ml_'+u});
   });
-  ['1-25','26-50','51-75','76-100','101-125','126-150','151-175','176-200','201-225'].forEach(g => {
+  ['1-25','26-50','51-75','76-100','101-107'].forEach(g => {
     const cnt = parseInt(localStorage.getItem(up('practice_ek_'+g))||'0');
     unitRows.push({name:'英検 '+g, cnt, key:'ek_'+g});
   });
@@ -6876,6 +7123,160 @@ async function handleOCRPhoto(event) {
   }
 }
 
+// ===== スペースキーで次へ =====
+document.addEventListener('keydown', (e) => {
+  if (e.key !== ' ') return;
+  const focused = document.activeElement;
+  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
+  const activeScreen = document.querySelector('.screen.active');
+  if (!activeScreen) return;
+  if (activeScreen.id === 'flash-screen' && state.answered) {
+    e.preventDefault(); nextCard();
+  } else if (activeScreen.id === 'session-test-screen') {
+    const nb = document.getElementById('stest-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); stestNext(); }
+  } else if (activeScreen.id === 'review-test-screen') {
+    const nb = document.getElementById('review-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); reviewNext(); }
+  }
+});
+
+// ===== 総復習テスト =====
+let reviewDeck = [], reviewIndex = 0, reviewCorrect = 0, reviewWrong = 0;
+let reviewCount = 20, reviewWeakPriority = true;
+
+function selectReviewCount(btn) {
+  document.querySelectorAll('[data-review-count]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  reviewCount = parseInt(btn.dataset.reviewCount);
+}
+
+function openReviewTestSetup() {
+  showScreen('review-test-screen');
+  document.getElementById('review-setup-area').style.display = 'flex';
+  document.getElementById('review-quiz-area').style.display = 'none';
+  document.getElementById('review-result-area').style.display = 'none';
+}
+
+function startReviewTest() {
+  const allWords = getAllDataWords();
+  if (!allWords.length) { alert('単語データがありません。'); return; }
+  let pool;
+  if (reviewWeakPriority) {
+    const weakWords = allWords.filter(w => isWeakWord(w['単語']));
+    const others = allWords.filter(w => !isWeakWord(w['単語']));
+    // 弱い単語を3倍の重みで入れる
+    const weighted = [...weakWords, ...weakWords, ...weakWords, ...others];
+    pool = weighted.sort(() => Math.random() - 0.5);
+    // 重複除去しながら必要数取得
+    const seen = new Set();
+    reviewDeck = [];
+    for (const w of pool) {
+      if (!seen.has(w['単語'])) { seen.add(w['単語']); reviewDeck.push(w); }
+      if (reviewDeck.length >= reviewCount) break;
+    }
+  } else {
+    reviewDeck = allWords.sort(() => Math.random() - 0.5).slice(0, reviewCount);
+  }
+  if (!reviewDeck.length) { alert('条件に合う単語がありません。'); return; }
+  reviewIndex = 0; reviewCorrect = 0; reviewWrong = 0;
+  document.getElementById('review-setup-area').style.display = 'none';
+  document.getElementById('review-result-area').style.display = 'none';
+  document.getElementById('review-quiz-area').style.display = 'flex';
+  loadReviewCard();
+}
+
+function loadReviewCard() {
+  if (reviewIndex >= reviewDeck.length) { showReviewResult(); return; }
+  const word = reviewDeck[reviewIndex];
+  const pct = reviewIndex / reviewDeck.length * 100;
+  document.getElementById('review-progress-fill').style.width = pct + '%';
+  document.getElementById('review-progress-text').textContent = (reviewIndex+1) + '/' + reviewDeck.length;
+  document.getElementById('review-source').textContent = word._source || '';
+  document.getElementById('review-meaning').textContent = word['意味'];
+  document.getElementById('review-answer-wrap').classList.remove('visible');
+  document.getElementById('review-word-answer').textContent = word['単語'];
+  document.getElementById('review-feedback').className = 'feedback-area';
+  document.getElementById('review-feedback').textContent = '';
+  document.getElementById('review-next-btn').style.display = 'none';
+  document.getElementById('review-input-row').style.display = 'flex';
+  const inp = document.getElementById('review-input');
+  const boxes = document.getElementById('review-letter-boxes');
+  inp.value = ''; inp.disabled = false;
+  boxes.innerHTML = '';
+  const w = word['単語'];
+  for (let i = 0; i < w.length; i++) {
+    const b = document.createElement('div'); b.className = 'letter-box empty'; b.textContent = '_'; boxes.appendChild(b);
+  }
+  setTimeout(() => inp.focus(), 100);
+}
+
+function checkReviewAnswer() {
+  const inp = document.getElementById('review-input');
+  if (!inp || inp.disabled) return;
+  const typed = inp.value.trim();
+  if (!typed) return;
+  const word = reviewDeck[reviewIndex];
+  const correct = word['単語'].toLowerCase();
+  const isOk = typed.toLowerCase() === correct;
+  inp.disabled = true;
+  document.getElementById('review-answer-wrap').classList.add('visible');
+  const boxes = document.getElementById('review-letter-boxes');
+  boxes.innerHTML = '';
+  const maxLen = Math.max(typed.length, correct.length);
+  for (let i = 0; i < maxLen; i++) {
+    const b = document.createElement('div'); b.className = 'letter-box';
+    const tc = (typed[i]||'').toLowerCase(); const cc = (correct[i]||'').toLowerCase();
+    if (!typed[i]) { b.textContent = correct[i]; b.classList.add('wrong'); }
+    else if (!correct[i]) { b.textContent = typed[i]; b.classList.add('wrong'); }
+    else if (tc === cc) { b.textContent = typed[i]; b.classList.add('correct'); }
+    else { b.textContent = typed[i]; b.classList.add('wrong'); }
+    boxes.appendChild(b);
+  }
+  const fb = document.getElementById('review-feedback');
+  if (isOk) {
+    reviewCorrect++;
+    fb.className = 'feedback-area correct'; fb.textContent = '正解！';
+    // 単語ステータス更新
+    const ws = getWordStatus(word['単語']);
+    ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
+    if (ws.streak >= 3) ws.hall = true;
+    setWordStatus(word['単語'], ws);
+  } else {
+    reviewWrong++;
+    fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
+    const ws = getWordStatus(word['単語']);
+    ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
+    setWordStatus(word['単語'], ws);
+  }
+  speakWord(word['単語']);
+  document.getElementById('review-next-btn').style.display = 'block';
+  document.getElementById('review-input-row').style.display = 'none';
+}
+
+function reviewNext() {
+  reviewIndex++;
+  loadReviewCard();
+}
+
+function showReviewResult() {
+  document.getElementById('review-quiz-area').style.display = 'none';
+  const total = reviewCorrect + reviewWrong;
+  const pct = total > 0 ? Math.round(reviewCorrect / total * 100) : 0;
+  document.getElementById('review-score-pct').textContent = pct + '%';
+  document.getElementById('review-correct-count').textContent = reviewCorrect;
+  document.getElementById('review-wrong-count').textContent = reviewWrong;
+  let emoji = '😊', title = 'おつかれさま！';
+  if (pct >= 90) { emoji = '🏆'; title = '完璧！すごい！'; }
+  else if (pct >= 70) { emoji = '⭐'; title = 'よくできました！'; }
+  else if (pct >= 50) { emoji = '💪'; title = 'もう少し！'; }
+  else { emoji = '📚'; title = 'もう一度チャレンジ！'; }
+  document.getElementById('review-result-emoji').textContent = emoji;
+  document.getElementById('review-result-title').textContent = title;
+  document.getElementById('review-result-area').style.display = 'flex';
+  updateHomeBadges();
+}
+
 // ===== 初期化 =====
 document.addEventListener('DOMContentLoaded', () => {
   renderUserSelectScreen();
@@ -6890,8 +7291,15 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHomeBadges();
   updateResumeBtn();
   renderUserNameSettings();
-  // stest input イベント登録
-  // stest keydown は上部で登録済み
+
+  // review-input のイベント登録（DOM確定後）
+  const ri = document.getElementById('review-input');
+  if (ri) ri.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (ri.disabled) reviewNext();
+      else checkReviewAnswer();
+    }
+  });
 });
 </script>
 </body>
