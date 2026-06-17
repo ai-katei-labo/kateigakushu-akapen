@@ -351,6 +351,8 @@
   .pref-mode-desc { font-size:11px; line-height:1.5; }
   .pref-count-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
   .pref-count-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .pref-toggle-btn { padding:8px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .pref-toggle-btn.active { border-color:rgba(78,205,196,.5); background:rgba(78,205,196,.12); color:#4ecdc4; }
   .pref-save-btn { width:100%; padding:16px; background:linear-gradient(135deg,var(--accent2),#ffb300); border:none; border-radius:var(--radius); color:var(--bg); font-size:16px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
   .pref-save-btn:active { transform:scale(.97); }
 
@@ -517,10 +519,6 @@
     <div class="home-badge hall-badge-card" onclick="startHallOnlyMode()">
       <div class="badge-num hall-num" id="badge-hall-num">0語</div>
       <div class="badge-label">殿堂入り</div>
-    </div>
-    <div class="home-badge rec-badge-card" onclick="showScreen('records-screen');renderRecords();">
-      <div class="badge-num" style="color:var(--accent2);font-size:16px;">わたしの記録</div>
-      <div class="badge-label">成長を見る</div>
     </div>
   </div>
   <div style="color:var(--text-muted);font-size:12px;text-align:center;font-family:'Noto Sans JP',sans-serif;">
@@ -784,6 +782,7 @@
       <div class="card-answer-wrap" id="card-answer-wrap">
         <div class="card-word-answer" id="card-word-answer"></div>
         <div class="card-phonetic" id="card-phonetic"></div>
+        <span id="flash-weakness-tag" class="weakness-tag" style="display:none;margin-top:4px;"></span>
       </div>
     </div>
   </div>
@@ -1692,6 +1691,20 @@
     <div style="display:flex;gap:8px;">
       <button class="pref-count-btn active" data-pref-unit-end="stop" onclick="selectPrefUnitEnd(this)">そこで終わり</button>
       <button class="pref-count-btn" data-pref-unit-end="fillNext" onclick="selectPrefUnitEnd(this)">次のユニットから補充</button>
+    </div>
+  </div>
+
+  <!-- 間違えたときに表示するもの -->
+  <div class="settings-section">
+    <div class="settings-label">間違えたときに表示するもの（複数選択可）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+      <button class="pref-toggle-btn active" data-wrong-display="etymology" onclick="toggleWrongDisplay(this)">語源・イメージ</button>
+      <button class="pref-toggle-btn active" data-wrong-display="pattern" onclick="toggleWrongDisplay(this)">同パターンの仲間</button>
+      <button class="pref-toggle-btn active" data-wrong-display="weaknessTag" onclick="toggleWrongDisplay(this)">苦手タグ</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="pref-count-btn" onclick="setAllWrongDisplay(true)" style="flex:none;padding:8px 16px;font-size:12px;">全部表示</button>
+      <button class="pref-count-btn" onclick="setAllWrongDisplay(false)" style="flex:none;padding:8px 16px;font-size:12px;">表示しない</button>
     </div>
   </div>
 
@@ -3375,6 +3388,8 @@ function loadCard() {
   if (etymAreaL) { etymAreaL.classList.remove('visible'); const et = document.getElementById('etymology-text'); if(et) et.textContent=''; }
   if (patAreaL) patAreaL.classList.remove('visible');
   if (etymBtnWrapL) etymBtnWrapL.style.display = 'none';
+  const flashTagL = document.getElementById('flash-weakness-tag');
+  if (flashTagL) flashTagL.style.display = 'none';
 
   cardStartTime = Date.now();
   resetVoiceUI();
@@ -3547,11 +3562,21 @@ function checkAnswer() {
     if (!wasAlreadyCorrectN && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     doSpellOut(wordStr);
-    showPatternGroup(wordStr);
-    const etymBtnWrapC = document.getElementById('etymology-btn-wrap');
-    const etymBtnC = document.getElementById('etymology-btn');
-    if (etymBtnWrapC) etymBtnWrapC.style.display = 'block';
-    if (etymBtnC) { etymBtnC.disabled = false; etymBtnC.textContent = 'なぜこのスペル？'; }
+    // v51: 設定に応じて間違え時の表示を切り替え
+    const wdsC = getWrongDisplayPrefs();
+    if (wdsC.pattern) { showPatternGroup(wordStr); }
+    else { const pa = document.getElementById('pattern-group-area'); if (pa) pa.classList.remove('visible'); }
+    if (wdsC.etymology) {
+      const etymBtnWrapC = document.getElementById('etymology-btn-wrap');
+      const etymBtnC = document.getElementById('etymology-btn');
+      if (etymBtnWrapC) etymBtnWrapC.style.display = 'block';
+      if (etymBtnC) { etymBtnC.disabled = false; etymBtnC.textContent = 'なぜこのスペル？'; }
+    }
+    if (wdsC.weaknessTag) {
+      const tag = getWeaknessTag(wordStr);
+      const tagEl = document.getElementById('flash-weakness-tag');
+      if (tagEl && tag) { tagEl.textContent = tag; tagEl.style.display = 'inline-block'; }
+    }
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
@@ -3741,11 +3766,21 @@ function revealAnswer() {
     document.getElementById('reveal-pronounce-status').textContent = '声に出して言ってみよう';
   }
   document.getElementById('reveal-btn').style.display = 'none';
-  showPatternGroup(wordStr);
-  const etymBtnWrapR = document.getElementById('etymology-btn-wrap');
-  const etymBtnR = document.getElementById('etymology-btn');
-  if (etymBtnWrapR) etymBtnWrapR.style.display = 'block';
-  if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
+  // v51: 設定に応じて表示を切り替え
+  const wdsR = getWrongDisplayPrefs();
+  if (wdsR.pattern) { showPatternGroup(wordStr); }
+  else { const pa = document.getElementById('pattern-group-area'); if (pa) pa.classList.remove('visible'); }
+  if (wdsR.etymology) {
+    const etymBtnWrapR = document.getElementById('etymology-btn-wrap');
+    const etymBtnR = document.getElementById('etymology-btn');
+    if (etymBtnWrapR) etymBtnWrapR.style.display = 'block';
+    if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
+  }
+  if (wdsR.weaknessTag) {
+    const tag = getWeaknessTag(wordStr);
+    const tagEl = document.getElementById('flash-weakness-tag');
+    if (tagEl && tag) { tagEl.textContent = tag; tagEl.style.display = 'inline-block'; }
+  }
   updateHomeBadges();
 }
 function skipCard() {
@@ -3951,23 +3986,24 @@ function goToLearnSettings() {
 function startLearnMode() {
   const prefs = getUserPrefSettings();
   const wps = parseInt(prefs.wordsPerSession) || 0;
-  const todayWordsList = getTodayWords();
-  const allWords = getAllDataWords();
 
-  let rawDeck;
-  if (todayWordsList.length > 0) {
-    // 今日の単語 + 苦手単語（正解率50%以下 or 直近間違えあり）
-    const todayDeck = todayWordsList.map(w => allWords.find(d => d['単語'] === w)).filter(Boolean);
-    const todaySet = new Set(todayWordsList);
-    const weakDeck = allWords.filter(w => isWeakWordV51(w['単語']) && !todaySet.has(w['単語']));
-    rawDeck = [...todayDeck, ...weakDeck];
+  // startTypingMode()と同じパターン：今日の単語＋苦手単語→件数制限→シャッフル
+  const todayWordList = getTodayWords();
+  const allDeck = buildDeckRaw(false);
+  let deck;
+  if (todayWordList.length > 0) {
+    const todaySet = new Set(todayWordList);
+    const todayDeck = allDeck.filter(w => todaySet.has(w['単語']));
+    const weakDeck = allDeck.filter(w => isWeakWordV51(w['単語']) && !todaySet.has(w['単語']));
+    deck = [...todayDeck, ...weakDeck];
   } else {
-    rawDeck = buildDeck();
+    deck = allDeck;
   }
+  if (!deck.length) { alert('条件に合う単語がありません。'); return; }
+  if (wps > 0 && deck.length > wps) deck = deck.slice(0, wps);
+  deck = deck.sort(() => Math.random() - 0.5);
 
-  if (!rawDeck.length) { alert('条件に合う単語がありません。'); return; }
-  if (wps > 0 && rawDeck.length > wps) rawDeck = rawDeck.slice(0, wps);
-  learnDeck = rawDeck.sort(() => Math.random() - 0.5);
+  learnDeck = deck;
   learnCurrent = 0;
   const startBtn = document.querySelector('.start-btn');
   if (startBtn) {
@@ -6198,33 +6234,48 @@ function getWeaknessTag(word) {
   return '';
 }
 
+// ===== v51: 間違え時の表示設定 =====
+function getWrongDisplayPrefs() {
+  const prefs = getUserPrefSettings();
+  const s = prefs.wrongDisplaySettings;
+  if (!s) return { etymology: true, pattern: true, weaknessTag: true }; // デフォルト：全部表示
+  return {
+    etymology: s.includes('etymology'),
+    pattern: s.includes('pattern'),
+    weaknessTag: s.includes('weaknessTag'),
+  };
+}
+function toggleWrongDisplay(btn) { btn.classList.toggle('active'); }
+function setAllWrongDisplay(show) {
+  document.querySelectorAll('[data-wrong-display]').forEach(b => b.classList.toggle('active', show));
+}
+
 // ===== v50: 同パターン単語提示 =====
+function getPatternSiblings(word) {
+  const w = (word || '').toLowerCase();
+  const allWords = getAllDataWords();
+  const matchSuffix = sfx => allWords
+    .filter(d => { const dw = (d['単語'] || '').toLowerCase(); return dw !== w && dw.endsWith(sfx) && dw.length >= 3; })
+    .map(d => d['単語']);
+  let suffix = w.length >= 3 ? w.slice(-3) : w.slice(-2);
+  let matches = matchSuffix(suffix);
+  if (matches.length < 2 && w.length >= 2) {
+    const s2 = w.slice(-2);
+    const m2 = matchSuffix(s2);
+    if (m2.length >= 2) { matches = m2; suffix = s2; }
+  }
+  return { suffix, siblings: [...new Set(matches)].slice(0, 6) };
+}
+
 function showPatternGroup(word) {
   const area = document.getElementById('pattern-group-area');
   const wordsEl = document.getElementById('pattern-group-words');
   if (!area || !wordsEl) return;
-  const w = word.toLowerCase();
-  const allWords = getAllDataWords();
-
-  // 末尾3文字でまずマッチ、足りなければ末尾2文字
-  let suffix = w.length >= 3 ? w.slice(-3) : w.slice(-2);
-  const matchSuffix = (sfx) => allWords
-    .filter(d => { const dw = (d['単語'] || '').toLowerCase(); return dw !== w && dw.endsWith(sfx) && dw.length >= 3; })
-    .map(d => d['単語']);
-
-  let matches = matchSuffix(suffix);
-  if (matches.length < 2 && w.length >= 2) {
-    const suffix2 = w.slice(-2);
-    const m2 = matchSuffix(suffix2);
-    if (m2.length >= 2) { matches = m2; suffix = suffix2; }
-  }
-
-  const unique = [...new Set(matches)].slice(0, 6);
-  if (unique.length < 1) { area.classList.remove('visible'); return; }
-
+  const { suffix, siblings } = getPatternSiblings(word);
+  if (siblings.length < 1) { area.classList.remove('visible'); return; }
   const label = area.querySelector('.pattern-group-label');
   if (label) label.textContent = `-${suffix}グループ`;
-  wordsEl.innerHTML = unique.map(uw =>
+  wordsEl.innerHTML = siblings.map(uw =>
     `<button class="pattern-word-chip" onclick="speakWord('${uw.replace(/'/g, "\\'")}')">${uw}</button>`
   ).join('');
   area.classList.add('visible');
@@ -7233,12 +7284,17 @@ function renderRecords() {
       const cnt = st.count || 0;
       const spellRatio = cnt > 0 ? `スペルミス ${mc}回/${cnt}回中` : `スペルミス ${mc}回`;
       const tag = getWeaknessTag(w['単語']);
+      const { suffix: ps, siblings } = getPatternSiblings(w['単語']);
+      const patternHtml = siblings.length >= 1
+        ? `<div style="font-size:10px;color:var(--accent2);font-weight:700;font-family:'Noto Sans JP',sans-serif;margin-top:3px;">-${ps}グループ：${siblings.slice(0,5).join('・')}</div>`
+        : '';
       return `<div class="rec-item" onclick="startWeakOnlyMode()" style="cursor:pointer;">
         <span style="font-size:12px;color:var(--text-muted);font-weight:700;min-width:22px;">${i+1}.</span>
         <div style="flex:1;">
           <div style="font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;letter-spacing:1px;">${w['単語'].toUpperCase()}${tag ? `<span class="weakness-tag">${tag}</span>` : ''}</div>
           <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${w['意味']}</div>
           <div class="spell-mistake-ratio">${spellRatio}</div>
+          ${patternHtml}
         </div>
         <span style="font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;">${mc}回</span>
       </div>`;
@@ -7825,6 +7881,11 @@ function loadPrefScreen() {
   document.querySelectorAll('[data-pref-unit-end]').forEach(b => {
     b.classList.toggle('active', b.dataset.prefUnitEnd === unitEnd);
   });
+  // 間違え時の表示設定 (v51)
+  const wds = prefs.wrongDisplaySettings || ['etymology', 'pattern', 'weaknessTag'];
+  document.querySelectorAll('[data-wrong-display]').forEach(b => {
+    b.classList.toggle('active', wds.includes(b.dataset.wrongDisplay));
+  });
   // 速度
   const speed = prefs.spelloutSpeed || 'normal';
   document.querySelectorAll('[data-pref-speed]').forEach(b => {
@@ -7882,11 +7943,13 @@ function savePrefSettings() {
   const sentCountBtn = document.querySelector('[data-pref-sent-count].active');
   const unitEndBtn = document.querySelector('[data-pref-unit-end].active');
   const speedBtn = document.querySelector('[data-pref-speed].active');
+  const wrongDisplayBtns = [...document.querySelectorAll('[data-wrong-display].active')].map(b => b.dataset.wrongDisplay);
   const prefs = {
     learningMode: modeBtn ? modeBtn.dataset.prefMode : 'free',
     wordsPerSession: countBtn ? parseInt(countBtn.dataset.prefCount) : 0,
     sentencesPerSession: sentCountBtn ? parseInt(sentCountBtn.dataset.prefSentCount) : 0,
     unitEndPolicy: unitEndBtn ? unitEndBtn.dataset.prefUnitEnd : 'stop',
+    wrongDisplaySettings: wrongDisplayBtns,
     spelloutSpeed: speedBtn ? speedBtn.dataset.prefSpeed : 'normal',
   };
   saveUserPrefToStorage(prefs);

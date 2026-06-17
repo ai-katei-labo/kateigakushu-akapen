@@ -13,10 +13,14 @@
 
 ## 現在地（2026/6/18）
 
-- 最新ファイル：`vocab_app_v51.html`（完成）
+- 最新ファイル：`vocab_app_v51.html`（バグ修正済み）
 - バックアップ：`vocab_app_v50.html`
 - APIキー：Anthropic・OpenAI ともに取得済み・上限$10設定済み
 - GitHub Pages：`ai-katei-labo.github.io/kateigakushu-akapen/`
+
+### 本日の修正（v51バグ修正）
+- `startLearnMode()` のデッキ構築を v51 仕様に修正（今日の単語＋苦手単語→件数制限→シャッフル）
+- メニュー画面の「わたしの記録」ボタン重複を削除（下部バーから除去）
 
 ---
 
