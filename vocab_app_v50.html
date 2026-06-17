@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WordSuck v48</title>
+<title>WordSuck v50</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap');
   :root {
@@ -342,6 +342,58 @@
 
   /* ===== キラキラ演出 ===== */
   @keyframes sparkle-fly { 0%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0;transform:translateY(-60px) scale(0.5)} }
+
+  /* ===== ユーザー設定画面 ===== */
+  #user-pref-screen { gap:16px; max-width:440px; margin:0 auto; width:100%; padding-bottom:40px; }
+  .pref-mode-card { flex:1; padding:14px 10px; border-radius:14px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:all .2s; text-align:center; display:flex; flex-direction:column; gap:4px; }
+  .pref-mode-card.active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.08); }
+  .pref-mode-title { font-size:15px; font-weight:800; font-family:'Nunito',sans-serif; }
+  .pref-mode-desc { font-size:11px; line-height:1.5; }
+  .pref-count-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
+  .pref-count-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
+  .pref-save-btn { width:100%; padding:16px; background:linear-gradient(135deg,var(--accent2),#ffb300); border:none; border-radius:var(--radius); color:var(--bg); font-size:16px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
+  .pref-save-btn:active { transform:scale(.97); }
+
+  /* ===== ステップモード表示 ===== */
+  .step-banner { display:none; background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05)); border:1.5px solid rgba(212,175,55,.4); border-radius:12px; padding:10px 14px; font-size:13px; font-weight:700; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; text-align:center; }
+  .step-banner.visible { display:block; }
+
+  /* ===== 習熟度マップ ===== */
+  .mastery-map-wrap { position:relative; width:100%; padding-top:56.25%; background:var(--surface); border-radius:14px; overflow:hidden; }
+  .mastery-map-inner { position:absolute; inset:0; }
+  .mastery-dot { position:absolute; width:10px; height:10px; border-radius:50%; transform:translate(-50%,-50%); cursor:pointer; transition:transform .15s; }
+  .mastery-dot:hover { transform:translate(-50%,-50%) scale(1.8); }
+  .mastery-dot.zone-safe { background:#06d6a0; box-shadow:0 0 6px rgba(6,214,160,.5); }
+  .mastery-dot.zone-practice { background:#f0d060; box-shadow:0 0 6px rgba(240,208,96,.5); }
+  .mastery-dot.zone-caution { background:#ff6b6b; box-shadow:0 0 6px rgba(255,107,107,.5); }
+  .mastery-dot.zone-new { background:#8a7d5a; }
+  .mastery-axis-label { position:absolute; font-size:10px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; pointer-events:none; }
+  .mastery-zone-label { position:absolute; font-size:10px; font-weight:700; font-family:'Noto Sans JP',sans-serif; pointer-events:none; opacity:.6; }
+  .mastery-tooltip { position:fixed; background:var(--card); border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:8px 12px; font-size:12px; z-index:9999; pointer-events:none; display:none; max-width:160px; }
+  .mastery-legend { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+  .mastery-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .mastery-legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+  /* ===== v50 新機能 ===== */
+  /* 語源・イメージAI */
+  .etymology-area { display:none; background:linear-gradient(135deg,rgba(78,205,196,.1),rgba(78,205,196,.05)); border:1.5px solid rgba(78,205,196,.3); border-radius:14px; padding:12px 14px; flex-direction:column; gap:8px; }
+  .etymology-area.visible { display:flex; }
+  .etymology-label { font-size:10px; font-weight:700; color:#4ecdc4; letter-spacing:1px; text-transform:uppercase; }
+  .etymology-text { font-size:13px; color:var(--text); font-family:'Noto Sans JP',sans-serif; line-height:1.7; }
+  .etymology-btn { padding:7px 14px; border-radius:10px; border:1.5px dashed rgba(78,205,196,.55); background:rgba(78,205,196,.07); color:#4ecdc4; font-size:11px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; align-self:flex-start; white-space:nowrap; }
+  .etymology-btn:active { background:rgba(78,205,196,.18); }
+  .etymology-btn:disabled { opacity:.4; pointer-events:none; }
+  /* 同パターン仲間 */
+  .pattern-group-area { display:none; background:rgba(212,175,55,.06); border:1px solid rgba(212,175,55,.22); border-radius:12px; padding:10px 14px; }
+  .pattern-group-area.visible { display:block; }
+  .pattern-group-label { font-size:10px; font-weight:700; color:var(--accent2); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+  .pattern-group-words { display:flex; flex-wrap:wrap; gap:6px; }
+  .pattern-word-chip { padding:4px 10px; border-radius:8px; background:rgba(212,175,55,.13); color:var(--accent2); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; border:none; transition:background .15s; }
+  .pattern-word-chip:active { background:rgba(212,175,55,.28); }
+  /* 苦手タグ */
+  .weakness-tag { display:inline-block; font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; background:rgba(255,107,107,.18); color:var(--accent); margin-left:6px; vertical-align:middle; }
+  /* スペルミス比率 */
+  .spell-mistake-ratio { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; margin-top:1px; }
 </style>
 </head>
 <body>
@@ -369,7 +421,10 @@
 <div id="home-screen" class="screen">
   <div style="text-align:center;">
     <div class="logo-title">WordSuck</div>
-    <div id="home-user-bar" style="font-size:12px;color:var(--gold);font-family:'Noto Sans JP',sans-serif;margin-top:4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openUserSelectFromHome()">▶ 切り替え</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:4px;">
+    <div id="home-user-bar" style="font-size:12px;color:var(--gold);font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openUserSelectFromHome()">▶ 切り替え</div>
+    <button onclick="showScreen('user-pref-screen');loadPrefScreen();" style="font-size:11px;font-weight:700;color:var(--text-muted);background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:3px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">⚙ 設定</button>
+  </div>
   </div>
   <div class="mode-cards">
     <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
@@ -707,6 +762,7 @@
 
 <!-- FLASH SCREEN -->
 <div id="flash-screen" class="screen">
+  <div id="step-banner" class="step-banner"></div>
   <div class="flash-header">
     <button class="back-btn" onclick="endSessionPrompt()">‹</button>
     <button class="back-btn" id="prev-btn" onclick="backCard()" style="display:none;font-size:14px;" title="前の問題へ">◀</button>
@@ -740,6 +796,17 @@
       </div>
     </div>
     <div id="spell-highlight-area"></div>
+    <div id="pattern-group-area" class="pattern-group-area">
+      <div class="pattern-group-label">同じパターンの仲間</div>
+      <div class="pattern-group-words" id="pattern-group-words"></div>
+    </div>
+    <div id="etymology-area" class="etymology-area">
+      <div class="etymology-label">語源・覚え方</div>
+      <div class="etymology-text" id="etymology-text"></div>
+    </div>
+    <div id="etymology-btn-wrap" style="display:none;padding:4px 0;">
+      <button class="etymology-btn" id="etymology-btn" onclick="fetchEtymology()">なぜこのスペル？</button>
+    </div>
     <div id="training-result-area"></div>
     <div class="feedback-area" id="feedback-area"></div>
     <div id="reveal-pronounce-area" style="display:none;flex-direction:column;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--surface);margin-top:4px;">
@@ -1534,11 +1601,97 @@
     <div id="rec-daily-log"></div>
   </div>
 
+  <!-- 習熟度マップ -->
+  <div class="rec-section" id="mastery-map-section">
+    <div class="rec-title" style="color:var(--accent2);">単語習熟度マップ</div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:8px;">練習済みの単語の定着度を見える化（殿堂入りを除く）</div>
+    <div id="mastery-map-container" style="position:relative;width:100%;height:220px;background:var(--surface);border-radius:12px;overflow:visible;">
+      <!-- ゾーン背景ラベル -->
+      <div style="position:absolute;inset:0;border-radius:12px;overflow:hidden;">
+        <div style="position:absolute;left:50%;right:0;top:0;bottom:50%;background:rgba(6,214,160,.04);border-bottom:1px dashed rgba(255,255,255,.07);border-left:1px dashed rgba(255,255,255,.07);"></div>
+        <div style="position:absolute;left:0;right:50%;top:0;bottom:50%;background:rgba(255,209,102,.03);border-bottom:1px dashed rgba(255,255,255,.07);border-right:1px dashed rgba(255,255,255,.07);"></div>
+        <div style="position:absolute;left:50%;right:0;top:50%;bottom:0;background:rgba(255,107,107,.04);border-top:1px dashed rgba(255,255,255,.07);border-left:1px dashed rgba(255,255,255,.07);"></div>
+        <div style="position:absolute;left:0;right:50%;top:50%;bottom:0;background:rgba(100,100,100,.02);border-top:1px dashed rgba(255,255,255,.07);border-right:1px dashed rgba(255,255,255,.07);"></div>
+      </div>
+      <!-- ゾーンラベル -->
+      <span class="mastery-zone-label" style="right:6px;top:4px;color:var(--accent3);">安心🟢</span>
+      <span class="mastery-zone-label" style="left:6px;top:4px;color:var(--accent2);">もう少し</span>
+      <span class="mastery-zone-label" style="right:6px;bottom:4px;color:var(--accent);">要注意🔴</span>
+      <span class="mastery-zone-label" style="left:6px;bottom:4px;color:var(--text-muted);">これから</span>
+      <!-- 軸ラベル -->
+      <span class="mastery-axis-label" style="left:50%;bottom:-18px;transform:translateX(-50%);">← 練習回数 →</span>
+      <span class="mastery-axis-label" style="top:50%;left:-16px;transform:translateY(-50%) rotate(-90deg);">正解率</span>
+      <!-- ドット描画エリア -->
+      <div id="mastery-dot-area" style="position:absolute;inset:0;"></div>
+    </div>
+    <div class="mastery-legend" style="margin-top:22px;">
+      <div class="mastery-legend-item"><div class="mastery-legend-dot" style="background:#06d6a0;"></div>安心（練習多・正解率高）</div>
+      <div class="mastery-legend-item"><div class="mastery-legend-dot" style="background:#f0d060;"></div>もう少し練習</div>
+      <div class="mastery-legend-item"><div class="mastery-legend-dot" style="background:#ff6b6b;"></div>要注意（練習多・正解率低）</div>
+      <div class="mastery-legend-item"><div class="mastery-legend-dot" style="background:#5a5a5a;"></div>これから</div>
+    </div>
+    <div id="mastery-map-empty" style="display:none;text-align:center;color:var(--text-muted);font-size:13px;font-family:'Noto Sans JP',sans-serif;padding:20px;">まだデータがありません。練習すると表示されます！</div>
+  </div>
+  <!-- ツールチップ -->
+  <div id="mastery-tooltip" class="mastery-tooltip"></div>
+
   <!-- リセット -->
   <div class="rec-section">
     <div class="rec-title" style="font-size:13px;color:var(--text-muted);">データ管理</div>
     <button class="rec-reset-btn" onclick="resetAllRecords()">全記録をリセット</button>
   </div>
+</div>
+
+<!-- USER PREF SCREEN -->
+<div id="user-pref-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="screen-title">⚙ 個人設定</div>
+  </div>
+
+  <!-- 学習モード -->
+  <div class="settings-section">
+    <div class="settings-label">学習モード</div>
+    <div style="display:flex;gap:8px;">
+      <button class="pref-mode-card active" data-pref-mode="free" onclick="selectPrefMode(this)">
+        <div class="pref-mode-title">フリーモード</div>
+        <div class="pref-mode-desc">試験範囲を自分で選んでスタート</div>
+      </button>
+      <button class="pref-mode-card" data-pref-mode="step" onclick="selectPrefMode(this)">
+        <div class="pref-mode-title">ステップモード</div>
+        <div class="pref-mode-desc">5語ずつ解放・累積で練習<br>7割クリアで次の5語へ</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- 1回の単語数 -->
+  <div class="settings-section" id="pref-count-section">
+    <div class="settings-label">1回に出す単語数（フリーモード時）</div>
+    <div style="display:flex;gap:8px;">
+      <button class="pref-count-btn" data-pref-count="5" onclick="selectPrefCount(this)">5語</button>
+      <button class="pref-count-btn" data-pref-count="10" onclick="selectPrefCount(this)">10語</button>
+      <button class="pref-count-btn" data-pref-count="15" onclick="selectPrefCount(this)">15語</button>
+      <button class="pref-count-btn active" data-pref-count="0" onclick="selectPrefCount(this)">全部</button>
+    </div>
+  </div>
+
+  <!-- スペルアウト速度 -->
+  <div class="settings-section">
+    <div class="settings-label">スペルアウト速度</div>
+    <div class="speed-btns">
+      <button class="speed-btn active" data-pref-speed="normal" onclick="selectPrefSpeed(this)">ふつう</button>
+      <button class="speed-btn" data-pref-speed="fast" onclick="selectPrefSpeed(this)">はやい</button>
+    </div>
+  </div>
+
+  <!-- ステップモード状況 -->
+  <div class="settings-section" id="pref-step-status" style="display:none;">
+    <div class="settings-label">ステップモード状況</div>
+    <div id="pref-step-info" style="font-size:14px;color:var(--accent2);font-weight:700;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:8px;"></div>
+    <button onclick="resetStepProgress()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(255,107,107,.4);background:transparent;color:var(--accent);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">ステップをリセット</button>
+  </div>
+
+  <button class="pref-save-btn" onclick="savePrefSettings()">保存して戻る</button>
 </div>
 
 </div>
@@ -1609,6 +1762,14 @@ function selectUser(uid) {
   const bar = document.getElementById('home-user-bar');
   if (bar) bar.textContent = '▶ ' + names[uid-1] + ' でプレイ中';
   restoreUnitSelection();
+  // ユーザーの設定をスペルアウト速度に反映
+  const prefs = getUserPrefSettings();
+  if (prefs.spelloutSpeed) {
+    spelloutSpeed = prefs.spelloutSpeed;
+    document.querySelectorAll('[data-speed]').forEach(b => {
+      b.classList.toggle('active', b.dataset.speed === prefs.spelloutSpeed);
+    });
+  }
   updateHomeBadges();
   updateResumeBtn();
   updateOriginalCountLabel();
@@ -3015,7 +3176,7 @@ function selectAllShogakusei() {
   saveUnitSelection(); updateSelectedCount();
 }
 
-function buildDeck() {
+function buildDeckRaw(shuffle = true) {
   const minilaboOn = document.getElementById('chk-minilabo').checked;
   const eikenOn = document.getElementById('chk-eiken').checked;
   const mabutanOn = document.getElementById('chk-mabutan').checked;
@@ -3038,8 +3199,17 @@ function buildDeck() {
       : allOrig;
     filteredOrig.forEach(w => result.push({...w, _source: 'オリジナル'}));
   }
-  return result.sort(() => Math.random() - 0.5);
+  // 同じ英単語が複数ソースに存在する場合は1つにまとめる
+  const seen = new Set();
+  const deduped = result.filter(w => {
+    const key = (w['単語']||'').toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+  return shuffle ? deduped.sort(() => Math.random() - 0.5) : deduped;
 }
+
+function buildDeck() { return buildDeckRaw(true); }
 
 function updateSelectedCount() {
   const deck = buildDeck();
@@ -3050,10 +3220,58 @@ function toggleTimer() {}
 function selectTimer(btn) {}
 
 function startFlash() {
-  const baseDeck = buildDeck();
-  if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
-  state.deck = buildWeightedDeck(baseDeck);
-  if (!state.deck.length) state.deck = baseDeck;
+  const prefs = getUserPrefSettings();
+  const learningMode = prefs.learningMode || 'free';
+  const stepBanner = document.getElementById('step-banner');
+
+  let baseDeck;
+  if (learningMode === 'step') {
+    // ステップモード：順序を保持してから先頭N語を取る
+    baseDeck = buildDeckRaw(false); // シャッフルなし（自然順）
+    if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
+    const totalPool = baseDeck.length;
+    const unlocked = getStepUnlocked(totalPool);
+    const stepDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+    state._stepMode = true;
+    state._stepPool = totalPool;
+    state._stepUnlocked = unlocked;
+    if (stepBanner) {
+      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}語 解放中`;
+      stepBanner.classList.add('visible');
+    }
+    state.deck = buildWeightedDeck(stepDeck);
+    if (!state.deck.length) state.deck = stepDeck;
+  } else {
+    baseDeck = buildDeck();
+    if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
+    state._stepMode = false;
+    if (stepBanner) stepBanner.classList.remove('visible');
+    // フリーモード：新規単語をwordsPerSession件に制限・苦手復習単語は別途追加
+    const wps = parseInt(prefs.wordsPerSession) || 0;
+    let limitedBase;
+    if (wps > 0) {
+      const newWords = baseDeck.filter(w => !hasEverBeenCorrect(w['単語']));
+      const reviewWords = baseDeck.filter(w => hasEverBeenCorrect(w['単語']) && isWeakWord(w['単語']));
+      const newLimited = newWords.slice(0, wps);
+      const combined = [...newLimited, ...reviewWords];
+      const seen = new Set();
+      limitedBase = combined.filter(w => { const k = w['単語']; if (seen.has(k)) return false; seen.add(k); return true; });
+      if (!limitedBase.length) limitedBase = baseDeck.slice(0, wps);
+    } else {
+      limitedBase = baseDeck;
+    }
+    state.deck = buildWeightedDeck(limitedBase);
+    if (!state.deck.length) state.deck = limitedBase;
+  }
+
+  // スペルアウト速度を設定に同期
+  if (prefs.spelloutSpeed) {
+    spelloutSpeed = prefs.spelloutSpeed;
+    document.querySelectorAll('[data-speed]').forEach(b => {
+      b.classList.toggle('active', b.dataset.speed === prefs.spelloutSpeed);
+    });
+  }
+
   state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
   recordUnitPractice();
   saveTodayDeck(state.deck);
@@ -3126,6 +3344,14 @@ function loadCard() {
   const rpm = document.getElementById('reveal-pronounce-result');
   if (rpm) rpm.style.display = 'none';
   revealRecorderCleanup();
+
+  // v50: 語源・パターンエリアをリセット
+  const etymAreaL = document.getElementById('etymology-area');
+  const patAreaL = document.getElementById('pattern-group-area');
+  const etymBtnWrapL = document.getElementById('etymology-btn-wrap');
+  if (etymAreaL) { etymAreaL.classList.remove('visible'); const et = document.getElementById('etymology-text'); if(et) et.textContent=''; }
+  if (patAreaL) patAreaL.classList.remove('visible');
+  if (etymBtnWrapL) etymBtnWrapL.style.display = 'none';
 
   cardStartTime = Date.now();
   resetVoiceUI();
@@ -3298,6 +3524,11 @@ function checkAnswer() {
     if (!wasAlreadyCorrectN && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     doSpellOut(wordStr);
+    showPatternGroup(wordStr);
+    const etymBtnWrapC = document.getElementById('etymology-btn-wrap');
+    const etymBtnC = document.getElementById('etymology-btn');
+    if (etymBtnWrapC) etymBtnWrapC.style.display = 'block';
+    if (etymBtnC) { etymBtnC.disabled = false; etymBtnC.textContent = 'なぜこのスペル？'; }
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
@@ -3487,6 +3718,11 @@ function revealAnswer() {
     document.getElementById('reveal-pronounce-status').textContent = '声に出して言ってみよう';
   }
   document.getElementById('reveal-btn').style.display = 'none';
+  showPatternGroup(wordStr);
+  const etymBtnWrapR = document.getElementById('etymology-btn-wrap');
+  const etymBtnR = document.getElementById('etymology-btn');
+  if (etymBtnWrapR) etymBtnWrapR.style.display = 'block';
+  if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
   updateHomeBadges();
 }
 function skipCard() {
@@ -3515,6 +3751,21 @@ function showResult() {
   else if (pct>=70){emoji='⭐';title='よくできました！';}
   else if (pct>=50){emoji='💪';title='もう少し！';}
   else {emoji='📚';title='もう一度チャレンジ！';}
+
+  // ステップモード解放チェック
+  if (state._stepMode && state._stepPool) {
+    if (pct >= 70) {
+      const newUnlocked = Math.min(state._stepUnlocked + 5, state._stepPool);
+      saveStepUnlocked(newUnlocked);
+      if (newUnlocked > state._stepUnlocked) {
+        emoji = '🎉';
+        title = `次の${Math.min(5, state._stepPool - state._stepUnlocked)}語が解放されました！`;
+      } else {
+        emoji = '🏆'; title = '全語クリア！完璧！';
+      }
+    }
+  }
+
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
   const total = state.deck.length;
@@ -5784,6 +6035,98 @@ function isWeakWord(word) {
   const cm = getCharMistakes(word);
   return Object.values(cm).some(v => v >= 3);
 }
+
+// ===== v50: 苦手タグ =====
+function getWeaknessTag(word) {
+  const st = getWordStatus(word);
+  if ((st.mistakeCount || 0) >= 3) return 'スペル苦手';
+  return '';
+}
+
+// ===== v50: 同パターン単語提示 =====
+function showPatternGroup(word) {
+  const area = document.getElementById('pattern-group-area');
+  const wordsEl = document.getElementById('pattern-group-words');
+  if (!area || !wordsEl) return;
+  const w = word.toLowerCase();
+  const allWords = getAllDataWords();
+
+  // 末尾3文字でまずマッチ、足りなければ末尾2文字
+  let suffix = w.length >= 3 ? w.slice(-3) : w.slice(-2);
+  const matchSuffix = (sfx) => allWords
+    .filter(d => { const dw = (d['単語'] || '').toLowerCase(); return dw !== w && dw.endsWith(sfx) && dw.length >= 3; })
+    .map(d => d['単語']);
+
+  let matches = matchSuffix(suffix);
+  if (matches.length < 2 && w.length >= 2) {
+    const suffix2 = w.slice(-2);
+    const m2 = matchSuffix(suffix2);
+    if (m2.length >= 2) { matches = m2; suffix = suffix2; }
+  }
+
+  const unique = [...new Set(matches)].slice(0, 6);
+  if (unique.length < 1) { area.classList.remove('visible'); return; }
+
+  const label = area.querySelector('.pattern-group-label');
+  if (label) label.textContent = `-${suffix}グループ`;
+  wordsEl.innerHTML = unique.map(uw =>
+    `<button class="pattern-word-chip" onclick="speakWord('${uw.replace(/'/g, "\\'")}')">${uw}</button>`
+  ).join('');
+  area.classList.add('visible');
+}
+
+// ===== v50: 語源・覚え方AI =====
+async function fetchEtymology() {
+  const word = state.deck[state.current];
+  if (!word) return;
+  const wordStr = word['単語'];
+  const meaning = word['意味'] || '';
+  const btn = document.getElementById('etymology-btn');
+  const etymText = document.getElementById('etymology-text');
+  const etymArea = document.getElementById('etymology-area');
+  if (!btn || !etymText || !etymArea) return;
+
+  const apiKey = localStorage.getItem('wordsuck_claude_api_key');
+  if (!apiKey) {
+    etymArea.classList.add('visible');
+    etymText.textContent = 'Claude APIキーが必要です。AI英会話画面で設定してください。';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '考え中...';
+  etymArea.classList.add('visible');
+  etymText.textContent = '...';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 200,
+        messages: [{
+          role: 'user',
+          content: `英単語「${wordStr}」（意味：${meaning}）のスペルを覚えるための語源・イメージを1〜2文で日本語で説明してください。例：「teacherはteach（教える）+er（人）→教える人」「pictureはピクト文字（絵）が語源→絵のこと」。短く・子どもにわかりやすく・記憶に残るように。`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '語源情報を取得できませんでした';
+    etymText.textContent = text;
+    btn.textContent = '✓ 確認した';
+  } catch(e) {
+    etymText.textContent = 'エラーが発生しました。もう一度お試しください。';
+    btn.disabled = false;
+    btn.textContent = 'なぜこのスペル？';
+  }
+}
+
 function isHallWord(word) {
   return getWordStatus(word).hall === true;
 }
@@ -5889,8 +6232,15 @@ function getAllDataWords() {
   if (typeof MINILABO !== 'undefined') MINILABO.forEach(w => result.push({...w, _source:'ミニラボ'}));
   if (typeof EIKEN !== 'undefined') EIKEN.forEach(w => result.push({...w, _source:'英検5級'}));
   if (typeof MABUTAN !== 'undefined') MABUTAN.forEach(w => result.push({...w, _source:'まぶたん'}));
+  if (typeof SHOGAKUSEI !== 'undefined') SHOGAKUSEI.forEach(w => result.push({...w, _source:'小学生英語'}));
   loadOriginalWords().forEach(w => result.push({...w, _source:'オリジナル'}));
-  return result;
+  // 英単語重複を除去（最初の出現を優先）
+  const seen = new Set();
+  return result.filter(w => {
+    const key = (w['単語']||'').toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key); return true;
+  });
 }
 
 function getWeakWordsFromData() {
@@ -5913,18 +6263,21 @@ function updateHomeBadges() {
 }
 
 function buildWeightedDeck(baseDeck) {
-  const weighted = [];
-  for (const w of baseDeck) {
-    const word = w['単語'];
-    if (isHallWord(word)) {
-      if (Math.random() < 0.2) weighted.push(w);
-    } else if (isWeakWord(word)) {
-      weighted.push(w, {...w}, {...w});
-    } else {
-      weighted.push(w);
-    }
-  }
-  return weighted.sort(() => Math.random() - 0.5);
+  // 同じセッションで同じ単語が2回出ないように1枚ずつ管理
+  // 苦手単語を優先的に前に配置、殿堂入りは20%の確率で含める
+  const weakOnes = baseDeck.filter(w => !isHallWord(w['単語']) && isWeakWord(w['単語']));
+  const normalOnes = baseDeck.filter(w => !isHallWord(w['単語']) && !isWeakWord(w['単語']));
+  const hallOnes = baseDeck.filter(w => isHallWord(w['単語']) && Math.random() < 0.2);
+  const shuffled = [
+    ...weakOnes.sort(() => Math.random() - 0.5),
+    ...normalOnes.sort(() => Math.random() - 0.5)
+  ];
+  // 殿堂入りをランダム位置に散りばめる
+  hallOnes.forEach(h => {
+    const pos = Math.floor(Math.random() * (shuffled.length + 1));
+    shuffled.splice(pos, 0, h);
+  });
+  return shuffled;
 }
 
 const ALPHABET_COLORS = {
@@ -6720,12 +7073,17 @@ function renderRecords() {
   document.getElementById('rec-weak-count').textContent = rankedWeak.length + '語';
   if (rankedWeak.length) {
     weakList.innerHTML = rankedWeak.map((w, i) => {
-      const mc = getWordStatus(w['単語']).mistakeCount || 0;
+      const st = getWordStatus(w['単語']);
+      const mc = st.mistakeCount || 0;
+      const cnt = st.count || 0;
+      const spellRatio = cnt > 0 ? `スペルミス ${mc}回/${cnt}回中` : `スペルミス ${mc}回`;
+      const tag = getWeaknessTag(w['単語']);
       return `<div class="rec-item" onclick="startWeakOnlyMode()" style="cursor:pointer;">
         <span style="font-size:12px;color:var(--text-muted);font-weight:700;min-width:22px;">${i+1}.</span>
         <div style="flex:1;">
-          <div style="font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;letter-spacing:1px;">${w['単語'].toUpperCase()}</div>
+          <div style="font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;letter-spacing:1px;">${w['単語'].toUpperCase()}${tag ? `<span class="weakness-tag">${tag}</span>` : ''}</div>
           <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${w['意味']}</div>
+          <div class="spell-mistake-ratio">${spellRatio}</div>
         </div>
         <span style="font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;">${mc}回</span>
       </div>`;
@@ -6875,6 +7233,9 @@ function renderRecords() {
       logEl.innerHTML = '<div class="rec-empty">まだ記録がありません</div>';
     }
   }
+
+  // 習熟度マップ
+  renderMasteryMap();
 }
 
 function speakWord(word) {
@@ -7275,6 +7636,171 @@ function showReviewResult() {
   document.getElementById('review-result-title').textContent = title;
   document.getElementById('review-result-area').style.display = 'flex';
   updateHomeBadges();
+}
+
+// ===== ユーザー設定（ per-user preferences） =====
+
+function getUserPrefSettings() {
+  try { return JSON.parse(localStorage.getItem(up('user_prefs'))) || {}; }
+  catch { return {}; }
+}
+function saveUserPrefToStorage(prefs) {
+  localStorage.setItem(up('user_prefs'), JSON.stringify(prefs));
+}
+
+function loadPrefScreen() {
+  const prefs = getUserPrefSettings();
+  // 学習モード
+  const mode = prefs.learningMode || 'free';
+  document.querySelectorAll('[data-pref-mode]').forEach(b => {
+    b.classList.toggle('active', b.dataset.prefMode === mode);
+  });
+  // 単語数
+  const wps = String(prefs.wordsPerSession !== undefined ? prefs.wordsPerSession : 0);
+  document.querySelectorAll('[data-pref-count]').forEach(b => {
+    b.classList.toggle('active', b.dataset.prefCount === wps);
+  });
+  // 速度
+  const speed = prefs.spelloutSpeed || 'normal';
+  document.querySelectorAll('[data-pref-speed]').forEach(b => {
+    b.classList.toggle('active', b.dataset.prefSpeed === speed);
+  });
+  // ステップ状況
+  const stepSection = document.getElementById('pref-step-status');
+  const stepInfo = document.getElementById('pref-step-info');
+  if (mode === 'step') {
+    if (stepSection) stepSection.style.display = 'block';
+    const unlocked = getStepUnlocked(0);
+    if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
+  } else {
+    if (stepSection) stepSection.style.display = 'none';
+  }
+  // フリーモード時のみ単語数セクション表示
+  const countSection = document.getElementById('pref-count-section');
+  if (countSection) countSection.style.display = mode === 'step' ? 'none' : 'block';
+}
+
+function selectPrefMode(btn) {
+  document.querySelectorAll('[data-pref-mode]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const mode = btn.dataset.prefMode;
+  const stepSection = document.getElementById('pref-step-status');
+  const countSection = document.getElementById('pref-count-section');
+  if (stepSection) stepSection.style.display = mode === 'step' ? 'block' : 'none';
+  if (countSection) countSection.style.display = mode === 'step' ? 'none' : 'block';
+  if (mode === 'step') {
+    const stepInfo = document.getElementById('pref-step-info');
+    const unlocked = getStepUnlocked(0);
+    if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
+  }
+}
+function selectPrefCount(btn) {
+  document.querySelectorAll('[data-pref-count]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selectPrefSpeed(btn) {
+  document.querySelectorAll('[data-pref-speed]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function savePrefSettings() {
+  const modeBtn = document.querySelector('[data-pref-mode].active');
+  const countBtn = document.querySelector('[data-pref-count].active');
+  const speedBtn = document.querySelector('[data-pref-speed].active');
+  const prefs = {
+    learningMode: modeBtn ? modeBtn.dataset.prefMode : 'free',
+    wordsPerSession: countBtn ? parseInt(countBtn.dataset.prefCount) : 0,
+    spelloutSpeed: speedBtn ? speedBtn.dataset.prefSpeed : 'normal',
+  };
+  saveUserPrefToStorage(prefs);
+  showScreen('home-screen');
+}
+
+// ===== ステップモード進捗管理 =====
+
+function getStepUnlocked(poolSize) {
+  const saved = parseInt(localStorage.getItem(up('step_unlocked')) || '0');
+  // 初回は5語、プールが決まっている場合はmin(saved, poolSize)
+  if (saved === 0) return Math.min(5, poolSize || 5);
+  return poolSize > 0 ? Math.min(saved, poolSize) : saved;
+}
+
+function saveStepUnlocked(count) {
+  localStorage.setItem(up('step_unlocked'), String(count));
+}
+
+function resetStepProgress() {
+  if (!confirm('ステップの進行状況をリセットしますか？')) return;
+  localStorage.removeItem(up('step_unlocked'));
+  const stepInfo = document.getElementById('pref-step-info');
+  if (stepInfo) stepInfo.textContent = '現在 5 語が解放されています（リセット済み）';
+}
+
+// ===== 習熟度マップ =====
+
+function renderMasteryMap() {
+  const dotArea = document.getElementById('mastery-dot-area');
+  const emptyEl = document.getElementById('mastery-map-empty');
+  const container = document.getElementById('mastery-map-container');
+  if (!dotArea || !container) return;
+  dotArea.innerHTML = '';
+
+  const allWords = getAllDataWords();
+  const mapWords = [];
+  allWords.forEach(w => {
+    const wk = w['単語'];
+    if (!wk) return;
+    if (isHallWord(wk)) return; // 殿堂入りは除外
+    const st = getWordStatus(wk);
+    const cnt = st.count || 0;
+    if (cnt === 0) return; // 未練習は除外
+    const mistakes = st.mistakeCount || 0;
+    const correctRate = Math.round((cnt - mistakes) / cnt * 100);
+    mapWords.push({ word: wk, meaning: w['意味'] || '', cnt, correctRate });
+  });
+
+  if (!mapWords.length) {
+    if (emptyEl) emptyEl.style.display = 'block';
+    container.style.height = '60px';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  container.style.height = '220px';
+
+  const maxCnt = Math.max(...mapWords.map(w => w.cnt), 1);
+  const tooltip = document.getElementById('mastery-tooltip');
+
+  mapWords.forEach(item => {
+    const xPct = 8 + (item.cnt / maxCnt) * 84; // 8%〜92%
+    const yPct = 8 + (1 - item.correctRate / 100) * 84; // 上が正解率高い（Y軸反転）
+
+    let zone = 'zone-new';
+    if (item.cnt >= maxCnt * 0.5 && item.correctRate >= 70) zone = 'zone-safe';
+    else if (item.cnt < maxCnt * 0.5 && item.correctRate >= 70) zone = 'zone-practice';
+    else if (item.cnt >= maxCnt * 0.5 && item.correctRate < 70) zone = 'zone-caution';
+
+    const dot = document.createElement('div');
+    dot.className = `mastery-dot ${zone}`;
+    dot.style.left = xPct + '%';
+    dot.style.top = yPct + '%';
+    dot.title = `${item.word}：正解率${item.correctRate}% / ${item.cnt}回練習`;
+
+    dot.addEventListener('mouseenter', (e) => {
+      if (!tooltip) return;
+      tooltip.innerHTML = `<strong>${item.word.toUpperCase()}</strong><br>${item.meaning}<br>正解率 ${item.correctRate}%<br>${item.cnt}回練習`;
+      tooltip.style.display = 'block';
+    });
+    dot.addEventListener('mousemove', (e) => {
+      if (!tooltip) return;
+      tooltip.style.left = (e.clientX + 12) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    });
+    dot.addEventListener('mouseleave', () => {
+      if (tooltip) tooltip.style.display = 'none';
+    });
+    dot.addEventListener('click', () => speakWord(item.word));
+    dotArea.appendChild(dot);
+  });
 }
 
 // ===== 初期化 =====
