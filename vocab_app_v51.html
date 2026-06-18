@@ -297,6 +297,21 @@
   .badge-num.hall-num { color:var(--accent3); }
   .badge-label { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
 
+  /* ===== v52: 豆知識エリア ===== */
+  @keyframes triviaFadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .flashcard.shake-anim { animation: shake 0.4s ease; }
+  #trivia-area { display:none; margin-top:6px; }
+  #trivia-area.visible { display:block; animation: triviaFadeIn 0.5s ease; }
+  .trivia-card { background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(212,175,55,.05)); border:1px solid rgba(212,175,55,.28); border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; }
+  .trivia-type-badge { font-size:10px; font-weight:700; color:var(--accent2); letter-spacing:1px; text-transform:uppercase; }
+  .trivia-text { font-size:13px; color:var(--text); font-family:'Noto Sans JP',sans-serif; line-height:1.7; }
+  .trivia-rating-row { display:flex; gap:6px; align-items:center; }
+  .trivia-rate-label { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; flex:1; }
+  .trivia-rating-btn { padding:4px 10px; border-radius:8px; border:1px solid rgba(255,255,255,.1); background:var(--surface); font-size:15px; cursor:pointer; transition:all .15s; }
+  .trivia-rating-btn:active { transform:scale(1.15); }
+  .trivia-rating-btn.liked { border-color:var(--accent3); background:rgba(6,214,160,.15); }
+  .trivia-rating-btn.disliked { border-color:var(--accent); background:rgba(255,107,107,.15); opacity:.5; }
+
   /* Records screen */
   #records-screen { gap:16px; max-width:440px; margin:0 auto; width:100%; padding-bottom:40px; }
   .rec-section { background:var(--card); border-radius:var(--radius); padding:18px; display:flex; flex-direction:column; gap:12px; }
@@ -489,7 +504,7 @@
       <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:6px;font-size:18px;flex-shrink:0;">📝</div>
       <div style="flex:1;min-width:0;">
         <div class="mode-name">総復習テスト</div>
-        <div class="mode-desc">全単語からランダム出題</div>
+        <div class="mode-desc">練習済みの単語から出題</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
@@ -805,6 +820,17 @@
     </div>
     <div id="etymology-btn-wrap" style="display:none;padding:4px 0;">
       <button class="etymology-btn" id="etymology-btn" onclick="fetchEtymology()">なぜこのスペル？</button>
+    </div>
+    <div id="trivia-area">
+      <div class="trivia-card">
+        <div class="trivia-type-badge" id="trivia-type-badge">語源</div>
+        <div class="trivia-text" id="trivia-text"></div>
+        <div class="trivia-rating-row">
+          <span class="trivia-rate-label">この豆知識：</span>
+          <button class="trivia-rating-btn" id="trivia-like-btn" onclick="rateTriviaGood()">👍</button>
+          <button class="trivia-rating-btn" id="trivia-dislike-btn" onclick="rateTriviaIgnore()">👎</button>
+        </div>
+      </div>
     </div>
     <div id="training-result-area"></div>
     <div class="feedback-area" id="feedback-area"></div>
@@ -1700,7 +1726,6 @@
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
       <button class="pref-toggle-btn active" data-wrong-display="etymology" onclick="toggleWrongDisplay(this)">語源・イメージ</button>
       <button class="pref-toggle-btn active" data-wrong-display="pattern" onclick="toggleWrongDisplay(this)">同パターンの仲間</button>
-      <button class="pref-toggle-btn active" data-wrong-display="weaknessTag" onclick="toggleWrongDisplay(this)">苦手タグ</button>
     </div>
     <div style="display:flex;gap:8px;">
       <button class="pref-count-btn" onclick="setAllWrongDisplay(true)" style="flex:none;padding:8px 16px;font-size:12px;">全部表示</button>
@@ -3390,6 +3415,8 @@ function loadCard() {
   if (etymBtnWrapL) etymBtnWrapL.style.display = 'none';
   const flashTagL = document.getElementById('flash-weakness-tag');
   if (flashTagL) flashTagL.style.display = 'none';
+  const triviaAreaL = document.getElementById('trivia-area');
+  if (triviaAreaL) triviaAreaL.classList.remove('visible');
 
   cardStartTime = Date.now();
   resetVoiceUI();
@@ -3556,6 +3583,9 @@ function checkAnswer() {
     state.wrongThisCard++;
     sessionWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい！';
+    // シェイクアニメーション
+    const flashCardEl = document.querySelector('#flash-screen .flashcard');
+    if (flashCardEl) { flashCardEl.classList.add('shake-anim'); setTimeout(() => flashCardEl.classList.remove('shake-anim'), 450); }
     const wasAlreadyCorrectN = hasEverBeenCorrect(wordStr);
     recordWrong(wordStr, word['意味'], typed, word);
     const spellHL = document.getElementById('spell-highlight-area');
@@ -3572,14 +3602,11 @@ function checkAnswer() {
       if (etymBtnWrapC) etymBtnWrapC.style.display = 'block';
       if (etymBtnC) { etymBtnC.disabled = false; etymBtnC.textContent = 'なぜこのスペル？'; }
     }
-    if (wdsC.weaknessTag) {
-      const tag = getWeaknessTag(wordStr);
-      const tagEl = document.getElementById('flash-weakness-tag');
-      if (tagEl && tag) { tagEl.textContent = tag; tagEl.style.display = 'inline-block'; }
-    }
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
+    // v52: 豆知識フェードイン（シェイク後）
+    setTimeout(() => showTrivia(wordStr, word), 500);
   }
 }
 
@@ -3764,6 +3791,8 @@ function revealAnswer() {
     const revMic = document.getElementById('reveal-mic-btn');
     if (revMic) { revMic.disabled = false; revMic.classList.remove('recording'); }
     document.getElementById('reveal-pronounce-status').textContent = '声に出して言ってみよう';
+    // v52: 豆知識フェードイン
+    setTimeout(() => showTrivia(wordStr, word), 300);
   }
   document.getElementById('reveal-btn').style.display = 'none';
   // v51: 設定に応じて表示を切り替え
@@ -3775,11 +3804,6 @@ function revealAnswer() {
     const etymBtnR = document.getElementById('etymology-btn');
     if (etymBtnWrapR) etymBtnWrapR.style.display = 'block';
     if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
-  }
-  if (wdsR.weaknessTag) {
-    const tag = getWeaknessTag(wordStr);
-    const tagEl = document.getElementById('flash-weakness-tag');
-    if (tagEl && tag) { tagEl.textContent = tag; tagEl.style.display = 'inline-block'; }
   }
   updateHomeBadges();
 }
@@ -6238,11 +6262,10 @@ function getWeaknessTag(word) {
 function getWrongDisplayPrefs() {
   const prefs = getUserPrefSettings();
   const s = prefs.wrongDisplaySettings;
-  if (!s) return { etymology: true, pattern: true, weaknessTag: true }; // デフォルト：全部表示
+  if (!s) return { etymology: true, pattern: true };
   return {
     etymology: s.includes('etymology'),
     pattern: s.includes('pattern'),
-    weaknessTag: s.includes('weaknessTag'),
   };
 }
 function toggleWrongDisplay(btn) { btn.classList.toggle('active'); }
@@ -7713,6 +7736,170 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ===== v52: 豆知識表示システム =====
+const TRIVIA_TYPES = ['etymology', 'pattern', 'phonetics'];
+const TRIVIA_TYPE_LABELS = { etymology: '語源', pattern: '同パターンの仲間', phonetics: '発音記号' };
+let triviaTypeIndex = 0;
+let currentTriviaWord = '';
+let currentTriviaText = '';
+let currentTriviaType = '';
+
+function getTriviaRatings(word) {
+  try { return JSON.parse(localStorage.getItem(up('trivia_ratings_' + wsKey(word)))) || { liked: [], rejected: [] }; }
+  catch { return { liked: [], rejected: [] }; }
+}
+function saveTriviaRatings(word, ratings) {
+  localStorage.setItem(up('trivia_ratings_' + wsKey(word)), JSON.stringify(ratings));
+}
+
+async function showTrivia(wordStr, wordObj) {
+  const area = document.getElementById('trivia-area');
+  const textEl = document.getElementById('trivia-text');
+  const typeEl = document.getElementById('trivia-type-badge');
+  if (!area || !textEl) return;
+
+  area.classList.remove('visible');
+  currentTriviaWord = wordStr;
+
+  const ratings = getTriviaRatings(wordStr);
+
+  // 👍済みの豆知識があればそちらを優先
+  if (ratings.liked.length > 0) {
+    const item = ratings.liked[Math.floor(Math.random() * ratings.liked.length)];
+    currentTriviaText = item.text;
+    currentTriviaType = item.type;
+    if (textEl) textEl.textContent = item.text;
+    if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS[item.type] || '豆知識';
+    area.classList.add('visible');
+    const likeBtn = document.getElementById('trivia-like-btn');
+    const dislikeBtn = document.getElementById('trivia-dislike-btn');
+    if (likeBtn) likeBtn.classList.add('liked');
+    if (dislikeBtn) dislikeBtn.classList.remove('disliked');
+    return;
+  }
+
+  // ローテーションでタイプを決定
+  const type = TRIVIA_TYPES[triviaTypeIndex % TRIVIA_TYPES.length];
+  triviaTypeIndex++;
+
+  if (type === 'pattern') {
+    const result = getPatternSiblings(wordStr);
+    if (result && result.siblings.length > 1) {
+      const text = `-${result.suffix}グループ：${result.siblings.slice(0, 5).join('・')}`;
+      currentTriviaText = text;
+      currentTriviaType = 'pattern';
+      if (textEl) textEl.textContent = text;
+      if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS.pattern;
+      area.classList.add('visible');
+      const likeBtn = document.getElementById('trivia-like-btn');
+      const dislikeBtn = document.getElementById('trivia-dislike-btn');
+      if (likeBtn) likeBtn.classList.remove('liked');
+      if (dislikeBtn) dislikeBtn.classList.remove('disliked');
+      return;
+    }
+    // パターン仲間が少なければ語源にフォールバック
+    await fetchTriviaFromAPI(wordStr, wordObj, 'etymology');
+    return;
+  }
+
+  await fetchTriviaFromAPI(wordStr, wordObj, type);
+}
+
+async function fetchTriviaFromAPI(wordStr, wordObj, type) {
+  const area = document.getElementById('trivia-area');
+  const textEl = document.getElementById('trivia-text');
+  const typeEl = document.getElementById('trivia-type-badge');
+  if (!area || !textEl) return;
+
+  const apiKey = localStorage.getItem('wordsuck_claude_api_key');
+  if (!apiKey) return;
+
+  const meaning = (wordObj && wordObj['意味']) ? wordObj['意味'] : '';
+  const ratings = getTriviaRatings(wordStr);
+
+  let prompt = '';
+  if (type === 'etymology') {
+    prompt = `英語「${wordStr}」（意味：${meaning}）の語源や覚え方を、小学生・中学生にわかりやすく日本語で1〜2文で説明してください。「teach+er＝教える人」のような「なるほど！」と思える説明だけ書いてください。無理やりな語呂合わせや強引な説明はNGです。豆知識テキストだけ出力してください。`;
+  } else {
+    prompt = `英語「${wordStr}」の発音記号と発音のコツを、小学生・中学生向けに日本語で1〜2文で説明してください。発音記号は必ず含め、よく知っている音に例えてわかりやすく説明してください。豆知識テキストだけ出力してください。`;
+  }
+
+  currentTriviaType = type;
+  if (textEl) textEl.textContent = '読み込み中...';
+  if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS[type] || '豆知識';
+  area.classList.add('visible');
+  const likeBtn = document.getElementById('trivia-like-btn');
+  const dislikeBtn = document.getElementById('trivia-dislike-btn');
+  if (likeBtn) likeBtn.classList.remove('liked');
+  if (dislikeBtn) dislikeBtn.classList.remove('disliked');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 150,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) { if (textEl) textEl.textContent = '（取得できませんでした）'; return; }
+    const data = await res.json();
+    const text = (data.content?.[0]?.text || '').trim();
+    if (text && !ratings.rejected.some(r => r.text === text)) {
+      currentTriviaText = text;
+      if (textEl) textEl.textContent = text;
+    } else if (text) {
+      if (textEl) textEl.textContent = '（この単語の別の豆知識はありません）';
+    } else {
+      if (textEl) textEl.textContent = '（取得できませんでした）';
+    }
+  } catch {
+    if (textEl) textEl.textContent = '（取得できませんでした）';
+  }
+}
+
+function rateTriviaGood() {
+  if (!currentTriviaWord || !currentTriviaText || currentTriviaText === '読み込み中...') return;
+  const ratings = getTriviaRatings(currentTriviaWord);
+  if (!ratings.liked.some(r => r.text === currentTriviaText)) {
+    ratings.liked.push({ type: currentTriviaType, text: currentTriviaText });
+  }
+  // rejected から除去
+  ratings.rejected = ratings.rejected.filter(r => r.text !== currentTriviaText);
+  saveTriviaRatings(currentTriviaWord, ratings);
+  const likeBtn = document.getElementById('trivia-like-btn');
+  const dislikeBtn = document.getElementById('trivia-dislike-btn');
+  if (likeBtn) likeBtn.classList.add('liked');
+  if (dislikeBtn) dislikeBtn.classList.remove('disliked');
+}
+
+function rateTriviaIgnore() {
+  if (!currentTriviaWord || !currentTriviaText || currentTriviaText === '読み込み中...') return;
+  const ratings = getTriviaRatings(currentTriviaWord);
+  ratings.liked = ratings.liked.filter(r => r.text !== currentTriviaText);
+  if (!ratings.rejected.some(r => r.text === currentTriviaText)) {
+    ratings.rejected.push({ type: currentTriviaType, text: currentTriviaText });
+  }
+  saveTriviaRatings(currentTriviaWord, ratings);
+  const dislikeBtn = document.getElementById('trivia-dislike-btn');
+  if (dislikeBtn) dislikeBtn.classList.add('disliked');
+  // 別の豆知識を次回のために取得（画面は一旦消す）
+  const area = document.getElementById('trivia-area');
+  if (area) area.classList.remove('visible');
+  const word = state.deck && state.deck[state.current];
+  if (word) {
+    const nextType = TRIVIA_TYPES[triviaTypeIndex % TRIVIA_TYPES.length];
+    triviaTypeIndex++;
+    setTimeout(() => fetchTriviaFromAPI(currentTriviaWord, word, nextType), 300);
+  }
+}
+
 // ===== 総復習テスト =====
 let reviewDeck = [], reviewIndex = 0, reviewCorrect = 0, reviewWrong = 0;
 let reviewCount = 20, reviewWeakPriority = true;
@@ -7732,11 +7919,13 @@ function openReviewTestSetup() {
 
 function startReviewTest() {
   const allWords = getAllDataWords();
-  if (!allWords.length) { alert('単語データがありません。'); return; }
+  // 1回以上練習した単語のみ対象
+  const practicedWords = allWords.filter(w => (getWordStatus(w['単語']).count || 0) > 0);
+  if (!practicedWords.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
   let pool;
   if (reviewWeakPriority) {
-    const weakWords = allWords.filter(w => isWeakWord(w['単語']));
-    const others = allWords.filter(w => !isWeakWord(w['単語']));
+    const weakWords = practicedWords.filter(w => isWeakWord(w['単語']));
+    const others = practicedWords.filter(w => !isWeakWord(w['単語']));
     // 弱い単語を3倍の重みで入れる
     const weighted = [...weakWords, ...weakWords, ...weakWords, ...others];
     pool = weighted.sort(() => Math.random() - 0.5);
@@ -7748,7 +7937,7 @@ function startReviewTest() {
       if (reviewDeck.length >= reviewCount) break;
     }
   } else {
-    reviewDeck = allWords.sort(() => Math.random() - 0.5).slice(0, reviewCount);
+    reviewDeck = practicedWords.sort(() => Math.random() - 0.5).slice(0, reviewCount);
   }
   if (!reviewDeck.length) { alert('条件に合う単語がありません。'); return; }
   reviewIndex = 0; reviewCorrect = 0; reviewWrong = 0;
@@ -7882,7 +8071,7 @@ function loadPrefScreen() {
     b.classList.toggle('active', b.dataset.prefUnitEnd === unitEnd);
   });
   // 間違え時の表示設定 (v51)
-  const wds = prefs.wrongDisplaySettings || ['etymology', 'pattern', 'weaknessTag'];
+  const wds = prefs.wrongDisplaySettings || ['etymology', 'pattern'];
   document.querySelectorAll('[data-wrong-display]').forEach(b => {
     b.classList.toggle('active', wds.includes(b.dataset.wrongDisplay));
   });
