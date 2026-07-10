@@ -371,6 +371,12 @@
   .pref-save-btn { width:100%; padding:16px; background:linear-gradient(135deg,var(--accent2),#ffb300); border:none; border-radius:var(--radius); color:var(--bg); font-size:16px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
   .pref-save-btn:active { transform:scale(.97); }
 
+  /* ===== 英文タイピング入力 ===== */
+  .entype-input { width:100%; padding:14px 16px; background:var(--surface); border:2px solid var(--surface); border-radius:14px; color:var(--text); font-size:18px; font-weight:700; font-family:'Nunito',sans-serif; outline:none; transition:border-color .2s; -webkit-appearance:none; }
+  .entype-input:focus { border-color:var(--accent2); }
+  .entype-submit-btn { width:100%; padding:13px; border-radius:14px; border:none; background:linear-gradient(135deg,#34d399,#059669); color:white; font-size:16px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; transition:transform .15s; }
+  .entype-submit-btn:active { transform:scale(.97); }
+
   /* ===== ステップモード表示 ===== */
   .step-banner { display:none; background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05)); border:1.5px solid rgba(212,175,55,.4); border-radius:12px; padding:10px 14px; font-size:13px; font-weight:700; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; text-align:center; }
   .step-banner.visible { display:block; }
@@ -476,6 +482,14 @@
       </div>
       <div class="mode-arrow">›</div>
     </div>
+    <div class="mode-card flash" onclick="goToEntypeSettings()" style="border-color:#34d399;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#34d399,#059669);border-radius:6px;font-size:18px;flex-shrink:0;">⌨️</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">英文タイピング</div>
+        <div class="mode-desc">日本語→英文をタイピングして答える</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
     <div class="mode-card flash" onclick="showScreen('listen-setup-screen')" style="border-color:#818cf8;">
       <div class="mode-icon"><img src="https://ai-katei-labo.github.io/kateigakushu-akapen/icon_memory.png" style="width:32px;height:32px;object-fit:contain;border-radius:6px;opacity:0.7;filter:hue-rotate(60deg);"></div>
       <div style="flex:1;min-width:0;">
@@ -497,6 +511,14 @@
       <div style="flex:1;min-width:0;">
         <div class="mode-name">オリジナル登録</div>
         <div class="mode-desc" id="orig-home-count">自分の単語を追加する</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
+    <div class="mode-card flash" onclick="openTodayTestSetup()" style="border-color:#10b981;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#10b981,#059669);border-radius:6px;font-size:18px;flex-shrink:0;">📋</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">振り返りテスト</div>
+        <div class="mode-desc">今日のまとめテスト</div>
       </div>
       <div class="mode-arrow">›</div>
     </div>
@@ -979,6 +1001,7 @@
     </div>
     <div class="progress-text" id="learn-progress-text">0/0</div>
   </div>
+  <div id="learn-step-banner" class="step-banner"></div>
   <div class="card-area">
     <div class="flashcard">
       <div class="card-source-badge" id="learn-card-source"></div>
@@ -1012,6 +1035,7 @@
       </div>
       <div class="progress-text" id="smem-progress-text">0/0</div>
     </div>
+    <div id="smem-step-banner" class="step-banner"></div>
     <div id="smem-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
       <div class="settings-label">ユニットを選ぶ</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -1074,6 +1098,7 @@
       </div>
       <div class="progress-text" id="typing-progress-text">0/0</div>
     </div>
+    <div id="typing-step-banner" class="step-banner"></div>
     <div id="typing-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
       <div class="settings-label">ユニットを選ぶ</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -1129,6 +1154,63 @@
         <button onclick="typingSkip()" class="action-btn btn-skip">スキップ</button>
         <button onclick="typingNext()" id="typing-next-btn" class="action-btn btn-next" style="display:none;">次へ →</button>
         <button onclick="typingReveal()" id="typing-reveal-btn" class="action-btn btn-reveal">答えを見る</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 英文タイピング SCREEN -->
+<div id="entype-screen" class="screen">
+  <div style="max-width:600px;margin:0 auto;width:100%;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;">
+    <div id="entype-settings-header" class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">英文タイピング設定</div>
+    </div>
+    <div id="entype-quiz-header" class="flash-header" style="display:none;">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="entype-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="entype-progress-text">0/0</div>
+    </div>
+    <div id="entype-step-banner" class="step-banner"></div>
+    <div id="entype-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
+      <div class="settings-label">ユニットを選ぶ</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="unit-btn unit-all-btn" onclick="selectAllEntypeUnits()">全Unit</button>
+        <button class="unit-btn active" data-entype-unit="1" onclick="toggleEntypeUnit(this)">Unit1</button>
+        <button class="unit-btn active" data-entype-unit="2" onclick="toggleEntypeUnit(this)">Unit2</button>
+        <button class="unit-btn active" data-entype-unit="3" onclick="toggleEntypeUnit(this)">Unit3</button>
+        <button class="unit-btn active" data-entype-unit="4" onclick="toggleEntypeUnit(this)">Unit4</button>
+        <button class="unit-btn active" data-entype-unit="5" onclick="toggleEntypeUnit(this)">Unit5</button>
+        <button class="unit-btn active" data-entype-unit="6" onclick="toggleEntypeUnit(this)">Unit6</button>
+        <button class="unit-btn active" data-entype-unit="7" onclick="toggleEntypeUnit(this)">Unit7</button>
+        <button class="unit-btn active" data-entype-unit="8" onclick="toggleEntypeUnit(this)">Unit8</button>
+        <button class="unit-btn active" data-entype-unit="9" onclick="toggleEntypeUnit(this)">Unit9</button>
+        <button class="unit-btn active" data-entype-unit="10" onclick="toggleEntypeUnit(this)">Unit10</button>
+      </div>
+      <div class="selected-count" id="entype-sentence-count">329文が選択されています</div>
+      <button onclick="startEntypeMode()" style="width:100%;padding:16px;background:linear-gradient(135deg,#34d399,#059669);border:none;border-radius:var(--radius);color:white;font-size:17px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(52,211,153,.35);">スタート →</button>
+    </div>
+    <div id="entype-quiz-area" style="display:none;flex-direction:column;gap:14px;">
+      <div class="flashcard" style="min-height:120px;">
+        <div class="card-source-badge" id="entype-unit-badge"></div>
+        <div style="font-size:22px;font-weight:800;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;line-height:1.5;text-align:center;padding:4px 0;" id="entype-ja-text">...</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">英文を入力してEnterまたはボタンで確認</div>
+        <input type="text" id="entype-input" class="entype-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="text" placeholder="Type the English sentence...">
+        <button class="entype-submit-btn" onclick="submitEntypeAnswer()">答え合わせ ✓</button>
+        <div id="entype-feedback" style="min-height:24px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;"></div>
+        <div id="entype-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;font-family:'Noto Sans JP',sans-serif;">正解</div>
+          <div id="entype-correct-text" style="font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;line-height:1.7;word-break:break-word;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="entypeSkip()" class="action-btn btn-skip">スキップ</button>
+        <button onclick="entypeNext()" id="entype-next-btn" class="action-btn btn-next" style="display:none;">次へ →</button>
+        <button onclick="entypeReveal()" id="entype-reveal-btn" class="action-btn btn-reveal">答えを見る</button>
       </div>
     </div>
   </div>
@@ -1492,6 +1574,70 @@
   </div>
 </div>
 
+<!-- TODAY TEST SCREEN -->
+<div id="today-test-screen" class="screen" style="max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
+  <!-- 設定フェーズ -->
+  <div id="today-setup-area" style="display:flex;flex-direction:column;gap:16px;width:100%;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="screen-title">振り返りテスト</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">問題数を選ぶ</div>
+      <div style="display:flex;gap:8px;">
+        <button class="timer-btn active" data-today-count="5" onclick="selectTodayCount(this)">5問</button>
+        <button class="timer-btn" data-today-count="10" onclick="selectTodayCount(this)">10問</button>
+        <button class="timer-btn" data-today-count="15" onclick="selectTodayCount(this)">15問</button>
+      </div>
+    </div>
+    <button onclick="startTodayTest()" class="start-btn" style="background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 24px rgba(16,185,129,.4);">スタート →</button>
+  </div>
+  <!-- クイズフェーズ -->
+  <div id="today-quiz-area" style="display:none;flex-direction:column;gap:14px;width:100%;">
+    <div class="flash-header" style="width:100%;">
+      <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="today-progress-fill" style="width:0%;background:linear-gradient(90deg,#10b981,#059669);"></div></div>
+      <div class="progress-text" id="today-progress-text">0/0</div>
+    </div>
+    <div class="flashcard" style="width:100%;min-height:140px;gap:10px;">
+      <div class="card-source-badge" id="today-source"></div>
+      <div class="card-meaning-main" id="today-meaning" style="font-size:34px;"></div>
+      <div class="card-answer-wrap" id="today-answer-wrap">
+        <div class="card-word-answer" id="today-word-answer" style="font-size:30px;"></div>
+      </div>
+    </div>
+    <div style="background:var(--card);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div class="letter-boxes" id="today-letter-boxes"></div>
+      <div class="text-input-row" id="today-input-row">
+        <input type="text" id="today-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="スペルを入力してEnter">
+        <button onclick="checkTodayAnswer()">確認</button>
+      </div>
+      <div class="feedback-area" id="today-feedback"></div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="action-btn btn-skip" onclick="todayNext()">スキップ</button>
+        <button class="action-btn btn-next" id="today-next-btn" onclick="todayNext()" style="display:none;">次へ →</button>
+      </div>
+    </div>
+  </div>
+  <!-- 結果フェーズ -->
+  <div id="today-result-area" style="display:none;flex-direction:column;align-items:center;gap:20px;width:100%;padding-top:40px;">
+    <div class="result-emoji" id="today-result-emoji">🎉</div>
+    <div class="result-title" id="today-result-title">おつかれさま！</div>
+    <div class="result-score-card">
+      <div class="score-big" id="today-score-pct">0%</div>
+      <div class="score-label">正答率</div>
+      <div class="score-detail">
+        <div class="score-item correct"><div class="score-num" id="today-correct-count">0</div><div class="score-desc">正解</div></div>
+        <div class="score-item wrong"><div class="score-num" id="today-wrong-count">0</div><div class="score-desc">まちがい</div></div>
+      </div>
+    </div>
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;">
+      <button class="result-btn primary" style="background:linear-gradient(135deg,#10b981,#059669);" onclick="openTodayTestSetup()">もう一度</button>
+      <button class="result-btn secondary" id="today-back-btn" onclick="showScreen('home-screen')">トップへ戻る</button>
+    </div>
+  </div>
+</div>
+
 <!-- REVIEW TEST SCREEN -->
 <div id="review-test-screen" class="screen" style="max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
   <!-- 設定フェーズ -->
@@ -1502,10 +1648,11 @@
     </div>
     <div class="settings-section">
       <div class="settings-label">問題数を選ぶ</div>
-      <div style="display:flex;gap:8px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="timer-btn" data-review-count="10" onclick="selectReviewCount(this)">10問</button>
         <button class="timer-btn active" data-review-count="20" onclick="selectReviewCount(this)">20問</button>
         <button class="timer-btn" data-review-count="50" onclick="selectReviewCount(this)">50問</button>
+        <button class="timer-btn" data-review-count="9999" onclick="selectReviewCount(this)">全問</button>
       </div>
     </div>
     <div class="settings-section">
@@ -1684,8 +1831,17 @@
       </button>
       <button class="pref-mode-card" data-pref-mode="step" onclick="selectPrefMode(this)">
         <div class="pref-mode-title">ステップモード</div>
-        <div class="pref-mode-desc">5語ずつ解放・累積で練習<br>7割クリアで次の5語へ</div>
+        <div class="pref-mode-desc">指定数ずつ解放・累積で練習<br>7割クリアで次のステップへ</div>
       </button>
+    </div>
+  </div>
+
+  <!-- ステップ解放数（ステップモード時のみ） -->
+  <div class="settings-section" id="pref-step-unlock-section" style="display:none;">
+    <div class="settings-label">ステップ解放数（単語・英文ともに）</div>
+    <div style="display:flex;gap:8px;">
+      <button class="pref-count-btn active" data-pref-step-unlock="5" onclick="selectPrefStepUnlock(this)">5語</button>
+      <button class="pref-count-btn" data-pref-step-unlock="10" onclick="selectPrefStepUnlock(this)">10語</button>
     </div>
   </div>
 
@@ -3836,12 +3992,14 @@ function showResult() {
 
   // ステップモード解放チェック
   if (state._stepMode && state._stepPool) {
+    const prefs2 = getUserPrefSettings();
+    const stepSize2 = prefs2.stepUnlockSize || 5;
     if (pct >= 70) {
-      const newUnlocked = Math.min(state._stepUnlocked + 5, state._stepPool);
+      const newUnlocked = Math.min(state._stepUnlocked + stepSize2, state._stepPool);
       saveStepUnlocked(newUnlocked);
       if (newUnlocked > state._stepUnlocked) {
         emoji = '🎉';
-        title = `次の${Math.min(5, state._stepPool - state._stepUnlocked)}語が解放されました！`;
+        title = `次の${Math.min(stepSize2, state._stepPool - state._stepUnlocked)}語が解放されました！`;
       } else {
         emoji = '🏆'; title = '全語クリア！完璧！';
       }
@@ -3862,7 +4020,9 @@ function showResult() {
 
 function endSessionPrompt() {
   if (state.deck.length === 0) { showScreen('home-screen'); return; }
-  startSessionTest();
+  saveSessionCoins();
+  todayTestFromSession = true;
+  openTodayTestSetup();
 }
 
 // ===== 締めのテスト =====
@@ -4009,23 +4169,28 @@ function goToLearnSettings() {
 }
 function startLearnMode() {
   const prefs = getUserPrefSettings();
-  const wps = parseInt(prefs.wordsPerSession) || 0;
+  const learningMode = prefs.learningMode || 'free';
+  const stepBanner = document.getElementById('learn-step-banner');
 
-  // startTypingMode()と同じパターン：今日の単語＋苦手単語→件数制限→シャッフル
-  const todayWordList = getTodayWords();
-  const allDeck = buildDeckRaw(false);
   let deck;
-  if (todayWordList.length > 0) {
-    const todaySet = new Set(todayWordList);
-    const todayDeck = allDeck.filter(w => todaySet.has(w['単語']));
-    const weakDeck = allDeck.filter(w => isWeakWordV51(w['単語']) && !todaySet.has(w['単語']));
-    deck = [...todayDeck, ...weakDeck];
+  if (learningMode === 'step') {
+    const baseDeck = buildDeckRaw(false); // フラッシュと同じプール（順序保持）
+    if (!baseDeck.length) { alert('条件に合う単語がありません。'); return; }
+    const totalPool = baseDeck.length;
+    const unlocked = getStepUnlocked(totalPool);
+    deck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+    if (stepBanner) {
+      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}語 解放中`;
+      stepBanner.classList.add('visible');
+    }
   } else {
-    deck = allDeck;
+    // フリーモード：選択セクションから全部出題
+    deck = buildDeck();
+    if (!deck.length) { alert('条件に合う単語がありません。'); return; }
+    const wps = parseInt(prefs.wordsPerSession) || 0;
+    if (wps > 0 && deck.length > wps) deck = deck.slice(0, wps);
+    if (stepBanner) stepBanner.classList.remove('visible');
   }
-  if (!deck.length) { alert('条件に合う単語がありません。'); return; }
-  if (wps > 0 && deck.length > wps) deck = deck.slice(0, wps);
-  deck = deck.sort(() => Math.random() - 0.5);
 
   learnDeck = deck;
   learnCurrent = 0;
@@ -4294,6 +4459,183 @@ function normalizeForCompare(text) {
   return text.toLowerCase().replace(/[.,?!'—\-:]/g, '').replace(/\s+/g, ' ').trim();
 }
 
+// ===== 英文タイピングモード =====
+let entypeDeck = [], entypeCurrent = 0;
+let currentEntypeSentence = null;
+let entypeAllCorrect = false;
+let entype_stepMode = false, entype_stepPool = 0, entype_stepUnlocked = 0;
+
+function selectAllEntypeUnits() {
+  const btns = document.querySelectorAll('[data-entype-unit]');
+  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
+  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
+  updateEntypeCount();
+}
+function toggleEntypeUnit(btn) { btn.classList.toggle('active'); updateEntypeCount(); }
+function updateEntypeCount() {
+  const selected = Array.from(document.querySelectorAll('[data-entype-unit].active')).map(b => parseInt(b.dataset.entypeUnit));
+  const count = SENTENCE_DATA.filter(s => selected.includes(s.unit)).length;
+  const el = document.getElementById('entype-sentence-count');
+  if (el) el.textContent = count + '文が選択されています';
+}
+
+function goToEntypeSettings() {
+  showScreen('entype-screen');
+  document.getElementById('entype-unit-select').style.display = 'flex';
+  document.getElementById('entype-quiz-area').style.display = 'none';
+  document.getElementById('entype-settings-header').style.display = '';
+  document.getElementById('entype-quiz-header').style.display = 'none';
+  const stepBanner = document.getElementById('entype-step-banner');
+  if (stepBanner) stepBanner.classList.remove('visible');
+}
+
+function startEntypeMode() {
+  const prefs = getUserPrefSettings();
+  const learningMode = prefs.learningMode || 'free';
+  const sps = parseInt(prefs.sentencesPerSession) || 0;
+  const fillNext = prefs.unitEndPolicy === 'fillNext';
+  const stepBanner = document.getElementById('entype-step-banner');
+
+  const selected = Array.from(document.querySelectorAll('[data-entype-unit].active')).map(b => parseInt(b.dataset.entypeUnit));
+  let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit));
+
+  if (learningMode === 'step') {
+    if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
+    const totalPool = baseDeck.length;
+    const unlocked = getSentenceStepUnlocked(totalPool);
+    baseDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+    if (stepBanner) {
+      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}文 解放中`;
+      stepBanner.classList.add('visible');
+    }
+    entype_stepMode = true;
+    entype_stepPool = totalPool;
+    entype_stepUnlocked = unlocked;
+  } else {
+    if (sps > 0 && baseDeck.length < sps && fillNext) {
+      const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
+      let remaining = sps - baseDeck.length;
+      for (const unit of allUnits) {
+        if (selected.includes(unit) || remaining <= 0) continue;
+        const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
+        baseDeck = [...baseDeck, ...extra];
+        remaining -= extra.length;
+      }
+    }
+    if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
+    baseDeck = baseDeck.sort(() => Math.random() - 0.5);
+    if (stepBanner) stepBanner.classList.remove('visible');
+    entype_stepMode = false;
+  }
+
+  if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
+  entypeDeck = baseDeck;
+  entypeCurrent = 0;
+  document.getElementById('entype-unit-select').style.display = 'none';
+  document.getElementById('entype-quiz-area').style.display = 'flex';
+  document.getElementById('entype-settings-header').style.display = 'none';
+  document.getElementById('entype-quiz-header').style.display = 'flex';
+  loadEntypeCard();
+}
+
+function loadEntypeCard() {
+  if (entypeCurrent >= entypeDeck.length) {
+    if (entype_stepMode) {
+      const prefs5 = getUserPrefSettings();
+      const stepSize5 = prefs5.stepUnlockSize || 5;
+      const newUnlocked = Math.min(entype_stepUnlocked + stepSize5, entype_stepPool);
+      saveSentenceStepUnlocked(newUnlocked);
+      const msg = newUnlocked > entype_stepUnlocked
+        ? `全部おわったよ！\n次の${Math.min(stepSize5, entype_stepPool - entype_stepUnlocked)}文が解放されました！`
+        : '全文クリア！完璧！';
+      alert(msg);
+      entype_stepMode = false;
+    } else {
+      alert('全部おわったよ！');
+    }
+    document.getElementById('entype-unit-select').style.display = 'flex';
+    document.getElementById('entype-quiz-area').style.display = 'none';
+    const stepBanner = document.getElementById('entype-step-banner');
+    if (stepBanner) stepBanner.classList.remove('visible');
+    return;
+  }
+  entypeAllCorrect = false;
+  currentEntypeSentence = entypeDeck[entypeCurrent];
+  const pct = (entypeCurrent / entypeDeck.length) * 100;
+  document.getElementById('entype-progress-fill').style.width = pct + '%';
+  document.getElementById('entype-progress-text').textContent = (entypeCurrent + 1) + '/' + entypeDeck.length;
+  document.getElementById('entype-unit-badge').textContent = 'Unit' + currentEntypeSentence.unit;
+  document.getElementById('entype-ja-text').textContent = currentEntypeSentence.ja;
+  document.getElementById('entype-input').value = '';
+  document.getElementById('entype-input').disabled = false;
+  document.getElementById('entype-feedback').textContent = '';
+  document.getElementById('entype-feedback').style.color = '';
+  document.getElementById('entype-answer-display').style.display = 'none';
+  document.getElementById('entype-next-btn').style.display = 'none';
+  document.getElementById('entype-reveal-btn').style.display = 'block';
+  // Enterキーで答え合わせ
+  const inp = document.getElementById('entype-input');
+  inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); submitEntypeAnswer(); } };
+  // スマホではキーボードが出るまで少し待ってfocus
+  setTimeout(() => inp.focus(), 100);
+}
+
+function submitEntypeAnswer() {
+  const typed = (document.getElementById('entype-input').value || '').trim();
+  if (!typed) return;
+  if (entypeAllCorrect) return;
+  const correct = currentEntypeSentence.en;
+  const { html, allCorrect } = buildSentenceDiffHtml(typed, correct);
+  document.getElementById('entype-correct-text').innerHTML = html;
+  document.getElementById('entype-answer-display').style.display = 'block';
+  document.getElementById('entype-reveal-btn').style.display = 'none';
+  const fb = document.getElementById('entype-feedback');
+  if (allCorrect) {
+    entypeAllCorrect = true;
+    fb.textContent = '完璧！'; fb.style.color = '#06d6a0';
+    document.getElementById('entype-next-btn').style.display = 'block';
+    document.getElementById('entype-input').disabled = true;
+    showSparkle(document.getElementById('entype-answer-display'));
+    // 英文ステータス記録（正解）
+    if (currentEntypeSentence) {
+      const st = getSentStatus(currentEntypeSentence.en);
+      st.count = (st.count || 0) + 1; st.correct = (st.correct || 0) + 1; st.streak = (st.streak || 0) + 1;
+      setSentStatus(currentEntypeSentence.en, st);
+    }
+  } else {
+    fb.textContent = '赤い単語をもう一度！'; fb.style.color = '#ff6b6b';
+    document.getElementById('entype-next-btn').style.display = 'none';
+    document.getElementById('entype-reveal-btn').style.display = 'none';
+    // 入力をクリアして再入力を促す
+    setTimeout(() => {
+      document.getElementById('entype-input').value = '';
+      document.getElementById('entype-input').focus();
+      // 再送信ボタンを再表示
+      document.getElementById('entype-reveal-btn').style.display = 'block';
+    }, 800);
+  }
+}
+
+function entypeReveal() {
+  entypeAllCorrect = false;
+  const correct = currentEntypeSentence.en;
+  document.getElementById('entype-correct-text').innerHTML = `<span style="color:var(--text-muted)">${escHtml(correct)}</span>`;
+  document.getElementById('entype-answer-display').style.display = 'block';
+  document.getElementById('entype-feedback').textContent = '声に出してみよう！';
+  document.getElementById('entype-feedback').style.color = 'var(--accent2)';
+  document.getElementById('entype-next-btn').style.display = 'block';
+  document.getElementById('entype-reveal-btn').style.display = 'none';
+  document.getElementById('entype-input').disabled = true;
+  // 英文ステータス記録（答えを見た = 不正解扱い）
+  if (currentEntypeSentence) {
+    const st = getSentStatus(currentEntypeSentence.en);
+    st.count = (st.count || 0) + 1; st.streak = 0;
+    setSentStatus(currentEntypeSentence.en, st);
+  }
+}
+function entypeNext() { entypeCurrent++; loadEntypeCard(); }
+function entypeSkip() { entypeCurrent++; loadEntypeCard(); }
+
 // ===== タイピングモード =====
 let typingDeck = [], typingCurrent = 0, typingAnswered = false, typingAllCorrect = false;
 let currentTypingSentence = null;
@@ -4320,22 +4662,28 @@ function goToTypingSettings() {
 }
 function startTypingMode() {
   const prefs = getUserPrefSettings();
+  const learningMode = prefs.learningMode || 'free';
   const sps = parseInt(prefs.sentencesPerSession) || 0;
   const fillNext = prefs.unitEndPolicy === 'fillNext';
-  const todaySentList = getTodaySentences();
+  const stepBanner = document.getElementById('typing-step-banner');
 
-  let baseDeck;
-  if (todaySentList.length > 0) {
-    // 今日の英文 + 苦手英文（テスト済みで正解率50%以下またはstreak<3）
-    const todayDeck = todaySentList.map(en => SENTENCE_DATA.find(s => s.en === en)).filter(Boolean);
-    const todaySet = new Set(todaySentList);
-    const weakDeck = SENTENCE_DATA.filter(s => isWeakSentence(s.en) && !todaySet.has(s.en));
-    baseDeck = [...todayDeck, ...weakDeck];
+  const selected = Array.from(document.querySelectorAll('[data-typing-unit].active')).map(b => parseInt(b.dataset.typingUnit));
+  let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)); // 順序保持
+
+  if (learningMode === 'step') {
+    if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
+    const totalPool = baseDeck.length;
+    const unlocked = getSentenceStepUnlocked(totalPool);
+    baseDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+    if (stepBanner) {
+      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}文 解放中`;
+      stepBanner.classList.add('visible');
+    }
+    typing_stepMode = true;
+    typing_stepPool = totalPool;
+    typing_stepUnlocked = unlocked;
   } else {
-    const selected = Array.from(document.querySelectorAll('[data-typing-unit].active')).map(b => parseInt(b.dataset.typingUnit));
-    baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit));
-
-    // ユニット末端補充
+    // フリーモード：選択ユニットから全部出題
     if (sps > 0 && baseDeck.length < sps && fillNext) {
       const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
       let remaining = sps - baseDeck.length;
@@ -4346,10 +4694,11 @@ function startTypingMode() {
         remaining -= extra.length;
       }
     }
+    if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
+    baseDeck = baseDeck.sort(() => Math.random() - 0.5);
+    if (stepBanner) stepBanner.classList.remove('visible');
+    typing_stepMode = false;
   }
-
-  if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
-  baseDeck = baseDeck.sort(() => Math.random() - 0.5);
 
   if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
   typingDeck = baseDeck;
@@ -4363,9 +4712,23 @@ function startTypingMode() {
 
 function loadTypingCard() {
   if (typingCurrent >= typingDeck.length) {
-    alert('全部おわったよ！');
+    if (typing_stepMode) {
+      const prefs4 = getUserPrefSettings();
+      const stepSize4 = prefs4.stepUnlockSize || 5;
+      const newUnlocked = Math.min(typing_stepUnlocked + stepSize4, typing_stepPool);
+      saveSentenceStepUnlocked(newUnlocked);
+      const msg = newUnlocked > typing_stepUnlocked
+        ? `全部おわったよ！\n次の${Math.min(stepSize4, typing_stepPool - typing_stepUnlocked)}文が解放されました！`
+        : '全文クリア！完璧！';
+      alert(msg);
+      typing_stepMode = false;
+    } else {
+      alert('全部おわったよ！');
+    }
     document.getElementById('typing-unit-select').style.display = 'flex';
     document.getElementById('typing-quiz-area').style.display = 'none';
+    const stepBanner = document.getElementById('typing-step-banner');
+    if (stepBanner) stepBanner.classList.remove('visible');
     return;
   }
   typingAnswered = false;
@@ -4720,6 +5083,8 @@ async function processRevealVoice() {
 // ===== 英文暗記モード =====
 let smemDeck = [], smemCurrent = 0;
 let currentSmemSentence = null;
+let smem_stepMode = false, smem_stepPool = 0, smem_stepUnlocked = 0;
+let typing_stepMode = false, typing_stepPool = 0, typing_stepUnlocked = 0;
 
 function selectAllSmemUnits() {
   const btns = document.querySelectorAll('[data-smem-unit]');
@@ -4736,25 +5101,43 @@ function updateSmemCount() {
 
 function startSmemMode() {
   const prefs = getUserPrefSettings();
+  const learningMode = prefs.learningMode || 'free';
   const sps = parseInt(prefs.sentencesPerSession) || 0;
   const fillNext = prefs.unitEndPolicy === 'fillNext';
   const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
-  let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit));
+  const stepBanner = document.getElementById('smem-step-banner');
 
-  // ユニット末端補充
-  if (sps > 0 && baseDeck.length < sps && fillNext) {
-    const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
-    let remaining = sps - baseDeck.length;
-    for (const unit of allUnits) {
-      if (selected.includes(unit) || remaining <= 0) continue;
-      const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
-      baseDeck = [...baseDeck, ...extra];
-      remaining -= extra.length;
+  let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)); // 順序保持
+
+  if (learningMode === 'step') {
+    if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
+    const totalPool = baseDeck.length;
+    const unlocked = getSentenceStepUnlocked(totalPool);
+    baseDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+    if (stepBanner) {
+      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}文 解放中`;
+      stepBanner.classList.add('visible');
     }
+    smem_stepMode = true;
+    smem_stepPool = totalPool;
+    smem_stepUnlocked = unlocked;
+  } else {
+    // フリーモード：選択ユニットから全部出題
+    if (sps > 0 && baseDeck.length < sps && fillNext) {
+      const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
+      let remaining = sps - baseDeck.length;
+      for (const unit of allUnits) {
+        if (selected.includes(unit) || remaining <= 0) continue;
+        const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
+        baseDeck = [...baseDeck, ...extra];
+        remaining -= extra.length;
+      }
+    }
+    baseDeck = baseDeck.sort(() => Math.random() - 0.5);
+    if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
+    if (stepBanner) stepBanner.classList.remove('visible');
+    smem_stepMode = false;
   }
-
-  baseDeck = baseDeck.sort(() => Math.random() - 0.5);
-  if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
 
   if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
 
@@ -4772,9 +5155,23 @@ function startSmemMode() {
 
 function loadSmemCard() {
   if (smemCurrent >= smemDeck.length) {
-    alert('全部おわったよ！');
+    if (smem_stepMode) {
+      const prefs3 = getUserPrefSettings();
+      const stepSize3 = prefs3.stepUnlockSize || 5;
+      const newUnlocked = Math.min(smem_stepUnlocked + stepSize3, smem_stepPool);
+      saveSentenceStepUnlocked(newUnlocked);
+      const msg = newUnlocked > smem_stepUnlocked
+        ? `全部おわったよ！\n次の${Math.min(stepSize3, smem_stepPool - smem_stepUnlocked)}文が解放されました！`
+        : '全文クリア！完璧！';
+      alert(msg);
+      smem_stepMode = false;
+    } else {
+      alert('全部おわったよ！');
+    }
     document.getElementById('smem-unit-select').style.display = 'flex';
     document.getElementById('smem-quiz-area').style.display = 'none';
+    const stepBanner = document.getElementById('smem-step-banner');
+    if (stepBanner) stepBanner.classList.remove('visible');
     return;
   }
   currentSmemSentence = smemDeck[smemCurrent];
@@ -8038,6 +8435,150 @@ function showReviewResult() {
   updateHomeBadges();
 }
 
+// ===== 振り返りテスト =====
+let todayTestDeck = [], todayTestIndex = 0, todayTestCorrect = 0, todayTestWrong = 0;
+let todayTestCount = 5;
+let todayTestFromSession = false;
+
+function selectTodayCount(btn) {
+  document.querySelectorAll('[data-today-count]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  todayTestCount = parseInt(btn.dataset.todayCount);
+}
+
+function openTodayTestSetup() {
+  showScreen('today-test-screen');
+  document.getElementById('today-setup-area').style.display = 'flex';
+  document.getElementById('today-quiz-area').style.display = 'none';
+  document.getElementById('today-result-area').style.display = 'none';
+}
+
+function startTodayTest() {
+  const allWords = getAllDataWords();
+  // 今日のセッション単語（重複除去）
+  const uniqueMap = {};
+  sessionWords.forEach(w => { if (w && w['単語']) uniqueMap[w['単語']] = w; });
+  const sessionUnique = Object.values(uniqueMap).sort(() => Math.random() - 0.5);
+  const sessionKeys = new Set(sessionUnique.map(w => w['単語']));
+  // 苦手単語（セッション単語を除外）
+  const weakWords = getWeakWordsFromData().filter(w => !sessionKeys.has(w['単語'])).sort(() => Math.random() - 0.5);
+  const combinedKeys = new Set([...sessionKeys, ...weakWords.map(w => w['単語'])]);
+  // 過去練習済み単語（セッション・苦手を除外）
+  const practicedOthers = allWords.filter(w =>
+    (getWordStatus(w['単語']).count || 0) > 0 && !combinedKeys.has(w['単語'])
+  ).sort(() => Math.random() - 0.5);
+  // 優先順位：セッション → 苦手 → 練習済み
+  const pool = [...sessionUnique, ...weakWords, ...practicedOthers];
+  if (!pool.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
+  todayTestDeck = pool.slice(0, todayTestCount);
+  todayTestIndex = 0; todayTestCorrect = 0; todayTestWrong = 0;
+  document.getElementById('today-setup-area').style.display = 'none';
+  document.getElementById('today-result-area').style.display = 'none';
+  document.getElementById('today-quiz-area').style.display = 'flex';
+  loadTodayCard();
+}
+
+function loadTodayCard() {
+  if (todayTestIndex >= todayTestDeck.length) { showTodayResult(); return; }
+  const word = todayTestDeck[todayTestIndex];
+  const pct = todayTestIndex / todayTestDeck.length * 100;
+  document.getElementById('today-progress-fill').style.width = pct + '%';
+  document.getElementById('today-progress-text').textContent = (todayTestIndex+1) + '/' + todayTestDeck.length;
+  document.getElementById('today-source').textContent = word._source || '';
+  document.getElementById('today-meaning').textContent = word['意味'];
+  document.getElementById('today-answer-wrap').classList.remove('visible');
+  document.getElementById('today-word-answer').textContent = word['単語'];
+  document.getElementById('today-feedback').className = 'feedback-area';
+  document.getElementById('today-feedback').textContent = '';
+  document.getElementById('today-next-btn').style.display = 'none';
+  document.getElementById('today-input-row').style.display = 'flex';
+  const inp = document.getElementById('today-input');
+  const boxes = document.getElementById('today-letter-boxes');
+  inp.value = ''; inp.disabled = false;
+  boxes.innerHTML = '';
+  const w = word['単語'];
+  for (let i = 0; i < w.length; i++) {
+    const b = document.createElement('div'); b.className = 'letter-box empty'; b.textContent = '_'; boxes.appendChild(b);
+  }
+  setTimeout(() => inp.focus(), 100);
+}
+
+function checkTodayAnswer() {
+  const inp = document.getElementById('today-input');
+  if (!inp || inp.disabled) return;
+  const typed = inp.value.trim();
+  if (!typed) return;
+  const word = todayTestDeck[todayTestIndex];
+  const correct = word['単語'].toLowerCase();
+  const isOk = typed.toLowerCase() === correct;
+  inp.disabled = true;
+  document.getElementById('today-answer-wrap').classList.add('visible');
+  const boxes = document.getElementById('today-letter-boxes');
+  boxes.innerHTML = '';
+  const maxLen = Math.max(typed.length, correct.length);
+  for (let i = 0; i < maxLen; i++) {
+    const b = document.createElement('div'); b.className = 'letter-box';
+    const tc = (typed[i]||'').toLowerCase(); const cc = (correct[i]||'').toLowerCase();
+    if (!typed[i]) { b.textContent = correct[i]; b.classList.add('wrong'); }
+    else if (!correct[i]) { b.textContent = typed[i]; b.classList.add('wrong'); }
+    else if (tc === cc) { b.textContent = typed[i]; b.classList.add('correct'); }
+    else { b.textContent = typed[i]; b.classList.add('wrong'); }
+    boxes.appendChild(b);
+  }
+  const fb = document.getElementById('today-feedback');
+  if (isOk) {
+    todayTestCorrect++;
+    fb.className = 'feedback-area correct'; fb.textContent = '正解！';
+    const ws = getWordStatus(word['単語']);
+    ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
+    if (ws.streak >= 3) ws.hall = true;
+    setWordStatus(word['単語'], ws);
+  } else {
+    todayTestWrong++;
+    fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
+    const ws = getWordStatus(word['単語']);
+    ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
+    setWordStatus(word['単語'], ws);
+  }
+  speakWord(word['単語']);
+  document.getElementById('today-next-btn').style.display = 'block';
+  document.getElementById('today-input-row').style.display = 'none';
+}
+
+function todayNext() {
+  todayTestIndex++;
+  loadTodayCard();
+}
+
+function showTodayResult() {
+  document.getElementById('today-quiz-area').style.display = 'none';
+  const total = todayTestCorrect + todayTestWrong;
+  const pct = total > 0 ? Math.round(todayTestCorrect / total * 100) : 0;
+  document.getElementById('today-score-pct').textContent = pct + '%';
+  document.getElementById('today-correct-count').textContent = todayTestCorrect;
+  document.getElementById('today-wrong-count').textContent = todayTestWrong;
+  let emoji = '😊', title = 'おつかれさま！';
+  if (pct >= 90) { emoji = '🏆'; title = '完璧！すごい！'; }
+  else if (pct >= 70) { emoji = '⭐'; title = 'よくできました！'; }
+  else if (pct >= 50) { emoji = '💪'; title = 'もう少し！'; }
+  else { emoji = '📚'; title = 'もう一度チャレンジ！'; }
+  document.getElementById('today-result-emoji').textContent = emoji;
+  document.getElementById('today-result-title').textContent = title;
+  document.getElementById('today-result-area').style.display = 'flex';
+  updateHomeBadges();
+  // セッション終了後は「今日の結果を見る」ボタンに切り替え
+  const backBtn = document.getElementById('today-back-btn');
+  if (backBtn) {
+    if (todayTestFromSession) {
+      backBtn.textContent = '今日の結果を見る';
+      backBtn.onclick = () => { todayTestFromSession = false; showDailyResults(); };
+    } else {
+      backBtn.textContent = 'トップへ戻る';
+      backBtn.onclick = () => showScreen('home-screen');
+    }
+  }
+}
+
 // ===== ユーザー設定（ per-user preferences） =====
 
 function getUserPrefSettings() {
@@ -8080,15 +8621,23 @@ function loadPrefScreen() {
   document.querySelectorAll('[data-pref-speed]').forEach(b => {
     b.classList.toggle('active', b.dataset.prefSpeed === speed);
   });
+  // ステップ解放数 (v51拡張)
+  const stepUnlock = String(prefs.stepUnlockSize !== undefined ? prefs.stepUnlockSize : 5);
+  document.querySelectorAll('[data-pref-step-unlock]').forEach(b => {
+    b.classList.toggle('active', b.dataset.prefStepUnlock === stepUnlock);
+  });
   // ステップ状況
   const stepSection = document.getElementById('pref-step-status');
+  const stepUnlockSection = document.getElementById('pref-step-unlock-section');
   const stepInfo = document.getElementById('pref-step-info');
   if (mode === 'step') {
     if (stepSection) stepSection.style.display = 'block';
+    if (stepUnlockSection) stepUnlockSection.style.display = 'block';
     const unlocked = getStepUnlocked(0);
     if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
   } else {
     if (stepSection) stepSection.style.display = 'none';
+    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
   }
   // フリーモード時のみ単語数セクション表示
   const countSection = document.getElementById('pref-count-section');
@@ -8100,14 +8649,20 @@ function selectPrefMode(btn) {
   btn.classList.add('active');
   const mode = btn.dataset.prefMode;
   const stepSection = document.getElementById('pref-step-status');
+  const stepUnlockSection = document.getElementById('pref-step-unlock-section');
   const countSection = document.getElementById('pref-count-section');
   if (stepSection) stepSection.style.display = mode === 'step' ? 'block' : 'none';
+  if (stepUnlockSection) stepUnlockSection.style.display = mode === 'step' ? 'block' : 'none';
   if (countSection) countSection.style.display = mode === 'step' ? 'none' : 'block';
   if (mode === 'step') {
     const stepInfo = document.getElementById('pref-step-info');
     const unlocked = getStepUnlocked(0);
     if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
   }
+}
+function selectPrefStepUnlock(btn) {
+  document.querySelectorAll('[data-pref-step-unlock]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 function selectPrefCount(btn) {
   document.querySelectorAll('[data-pref-count]').forEach(b => b.classList.remove('active'));
@@ -8132,6 +8687,7 @@ function savePrefSettings() {
   const sentCountBtn = document.querySelector('[data-pref-sent-count].active');
   const unitEndBtn = document.querySelector('[data-pref-unit-end].active');
   const speedBtn = document.querySelector('[data-pref-speed].active');
+  const stepUnlockBtn = document.querySelector('[data-pref-step-unlock].active');
   const wrongDisplayBtns = [...document.querySelectorAll('[data-wrong-display].active')].map(b => b.dataset.wrongDisplay);
   const prefs = {
     learningMode: modeBtn ? modeBtn.dataset.prefMode : 'free',
@@ -8140,6 +8696,7 @@ function savePrefSettings() {
     unitEndPolicy: unitEndBtn ? unitEndBtn.dataset.prefUnitEnd : 'stop',
     wrongDisplaySettings: wrongDisplayBtns,
     spelloutSpeed: speedBtn ? speedBtn.dataset.prefSpeed : 'normal',
+    stepUnlockSize: stepUnlockBtn ? parseInt(stepUnlockBtn.dataset.prefStepUnlock) : 5,
   };
   saveUserPrefToStorage(prefs);
   showScreen('home-screen');
@@ -8148,9 +8705,10 @@ function savePrefSettings() {
 // ===== ステップモード進捗管理 =====
 
 function getStepUnlocked(poolSize) {
+  const prefs = getUserPrefSettings();
+  const stepSize = prefs.stepUnlockSize || 5;
   const saved = parseInt(localStorage.getItem(up('step_unlocked')) || '0');
-  // 初回は5語、プールが決まっている場合はmin(saved, poolSize)
-  if (saved === 0) return Math.min(5, poolSize || 5);
+  if (saved === 0) return Math.min(stepSize, poolSize || stepSize);
   return poolSize > 0 ? Math.min(saved, poolSize) : saved;
 }
 
@@ -8158,11 +8716,26 @@ function saveStepUnlocked(count) {
   localStorage.setItem(up('step_unlocked'), String(count));
 }
 
+function getSentenceStepUnlocked(poolSize) {
+  const prefs = getUserPrefSettings();
+  const stepSize = prefs.stepUnlockSize || 5;
+  const saved = parseInt(localStorage.getItem(up('step_sent_unlocked')) || '0');
+  if (saved === 0) return Math.min(stepSize, poolSize || stepSize);
+  return poolSize > 0 ? Math.min(saved, poolSize) : saved;
+}
+
+function saveSentenceStepUnlocked(count) {
+  localStorage.setItem(up('step_sent_unlocked'), String(count));
+}
+
 function resetStepProgress() {
   if (!confirm('ステップの進行状況をリセットしますか？')) return;
   localStorage.removeItem(up('step_unlocked'));
+  localStorage.removeItem(up('step_sent_unlocked'));
   const stepInfo = document.getElementById('pref-step-info');
-  if (stepInfo) stepInfo.textContent = '現在 5 語が解放されています（リセット済み）';
+  const prefs = getUserPrefSettings();
+  const stepSize = prefs.stepUnlockSize || 5;
+  if (stepInfo) stepInfo.textContent = `現在 ${stepSize} 語が解放されています（リセット済み）`;
 }
 
 // ===== 習熟度マップ =====
@@ -8253,6 +8826,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') {
       if (ri.disabled) reviewNext();
       else checkReviewAnswer();
+    }
+  });
+
+  // today-input のイベント登録（DOM確定後）
+  const ti = document.getElementById('today-input');
+  if (ti) ti.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (ti.disabled) todayNext();
+      else checkTodayAnswer();
     }
   });
 });
