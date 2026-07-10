@@ -5921,7 +5921,7 @@ let aiLoading = false;
 let aiSoundOn = true;
 let aiReturnScreen = 'home-screen';
 let aiTurnCount = 0;
-const AI_MAX_TURNS = 5;
+const AI_MAX_TURNS = 7;
 
 // テキストを英語・日本語セグメントに分割する
 function splitForTTS(text) {
@@ -6173,6 +6173,9 @@ function restartAIChat() {
   document.getElementById('ai-hint-btn').disabled = false;
   document.getElementById('ai-voice-status').textContent = 'ボタンを押して話す';
   document.getElementById('ai-voice-timer').textContent = '';
+  if (aiSessionWords.length > 1) {
+    aiSessionWords = [...aiSessionWords].sort(() => Math.random() - 0.5);
+  }
   const apiKey = localStorage.getItem('wordsuck_claude_api_key');
   if (apiKey) startAIConversation();
 }
@@ -6192,7 +6195,7 @@ ${wordInstruction}
 
 会話ルール:
 - 必ず次の質問を投げかけて会話を引っ張ること（会話をリードするのはあなた）
-- 正解・英語で返事が来たら必ず褒めてから次の単語に誘導する（例：「すごい！じゃあ次は...について話そう」）
+- 正解・英語で返事が来たら褒めたあと、より自然な表現や別の言い方を1つ短く教えてから次に進む（例：「すごい！"I enjoy it a lot" とも言えるよ。じゃあ次は...について話そう」）
 - ユーザーが日本語で話しかけてきたら「〇〇 と言えばいいよ」の形式で英語表現を教えてから質問する
 - 返答は短くシンプルに（1〜2文）
 - 日本語訳は括弧内に（例：I like apples.（りんごが好き））
@@ -6255,7 +6258,13 @@ async function callClaude(messages) {
 
   try {
     const apiKey = localStorage.getItem('wordsuck_claude_api_key');
-    const allMessages = [...aiHistory, ...messages];
+    const isLastTurn = aiTurnCount >= AI_MAX_TURNS;
+    const finalMessages = isLastTurn
+      ? messages.map((m, i) => i === messages.length - 1 && m.role === 'user'
+          ? { ...m, content: m.content + '\n\n[最終ターンです。絶対に新しい質問をしないでください。「今日はここまで！よくできました！」の言葉を必ず使って温かく締めくくってください。]' }
+          : m)
+      : messages;
+    const allMessages = [...aiHistory, ...finalMessages];
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
