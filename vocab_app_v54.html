@@ -399,6 +399,8 @@
   .cp-source-input { width:56px; padding:5px 6px; border-radius:8px; border:1.5px solid rgba(255,255,255,.2); background:var(--surface); color:var(--text); font-size:14px; text-align:center; font-family:'Nunito',sans-serif; }
   .cp-validation { font-size:11px; color:var(--accent); padding:4px 0; font-family:'Noto Sans JP',sans-serif; min-height:16px; }
   .cp-status { font-size:12px; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; padding:6px 0; }
+  .cp-shortage-warning { display:none; font-size:12px; color:#ff6b6b; background:rgba(255,107,107,.1); border:1.5px solid rgba(255,107,107,.35); border-radius:10px; padding:8px 10px; font-family:'Noto Sans JP',sans-serif; line-height:1.5; margin-top:4px; }
+  .cp-shortage-warning.visible { display:block; }
   /* ===== v53: 豆知識構造表示 ===== */
   #trivia-structured { display:none; }
   .trivia-struct-item { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.07); }
@@ -1996,6 +1998,8 @@
       </div>
       <!-- プール状況 -->
       <div class="cp-status" id="pref-custom-pool-status"></div>
+      <!-- 語数不足の注意書き -->
+      <div class="cp-shortage-warning" id="pref-custom-pool-shortage"></div>
       <!-- プール初期化ボタン -->
       <button onclick="reinitCustomPool()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(6,214,160,.4);background:transparent;color:#06d6a0;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">プールをリセット・再構築</button>
     </div>
@@ -8973,8 +8977,10 @@ function checkTodayAnswer() {
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
     const ws = getWordStatus(word['単語']);
     ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
-    if (ws.streak >= 3) ws.hall = true;
+    const justEnteredHall = !ws.hall && ws.streak >= 3;
+    if (justEnteredHall) ws.hall = true;
     setWordStatus(word['単語'], ws);
+    if (justEnteredHall) checkAndReplenishPool();
   } else {
     todayTestWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
@@ -9390,6 +9396,22 @@ function reinitCustomPool() {
   const pool = getCustomPool();
   const el = document.getElementById('pref-custom-pool-status');
   if (el) el.textContent = `プールを再構築しました（${pool.length}語）`;
+  updateCustomPoolShortageWarning();
+}
+
+// ② 選択範囲内の単語が不足していてpoolSizeを維持できない場合の注意書き
+function updateCustomPoolShortageWarning() {
+  const el = document.getElementById('pref-custom-pool-shortage');
+  if (!el) return;
+  const settings = getCustomPoolSettings();
+  const pool = getCustomPool();
+  if (pool.length > 0 && pool.length < (settings.poolSize || 0)) {
+    el.textContent = '⚠️ 選択している範囲内の単語が不足しています。出題ソースの範囲を広げてください。';
+    el.classList.add('visible');
+  } else {
+    el.textContent = '';
+    el.classList.remove('visible');
+  }
 }
 
 function buildCustomPoolDeck() {
@@ -9414,14 +9436,22 @@ function checkAndReplenishPool() {
   const hallPool = pool.filter(w => isHallWord(w));
   if (hallPool.length < threshold) return;
 
+  // 前回チェック以降にしきい値を超えて殿堂入りが溜まっていた場合も、
+  // バッチ単位（しきい値の倍数）で処理することでpoolSizeを正しく維持する。
+  // しきい値未満の余り分は殿堂入りしたまま次回のチェックに持ち越す。
+  const batches = Math.floor(hallPool.length / threshold);
+  const removeCount = batches * threshold;
+  const hallToRemove = new Set(hallPool.slice(0, removeCount));
+  let newPool = pool.filter(w => !hallToRemove.has(w));
+
   const queues = getCustomPoolQueues();
   const allBySource = getAllWordsBySource();
   const gradSet = new Set(getHallWordsFromData().map(w => w['単語']));
-  let newPool = pool.filter(w => !isHallWord(w));
   const toAdd = [];
+  let shortfall = 0;
 
   for (const src of CP_SOURCES.map(s => s.key)) {
-    const cnt = settings.replenishDist[src] || 0;
+    const cnt = (settings.replenishDist[src] || 0) * batches;
     if (!cnt) continue;
     const q = queues[src] || [];
     const alreadyIn = new Set([...newPool, ...toAdd]);
@@ -9429,18 +9459,29 @@ function checkAndReplenishPool() {
     if (available.length < cnt) {
       const all = (allBySource[src] || []).filter(w => !gradSet.has(w) && !alreadyIn.has(w) && !q.includes(w));
       available = [...available, ...all.sort(() => Math.random() - 0.5)];
-      queues[src] = available.slice(cnt);
-    } else {
-      queues[src] = available.slice(cnt);
     }
-    toAdd.push(...available.slice(0, cnt));
+    queues[src] = available.slice(cnt);
+    const picked = available.slice(0, cnt);
+    toAdd.push(...picked);
+    if (picked.length < cnt) shortfall += (cnt - picked.length);
+  }
+
+  // ① 新規（未挑戦）単語が不足する分は、苦手単語（間違えたことがあり、まだ殿堂入りしていない単語）で補充
+  if (shortfall > 0) {
+    const alreadyIn = new Set([...newPool, ...toAdd]);
+    const weakCandidates = [...new Set(Object.values(allBySource).flat())]
+      .filter(w => !gradSet.has(w) && !alreadyIn.has(w))
+      .filter(w => (getWordStatus(w).mistakeCount || 0) > 0)
+      .sort(() => Math.random() - 0.5);
+    toAdd.push(...weakCandidates.slice(0, shortfall));
   }
 
   newPool = [...new Set([...newPool, ...toAdd])].slice(0, settings.poolSize);
   saveCustomPool(newPool);
   saveCustomPoolQueues(queues);
+  updateCustomPoolShortageWarning();
   if (toAdd.length > 0) {
-    alert(`殿堂入り ${hallPool.length}語達成！\n新しい ${toAdd.length}語 がプールに追加されました。\n現在のプール：${newPool.length}語`);
+    alert(`殿堂入り ${removeCount}語達成！\n新しい ${toAdd.length}語 がプールに追加されました。\n現在のプール：${newPool.length}語`);
   }
 }
 
@@ -9467,6 +9508,7 @@ function loadCustomPoolPrefUI() {
       statusEl.textContent = '（プール未構築 — 保存後「プールをリセット・再構築」で初期化してください）';
     }
   }
+  updateCustomPoolShortageWarning();
 }
 
 function renderCustomPoolSourceRows(containerId, distObj, mode) {
