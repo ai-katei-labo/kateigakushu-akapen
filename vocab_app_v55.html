@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WordSuck v51</title>
+<title>WordSuck v54</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Serif+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800;900&display=swap');
   :root {
@@ -133,6 +133,7 @@
   .action-btn:active { transform:scale(.96); }
   .btn-skip { background:var(--card); color:var(--text-muted); border:2px solid var(--surface); }
   .btn-next { background:linear-gradient(135deg,var(--accent3),#00b894); color:var(--bg); box-shadow:0 6px 20px rgba(6,214,160,.3); }
+  .btn-retry-again { background:linear-gradient(135deg,#a29bfe,#6c5ce7); color:#fff; box-shadow:0 6px 20px rgba(108,92,231,.3); }
   .btn-reveal { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); box-shadow:0 6px 20px rgba(255,209,102,.3); }
 
   @media (min-width: 768px) {
@@ -153,7 +154,7 @@
   #result-screen { align-items:center; justify-content:center; gap:28px; padding:40px 24px; }
   .result-emoji { font-size:72px; animation:bounce .6s ease; }
   @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
-  .result-title { font-size:28px; font-weight:900; text-align:center; }
+  .result-title { font-size:28px; font-weight:900; text-align:center; white-space:pre-line; }
   .result-score-card { background:var(--card); border-radius:var(--radius); padding:28px 32px; text-align:center; width:100%; max-width:320px; }
   .score-big { font-size:64px; font-weight:900; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
   .score-label { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
@@ -331,6 +332,12 @@
   .rec-reset-btn { width:100%; padding:14px; border-radius:var(--radius); border:2px solid rgba(255,107,107,.4); background:transparent; color:var(--accent); font-size:15px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
   .rec-reset-btn:active { background:rgba(255,107,107,.1); }
   .rec-empty { text-align:center; color:var(--text-muted); font-size:13px; font-family:'Noto Sans JP',sans-serif; padding:8px; }
+  /* v52: データ管理ボタン */
+  .rec-mgmt-btn { flex:1; padding:12px 8px; border-radius:var(--radius); border:2px solid; background:transparent; font-size:13px; font-weight:800; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
+  .rec-mgmt-btn.export { border-color:rgba(96,165,250,.4); color:#60a5fa; }
+  .rec-mgmt-btn.export:active { background:rgba(96,165,250,.1); }
+  .rec-mgmt-btn.import { border-color:rgba(6,214,160,.4); color:var(--accent3); }
+  .rec-mgmt-btn.import:active { background:rgba(6,214,160,.1); }
 
   /* ===== 小学生英語 2段階カテゴリ ===== */
   .sg-group { display:flex; flex-direction:column; gap:0; }
@@ -378,8 +385,30 @@
   .entype-submit-btn:active { transform:scale(.97); }
 
   /* ===== ステップモード表示 ===== */
-  .step-banner { display:none; background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05)); border:1.5px solid rgba(212,175,55,.4); border-radius:12px; padding:10px 14px; font-size:13px; font-weight:700; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; text-align:center; }
-  .step-banner.visible { display:block; }
+  .step-banner { display:none; background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05)); border:1.5px solid rgba(212,175,55,.4); border-radius:12px; padding:8px 14px; font-size:13px; font-weight:700; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; }
+  .step-banner.visible { display:flex; align-items:center; gap:8px; }
+  .step-banner-text { flex:1; text-align:center; }
+  .step-pause-btn { font-size:11px; font-weight:700; color:var(--accent2); background:rgba(255,209,102,.15); border:1.5px solid rgba(255,209,102,.4); border-radius:8px; padding:3px 10px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; white-space:nowrap; flex-shrink:0; }
+  /* ===== v53: ステップ一時停止バナー ===== */
+  .step-pause-banner { display:none; background:linear-gradient(135deg,rgba(255,107,107,.12),rgba(255,107,107,.06)); border:1.5px solid rgba(255,107,107,.4); border-radius:12px; padding:10px 14px; font-size:13px; font-family:'Noto Sans JP',sans-serif; text-align:center; margin-bottom:8px; }
+  .step-pause-banner.visible { display:block; }
+  /* ===== v53: カスタムプール設定 ===== */
+  .cp-source-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .cp-source-label { flex:1; font-size:12px; font-family:'Noto Sans JP',sans-serif; color:var(--text); }
+  .cp-source-sub { font-size:10px; color:var(--text-muted); }
+  .cp-source-input { width:56px; padding:5px 6px; border-radius:8px; border:1.5px solid rgba(255,255,255,.2); background:var(--surface); color:var(--text); font-size:14px; text-align:center; font-family:'Nunito',sans-serif; }
+  .cp-validation { font-size:11px; color:var(--accent); padding:4px 0; font-family:'Noto Sans JP',sans-serif; min-height:16px; }
+  .cp-status { font-size:12px; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; padding:6px 0; }
+  .cp-shortage-warning { display:none; font-size:12px; color:#ff6b6b; background:rgba(255,107,107,.1); border:1.5px solid rgba(255,107,107,.35); border-radius:10px; padding:8px 10px; font-family:'Noto Sans JP',sans-serif; line-height:1.5; margin-top:4px; }
+  .cp-shortage-warning.visible { display:block; }
+  /* ===== v53: 豆知識構造表示 ===== */
+  #trivia-structured { display:none; }
+  .trivia-struct-item { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+  .trivia-struct-item:last-child { border-bottom:none; }
+  .trivia-struct-word { font-size:14px; font-weight:700; color:var(--accent2); min-width:90px; }
+  .trivia-struct-meaning { font-size:12px; color:var(--text); font-family:'Noto Sans JP',sans-serif; flex:1; line-height:1.5; }
+  .trivia-struct-nuance { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .trivia-speak-btn { font-size:15px; background:none; border:none; cursor:pointer; padding:0 2px; color:var(--accent2); flex-shrink:0; line-height:1; }
 
   /* ===== 習熟度マップ ===== */
   .mastery-map-wrap { position:relative; width:100%; padding-top:56.25%; background:var(--surface); border-radius:14px; overflow:hidden; }
@@ -448,6 +477,11 @@
     <div id="home-user-bar" style="font-size:12px;color:var(--gold);font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openUserSelectFromHome()">▶ 切り替え</div>
     <button onclick="showScreen('user-pref-screen');loadPrefScreen();" style="font-size:11px;font-weight:700;color:var(--text-muted);background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:3px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">⚙ 設定</button>
   </div>
+  </div>
+  <!-- v53: ステップモード一時停止中バナー -->
+  <div id="home-step-pause-banner" class="step-pause-banner">
+    <span>⏸ ステップモード一時停止中</span>
+    <button onclick="resumeStepMode()" style="margin-left:10px;font-size:12px;font-weight:700;color:#06d6a0;background:rgba(6,214,160,.12);border:1.5px solid rgba(6,214,160,.4);border-radius:8px;padding:3px 12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">▶ 再開</button>
   </div>
   <div class="mode-cards">
     <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
@@ -580,18 +614,37 @@
         <div class="source-name">ミニラボ（教科書）</div>
         <div class="source-count">166語</div>
       </div>
-      <div class="unit-grid" id="unit-grid">
-        <button class="unit-btn unit-all-btn" onclick="selectAllUnits()">全選択</button>
-        <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)">Unit1</button>
-        <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)">Unit2</button>
-        <button class="unit-btn active" data-unit="Unit3" onclick="toggleUnit(this)">Unit3</button>
-        <button class="unit-btn active" data-unit="Unit4" onclick="toggleUnit(this)">Unit4</button>
-        <button class="unit-btn active" data-unit="Unit5" onclick="toggleUnit(this)">Unit5</button>
-        <button class="unit-btn active" data-unit="Unit6" onclick="toggleUnit(this)">Unit6</button>
-        <button class="unit-btn active" data-unit="Unit7" onclick="toggleUnit(this)">Unit7</button>
-        <button class="unit-btn active" data-unit="Unit8" onclick="toggleUnit(this)">Unit8</button>
-        <button class="unit-btn active" data-unit="Unit9" onclick="toggleUnit(this)">Unit9</button>
-        <button class="unit-btn active" data-unit="Unit10" onclick="toggleUnit(this)">Unit10</button>
+      <div id="unit-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
+        <div style="display:flex;gap:6px;margin-bottom:2px;">
+          <button class="unit-btn unit-all-btn" onclick="selectAllUnits(true)">全選択</button>
+          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="ml-g1" onclick="toggleSrcMidAll(this)">Unit1〜5</button>
+            <button class="sg-expand-btn" id="src-exp-ml-g1" onclick="toggleSrcExpand('ml-g1')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-ml-g1">
+            <button class="unit-btn active" data-unit="Unit1" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit1</button>
+            <button class="unit-btn active" data-unit="Unit2" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit2</button>
+            <button class="unit-btn active" data-unit="Unit3" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit3</button>
+            <button class="unit-btn active" data-unit="Unit4" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit4</button>
+            <button class="unit-btn active" data-unit="Unit5" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit5</button>
+          </div>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="ml-g2" onclick="toggleSrcMidAll(this)">Unit6〜10</button>
+            <button class="sg-expand-btn" id="src-exp-ml-g2" onclick="toggleSrcExpand('ml-g2')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-ml-g2">
+            <button class="unit-btn active" data-unit="Unit6" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit6</button>
+            <button class="unit-btn active" data-unit="Unit7" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit7</button>
+            <button class="unit-btn active" data-unit="Unit8" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit8</button>
+            <button class="unit-btn active" data-unit="Unit9" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit9</button>
+            <button class="unit-btn active" data-unit="Unit10" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit10</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -604,13 +657,32 @@
         <div class="source-name">英検5級</div>
         <div class="source-count">107語</div>
       </div>
-      <div class="unit-grid" id="eiken-grid">
-        <button class="unit-btn unit-all-btn" onclick="selectAllEiken()">全選択</button>
-        <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)">1〜25</button>
-        <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)">26〜50</button>
-        <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)">51〜75</button>
-        <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)">76〜100</button>
-        <button class="unit-btn active" data-eiken="101-107" onclick="toggleEiken(this)">101〜107</button>
+      <div id="eiken-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
+        <div style="display:flex;gap:6px;margin-bottom:2px;">
+          <button class="unit-btn unit-all-btn" onclick="selectAllEiken(true)">全選択</button>
+          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="ek-g1" onclick="toggleSrcMidAll(this)">1〜50</button>
+            <button class="sg-expand-btn" id="src-exp-ek-g1" onclick="toggleSrcExpand('ek-g1')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-ek-g1">
+            <button class="unit-btn active" data-eiken="1-25" data-src-parent="ek-g1" onclick="toggleEiken(this)">1〜25</button>
+            <button class="unit-btn active" data-eiken="26-50" data-src-parent="ek-g1" onclick="toggleEiken(this)">26〜50</button>
+          </div>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="ek-g2" onclick="toggleSrcMidAll(this)">51〜107</button>
+            <button class="sg-expand-btn" id="src-exp-ek-g2" onclick="toggleSrcExpand('ek-g2')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-ek-g2">
+            <button class="unit-btn active" data-eiken="51-75" data-src-parent="ek-g2" onclick="toggleEiken(this)">51〜75</button>
+            <button class="unit-btn active" data-eiken="76-100" data-src-parent="ek-g2" onclick="toggleEiken(this)">76〜100</button>
+            <button class="unit-btn active" data-eiken="101-107" data-src-parent="ek-g2" onclick="toggleEiken(this)">101〜107</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -623,30 +695,65 @@
         <div class="source-name">まぶたん（中1）</div>
         <div class="source-count">343語</div>
       </div>
-      <div class="unit-grid" id="mabutan-grid">
-        <button class="unit-btn unit-all-btn" onclick="selectAllMabutan()">全選択</button>
-        <button class="unit-btn active" data-mabutan="1-16" onclick="toggleMabutan(this)">1〜16</button>
-        <button class="unit-btn active" data-mabutan="17-32" onclick="toggleMabutan(this)">17〜32</button>
-        <button class="unit-btn active" data-mabutan="33-48" onclick="toggleMabutan(this)">33〜48</button>
-        <button class="unit-btn active" data-mabutan="49-64" onclick="toggleMabutan(this)">49〜64</button>
-        <button class="unit-btn active" data-mabutan="65-80" onclick="toggleMabutan(this)">65〜80</button>
-        <button class="unit-btn active" data-mabutan="81-96" onclick="toggleMabutan(this)">81〜96</button>
-        <button class="unit-btn active" data-mabutan="97-112" onclick="toggleMabutan(this)">97〜112</button>
-        <button class="unit-btn active" data-mabutan="113-128" onclick="toggleMabutan(this)">113〜128</button>
-        <button class="unit-btn active" data-mabutan="129-144" onclick="toggleMabutan(this)">129〜144</button>
-        <button class="unit-btn active" data-mabutan="145-160" onclick="toggleMabutan(this)">145〜160</button>
-        <button class="unit-btn active" data-mabutan="161-176" onclick="toggleMabutan(this)">161〜176</button>
-        <button class="unit-btn active" data-mabutan="177-192" onclick="toggleMabutan(this)">177〜192</button>
-        <button class="unit-btn active" data-mabutan="193-208" onclick="toggleMabutan(this)">193〜208</button>
-        <button class="unit-btn active" data-mabutan="209-224" onclick="toggleMabutan(this)">209〜224</button>
-        <button class="unit-btn active" data-mabutan="225-240" onclick="toggleMabutan(this)">225〜240</button>
-        <button class="unit-btn active" data-mabutan="241-256" onclick="toggleMabutan(this)">241〜256</button>
-        <button class="unit-btn active" data-mabutan="257-272" onclick="toggleMabutan(this)">257〜272</button>
-        <button class="unit-btn active" data-mabutan="273-288" onclick="toggleMabutan(this)">273〜288</button>
-        <button class="unit-btn active" data-mabutan="289-304" onclick="toggleMabutan(this)">289〜304</button>
-        <button class="unit-btn active" data-mabutan="305-320" onclick="toggleMabutan(this)">305〜320</button>
-        <button class="unit-btn active" data-mabutan="321-336" onclick="toggleMabutan(this)">321〜336</button>
-        <button class="unit-btn active" data-mabutan="337-343" onclick="toggleMabutan(this)">337〜343</button>
+      <div id="mabutan-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
+        <div style="display:flex;gap:6px;margin-bottom:2px;">
+          <button class="unit-btn unit-all-btn" onclick="selectAllMabutan(true)">全選択</button>
+          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllMabutan(false)">全解除</button>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="mb-g1" onclick="toggleSrcMidAll(this)">1〜80</button>
+            <button class="sg-expand-btn" id="src-exp-mb-g1" onclick="toggleSrcExpand('mb-g1')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-mb-g1">
+            <button class="unit-btn active" data-mabutan="1-16" data-src-parent="mb-g1" onclick="toggleMabutan(this)">1〜16</button>
+            <button class="unit-btn active" data-mabutan="17-32" data-src-parent="mb-g1" onclick="toggleMabutan(this)">17〜32</button>
+            <button class="unit-btn active" data-mabutan="33-48" data-src-parent="mb-g1" onclick="toggleMabutan(this)">33〜48</button>
+            <button class="unit-btn active" data-mabutan="49-64" data-src-parent="mb-g1" onclick="toggleMabutan(this)">49〜64</button>
+            <button class="unit-btn active" data-mabutan="65-80" data-src-parent="mb-g1" onclick="toggleMabutan(this)">65〜80</button>
+          </div>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="mb-g2" onclick="toggleSrcMidAll(this)">81〜160</button>
+            <button class="sg-expand-btn" id="src-exp-mb-g2" onclick="toggleSrcExpand('mb-g2')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-mb-g2">
+            <button class="unit-btn active" data-mabutan="81-96" data-src-parent="mb-g2" onclick="toggleMabutan(this)">81〜96</button>
+            <button class="unit-btn active" data-mabutan="97-112" data-src-parent="mb-g2" onclick="toggleMabutan(this)">97〜112</button>
+            <button class="unit-btn active" data-mabutan="113-128" data-src-parent="mb-g2" onclick="toggleMabutan(this)">113〜128</button>
+            <button class="unit-btn active" data-mabutan="129-144" data-src-parent="mb-g2" onclick="toggleMabutan(this)">129〜144</button>
+            <button class="unit-btn active" data-mabutan="145-160" data-src-parent="mb-g2" onclick="toggleMabutan(this)">145〜160</button>
+          </div>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="mb-g3" onclick="toggleSrcMidAll(this)">161〜240</button>
+            <button class="sg-expand-btn" id="src-exp-mb-g3" onclick="toggleSrcExpand('mb-g3')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-mb-g3">
+            <button class="unit-btn active" data-mabutan="161-176" data-src-parent="mb-g3" onclick="toggleMabutan(this)">161〜176</button>
+            <button class="unit-btn active" data-mabutan="177-192" data-src-parent="mb-g3" onclick="toggleMabutan(this)">177〜192</button>
+            <button class="unit-btn active" data-mabutan="193-208" data-src-parent="mb-g3" onclick="toggleMabutan(this)">193〜208</button>
+            <button class="unit-btn active" data-mabutan="209-224" data-src-parent="mb-g3" onclick="toggleMabutan(this)">209〜224</button>
+            <button class="unit-btn active" data-mabutan="225-240" data-src-parent="mb-g3" onclick="toggleMabutan(this)">225〜240</button>
+          </div>
+        </div>
+        <div class="sg-group">
+          <div class="sg-mid-header">
+            <button class="sg-mid-btn active" data-src-mid="mb-g4" onclick="toggleSrcMidAll(this)">241〜343</button>
+            <button class="sg-expand-btn" id="src-exp-mb-g4" onclick="toggleSrcExpand('mb-g4')">▾</button>
+          </div>
+          <div class="sg-sub-area" id="src-subs-mb-g4">
+            <button class="unit-btn active" data-mabutan="241-256" data-src-parent="mb-g4" onclick="toggleMabutan(this)">241〜256</button>
+            <button class="unit-btn active" data-mabutan="257-272" data-src-parent="mb-g4" onclick="toggleMabutan(this)">257〜272</button>
+            <button class="unit-btn active" data-mabutan="273-288" data-src-parent="mb-g4" onclick="toggleMabutan(this)">273〜288</button>
+            <button class="unit-btn active" data-mabutan="289-304" data-src-parent="mb-g4" onclick="toggleMabutan(this)">289〜304</button>
+            <button class="unit-btn active" data-mabutan="305-320" data-src-parent="mb-g4" onclick="toggleMabutan(this)">305〜320</button>
+            <button class="unit-btn active" data-mabutan="321-336" data-src-parent="mb-g4" onclick="toggleMabutan(this)">321〜336</button>
+            <button class="unit-btn active" data-mabutan="337-343" data-src-parent="mb-g4" onclick="toggleMabutan(this)">337〜343</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -660,110 +767,113 @@
         <div class="source-count">332語</div>
       </div>
       <div id="shogakusei-grid" style="display:none;flex-direction:column;gap:6px;">
-        <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn" onclick="selectAllShogakusei()">全選択</button></div>
+        <div style="margin-bottom:2px;display:flex;gap:6px;">
+          <button class="unit-btn unit-all-btn" onclick="selectAllShogakusei(true)">全選択</button>
+          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllShogakusei(false)">全解除</button>
+        </div>
         <!-- 数・時間 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)">数・時間</button>
+            <button class="sg-mid-btn" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)">数・時間</button>
             <button class="sg-expand-btn" id="sg-exp-数・時間" onclick="toggleSgExpand('数・時間')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-数・時間">
-            <button class="sg-sub-btn active" data-sg-sub="数字" data-sg-parent="数・時間" onclick="toggleSgSub(this)">数字</button>
-            <button class="sg-sub-btn active" data-sg-sub="曜日" data-sg-parent="数・時間" onclick="toggleSgSub(this)">曜日</button>
-            <button class="sg-sub-btn active" data-sg-sub="月" data-sg-parent="数・時間" onclick="toggleSgSub(this)">月</button>
-            <button class="sg-sub-btn active" data-sg-sub="季節" data-sg-parent="数・時間" onclick="toggleSgSub(this)">季節</button>
-            <button class="sg-sub-btn active" data-sg-sub="時刻" data-sg-parent="数・時間" onclick="toggleSgSub(this)">時刻</button>
+            <button class="sg-sub-btn" data-sg-sub="数字" data-sg-parent="数・時間" onclick="toggleSgSub(this)">数字</button>
+            <button class="sg-sub-btn" data-sg-sub="曜日" data-sg-parent="数・時間" onclick="toggleSgSub(this)">曜日</button>
+            <button class="sg-sub-btn" data-sg-sub="月" data-sg-parent="数・時間" onclick="toggleSgSub(this)">月</button>
+            <button class="sg-sub-btn" data-sg-sub="季節" data-sg-parent="数・時間" onclick="toggleSgSub(this)">季節</button>
+            <button class="sg-sub-btn" data-sg-sub="時刻" data-sg-parent="数・時間" onclick="toggleSgSub(this)">時刻</button>
           </div>
         </div>
         <!-- 食べ物 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)">食べ物</button>
+            <button class="sg-mid-btn" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)">食べ物</button>
             <button class="sg-expand-btn" id="sg-exp-食べ物" onclick="toggleSgExpand('食べ物')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-食べ物">
-            <button class="sg-sub-btn active" data-sg-sub="果物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">果物</button>
-            <button class="sg-sub-btn active" data-sg-sub="野菜" data-sg-parent="食べ物" onclick="toggleSgSub(this)">野菜</button>
-            <button class="sg-sub-btn active" data-sg-sub="食べ物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">食べ物</button>
-            <button class="sg-sub-btn active" data-sg-sub="飲み物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">飲み物</button>
+            <button class="sg-sub-btn" data-sg-sub="果物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">果物</button>
+            <button class="sg-sub-btn" data-sg-sub="野菜" data-sg-parent="食べ物" onclick="toggleSgSub(this)">野菜</button>
+            <button class="sg-sub-btn" data-sg-sub="食べ物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">食べ物</button>
+            <button class="sg-sub-btn" data-sg-sub="飲み物" data-sg-parent="食べ物" onclick="toggleSgSub(this)">飲み物</button>
           </div>
         </div>
         <!-- 生き物 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="生き物" onclick="toggleSgMidAll(this)">生き物</button>
+            <button class="sg-mid-btn" data-sg-mid="生き物" onclick="toggleSgMidAll(this)">生き物</button>
             <button class="sg-expand-btn" id="sg-exp-生き物" onclick="toggleSgExpand('生き物')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-生き物">
-            <button class="sg-sub-btn active" data-sg-sub="動物" data-sg-parent="生き物" onclick="toggleSgSub(this)">動物</button>
-            <button class="sg-sub-btn active" data-sg-sub="昆虫" data-sg-parent="生き物" onclick="toggleSgSub(this)">昆虫</button>
-            <button class="sg-sub-btn active" data-sg-sub="魚・海の生き物" data-sg-parent="生き物" onclick="toggleSgSub(this)">魚</button>
-            <button class="sg-sub-btn active" data-sg-sub="植物" data-sg-parent="生き物" onclick="toggleSgSub(this)">植物</button>
+            <button class="sg-sub-btn" data-sg-sub="動物" data-sg-parent="生き物" onclick="toggleSgSub(this)">動物</button>
+            <button class="sg-sub-btn" data-sg-sub="昆虫" data-sg-parent="生き物" onclick="toggleSgSub(this)">昆虫</button>
+            <button class="sg-sub-btn" data-sg-sub="魚・海の生き物" data-sg-parent="生き物" onclick="toggleSgSub(this)">魚</button>
+            <button class="sg-sub-btn" data-sg-sub="植物" data-sg-parent="生き物" onclick="toggleSgSub(this)">植物</button>
           </div>
         </div>
         <!-- 人・体 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="人・体" onclick="toggleSgMidAll(this)">人・体</button>
+            <button class="sg-mid-btn" data-sg-mid="人・体" onclick="toggleSgMidAll(this)">人・体</button>
             <button class="sg-expand-btn" id="sg-exp-人・体" onclick="toggleSgExpand('人・体')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-人・体">
-            <button class="sg-sub-btn active" data-sg-sub="家族" data-sg-parent="人・体" onclick="toggleSgSub(this)">家族</button>
-            <button class="sg-sub-btn active" data-sg-sub="体" data-sg-parent="人・体" onclick="toggleSgSub(this)">体</button>
-            <button class="sg-sub-btn active" data-sg-sub="気持ち" data-sg-parent="人・体" onclick="toggleSgSub(this)">気持ち</button>
-            <button class="sg-sub-btn active" data-sg-sub="職業" data-sg-parent="人・体" onclick="toggleSgSub(this)">職業</button>
+            <button class="sg-sub-btn" data-sg-sub="家族" data-sg-parent="人・体" onclick="toggleSgSub(this)">家族</button>
+            <button class="sg-sub-btn" data-sg-sub="体" data-sg-parent="人・体" onclick="toggleSgSub(this)">体</button>
+            <button class="sg-sub-btn" data-sg-sub="気持ち" data-sg-parent="人・体" onclick="toggleSgSub(this)">気持ち</button>
+            <button class="sg-sub-btn" data-sg-sub="職業" data-sg-parent="人・体" onclick="toggleSgSub(this)">職業</button>
           </div>
         </div>
         <!-- 学校・町 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)">学校・町</button>
+            <button class="sg-mid-btn" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)">学校・町</button>
             <button class="sg-expand-btn" id="sg-exp-学校・町" onclick="toggleSgExpand('学校・町')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-学校・町">
-            <button class="sg-sub-btn active" data-sg-sub="学校" data-sg-parent="学校・町" onclick="toggleSgSub(this)">学校</button>
-            <button class="sg-sub-btn active" data-sg-sub="文房具" data-sg-parent="学校・町" onclick="toggleSgSub(this)">文房具</button>
-            <button class="sg-sub-btn active" data-sg-sub="町" data-sg-parent="学校・町" onclick="toggleSgSub(this)">町</button>
-            <button class="sg-sub-btn active" data-sg-sub="建物" data-sg-parent="学校・町" onclick="toggleSgSub(this)">建物</button>
-            <button class="sg-sub-btn active" data-sg-sub="乗り物" data-sg-parent="学校・町" onclick="toggleSgSub(this)">乗り物</button>
+            <button class="sg-sub-btn" data-sg-sub="学校" data-sg-parent="学校・町" onclick="toggleSgSub(this)">学校</button>
+            <button class="sg-sub-btn" data-sg-sub="文房具" data-sg-parent="学校・町" onclick="toggleSgSub(this)">文房具</button>
+            <button class="sg-sub-btn" data-sg-sub="町" data-sg-parent="学校・町" onclick="toggleSgSub(this)">町</button>
+            <button class="sg-sub-btn" data-sg-sub="建物" data-sg-parent="学校・町" onclick="toggleSgSub(this)">建物</button>
+            <button class="sg-sub-btn" data-sg-sub="乗り物" data-sg-parent="学校・町" onclick="toggleSgSub(this)">乗り物</button>
           </div>
         </div>
         <!-- 生活 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="生活" onclick="toggleSgMidAll(this)">生活</button>
+            <button class="sg-mid-btn" data-sg-mid="生活" onclick="toggleSgMidAll(this)">生活</button>
             <button class="sg-expand-btn" id="sg-exp-生活" onclick="toggleSgExpand('生活')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-生活">
-            <button class="sg-sub-btn active" data-sg-sub="服" data-sg-parent="生活" onclick="toggleSgSub(this)">服</button>
-            <button class="sg-sub-btn active" data-sg-sub="持ち物" data-sg-parent="生活" onclick="toggleSgSub(this)">持ち物</button>
-            <button class="sg-sub-btn active" data-sg-sub="スポーツ" data-sg-parent="生活" onclick="toggleSgSub(this)">スポーツ</button>
-            <button class="sg-sub-btn active" data-sg-sub="遊び" data-sg-parent="生活" onclick="toggleSgSub(this)">遊び</button>
-            <button class="sg-sub-btn active" data-sg-sub="行事" data-sg-parent="生活" onclick="toggleSgSub(this)">行事</button>
+            <button class="sg-sub-btn" data-sg-sub="服" data-sg-parent="生活" onclick="toggleSgSub(this)">服</button>
+            <button class="sg-sub-btn" data-sg-sub="持ち物" data-sg-parent="生活" onclick="toggleSgSub(this)">持ち物</button>
+            <button class="sg-sub-btn" data-sg-sub="スポーツ" data-sg-parent="生活" onclick="toggleSgSub(this)">スポーツ</button>
+            <button class="sg-sub-btn" data-sg-sub="遊び" data-sg-parent="生活" onclick="toggleSgSub(this)">遊び</button>
+            <button class="sg-sub-btn" data-sg-sub="行事" data-sg-parent="生活" onclick="toggleSgSub(this)">行事</button>
           </div>
         </div>
         <!-- 自然 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="自然" onclick="toggleSgMidAll(this)">自然</button>
+            <button class="sg-mid-btn" data-sg-mid="自然" onclick="toggleSgMidAll(this)">自然</button>
             <button class="sg-expand-btn" id="sg-exp-自然" onclick="toggleSgExpand('自然')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-自然">
-            <button class="sg-sub-btn active" data-sg-sub="天気" data-sg-parent="自然" onclick="toggleSgSub(this)">天気</button>
-            <button class="sg-sub-btn active" data-sg-sub="自然" data-sg-parent="自然" onclick="toggleSgSub(this)">自然</button>
-            <button class="sg-sub-btn active" data-sg-sub="国" data-sg-parent="自然" onclick="toggleSgSub(this)">国</button>
-            <button class="sg-sub-btn active" data-sg-sub="言語" data-sg-parent="自然" onclick="toggleSgSub(this)">言語</button>
+            <button class="sg-sub-btn" data-sg-sub="天気" data-sg-parent="自然" onclick="toggleSgSub(this)">天気</button>
+            <button class="sg-sub-btn" data-sg-sub="自然" data-sg-parent="自然" onclick="toggleSgSub(this)">自然</button>
+            <button class="sg-sub-btn" data-sg-sub="国" data-sg-parent="自然" onclick="toggleSgSub(this)">国</button>
+            <button class="sg-sub-btn" data-sg-sub="言語" data-sg-parent="自然" onclick="toggleSgSub(this)">言語</button>
           </div>
         </div>
         <!-- 色・形 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-sg-mid="色・形" onclick="toggleSgMidAll(this)">色・形</button>
+            <button class="sg-mid-btn" data-sg-mid="色・形" onclick="toggleSgMidAll(this)">色・形</button>
             <button class="sg-expand-btn" id="sg-exp-色・形" onclick="toggleSgExpand('色・形')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-色・形">
-            <button class="sg-sub-btn active" data-sg-sub="色" data-sg-parent="色・形" onclick="toggleSgSub(this)">色</button>
-            <button class="sg-sub-btn active" data-sg-sub="形" data-sg-parent="色・形" onclick="toggleSgSub(this)">形</button>
+            <button class="sg-sub-btn" data-sg-sub="色" data-sg-parent="色・形" onclick="toggleSgSub(this)">色</button>
+            <button class="sg-sub-btn" data-sg-sub="形" data-sg-parent="色・形" onclick="toggleSgSub(this)">形</button>
           </div>
         </div>
       </div>
@@ -797,7 +907,7 @@
 
 <!-- FLASH SCREEN -->
 <div id="flash-screen" class="screen">
-  <div id="step-banner" class="step-banner"></div>
+  <div id="step-banner" class="step-banner"><span class="step-banner-text"></span><button class="step-pause-btn" onclick="pauseStepMode()" id="flash-pause-btn" style="display:none;">⏸ 一時停止</button></div>
   <div class="flash-header">
     <button class="back-btn" onclick="endSessionPrompt()">‹</button>
     <button class="back-btn" id="prev-btn" onclick="backCard()" style="display:none;font-size:14px;" title="前の問題へ">◀</button>
@@ -847,6 +957,7 @@
       <div class="trivia-card">
         <div class="trivia-type-badge" id="trivia-type-badge">語源</div>
         <div class="trivia-text" id="trivia-text"></div>
+        <div id="trivia-structured"></div>
         <div class="trivia-rating-row">
           <span class="trivia-rate-label">この豆知識：</span>
           <button class="trivia-rating-btn" id="trivia-like-btn" onclick="rateTriviaGood()">👍</button>
@@ -874,6 +985,7 @@
   </div>
   <div class="action-row">
     <button class="action-btn btn-skip" onclick="skipCard()">スキップ</button>
+    <button class="action-btn btn-retry-again" id="retry-again-btn" onclick="retryCurrentCard()" style="display:none;">もう一度</button>
     <button class="action-btn btn-next" id="next-btn" onclick="nextCard()" style="display:none;">次へ →</button>
     <button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button>
   </div>
@@ -1002,7 +1114,7 @@
     </div>
     <div class="progress-text" id="learn-progress-text">0/0</div>
   </div>
-  <div id="learn-step-banner" class="step-banner"></div>
+  <div id="learn-step-banner" class="step-banner"><span class="step-banner-text"></span><button class="step-pause-btn" onclick="pauseStepMode()" id="learn-pause-btn" style="display:none;">⏸ 一時停止</button></div>
   <div class="card-area">
     <div class="flashcard">
       <div class="card-source-badge" id="learn-card-source"></div>
@@ -1808,11 +1920,27 @@
   <!-- ツールチップ -->
   <div id="mastery-tooltip" class="mastery-tooltip"></div>
 
-  <!-- リセット -->
+  <!-- データ管理 -->
   <div class="rec-section">
     <div class="rec-title" style="font-size:13px;color:var(--text-muted);">データ管理</div>
+    <div style="display:flex;gap:8px;">
+      <button class="rec-mgmt-btn export" onclick="exportUserData()">📤 エクスポート</button>
+      <button class="rec-mgmt-btn import" onclick="importUserData()">📥 インポート</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">エクスポート：このユーザーのデータをJSONファイルで保存<br>インポート：別端末や別ユーザーのデータをこのユーザーに読み込む</div>
+    <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="handleImportFile(event)">
     <button class="rec-reset-btn" onclick="resetAllRecords()">全記録をリセット</button>
   </div>
+</div>
+
+<!-- DAILY WORD SET HISTORY SCREEN -->
+<div id="daily-history-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('user-pref-screen')">‹</button>
+    <div class="screen-title">📅 今日の単語セット履歴</div>
+  </div>
+  <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;padding:0 2px 4px;">ステップモードで出典ごとに固定された「その日のセット」を、直近の日付から振り返れます。🆕＝その日新しく解禁／🔁＝前日から持ち越し</div>
+  <div id="daily-history-list" style="display:flex;flex-direction:column;gap:14px;"></div>
 </div>
 
 <!-- USER PREF SCREEN -->
@@ -1825,14 +1953,18 @@
   <!-- 学習モード -->
   <div class="settings-section">
     <div class="settings-label">学習モード</div>
-    <div style="display:flex;gap:8px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
       <button class="pref-mode-card active" data-pref-mode="free" onclick="selectPrefMode(this)">
         <div class="pref-mode-title">フリーモード</div>
         <div class="pref-mode-desc">試験範囲を自分で選んでスタート</div>
       </button>
       <button class="pref-mode-card" data-pref-mode="step" onclick="selectPrefMode(this)">
         <div class="pref-mode-title">ステップモード</div>
-        <div class="pref-mode-desc">指定数ずつ解放・累積で練習<br>7割クリアで次のステップへ</div>
+        <div class="pref-mode-desc">指定数ずつ解放・累積で練習。7割クリアで次のステップへ</div>
+      </button>
+      <button class="pref-mode-card" data-pref-mode="custom" onclick="selectPrefMode(this)">
+        <div class="pref-mode-title">カスタムプール</div>
+        <div class="pref-mode-desc">プール内の語を管理。殿堂入りで自動補充（上級）</div>
       </button>
     </div>
   </div>
@@ -1843,6 +1975,43 @@
     <div style="display:flex;gap:8px;">
       <button class="pref-count-btn active" data-pref-step-unlock="5" onclick="selectPrefStepUnlock(this)">5語</button>
       <button class="pref-count-btn" data-pref-step-unlock="10" onclick="selectPrefStepUnlock(this)">10語</button>
+    </div>
+  </div>
+
+  <!-- カスタムプール設定（カスタムプールモード時のみ） -->
+  <div class="settings-section" id="pref-custom-pool-section" style="display:none;">
+    <div class="settings-label">カスタムプール設定（上級）</div>
+    <div id="pref-custom-pool-settings">
+      <!-- プール合計数 -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">出題プール合計数</div>
+        <input type="number" id="pref-pool-size" min="5" max="200" value="30" oninput="validatePoolDist()" style="width:80px;padding:6px 8px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:var(--surface);color:var(--text);font-size:15px;text-align:center;font-family:'Nunito',sans-serif;">
+        <span style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-left:6px;">語</span>
+      </div>
+      <!-- 初期プール内訳 -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:6px;">初期プールの内訳（テキストごとの語数）</div>
+        <div id="pref-init-dist-rows"></div>
+        <div class="cp-validation" id="pref-init-validation"></div>
+      </div>
+      <!-- 殿堂入りしきい値 -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">殿堂入りが何語たまったら次を補充する？</div>
+        <input type="number" id="pref-unlock-threshold" min="1" max="100" value="10" oninput="validateReplenishDist()" style="width:80px;padding:6px 8px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:var(--surface);color:var(--text);font-size:15px;text-align:center;font-family:'Nunito',sans-serif;">
+        <span style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-left:6px;">語</span>
+      </div>
+      <!-- 補充内訳 -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:6px;">補充の内訳（殿堂入りしきい値の合計に合わせる）</div>
+        <div id="pref-replenish-dist-rows"></div>
+        <div class="cp-validation" id="pref-replenish-validation"></div>
+      </div>
+      <!-- プール状況 -->
+      <div class="cp-status" id="pref-custom-pool-status"></div>
+      <!-- 語数不足の注意書き -->
+      <div class="cp-shortage-warning" id="pref-custom-pool-shortage"></div>
+      <!-- プール初期化ボタン -->
+      <button onclick="reinitCustomPool()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(6,214,160,.4);background:transparent;color:#06d6a0;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">プールをリセット・再構築</button>
     </div>
   </div>
 
@@ -1903,7 +2072,8 @@
   <div class="settings-section" id="pref-step-status" style="display:none;">
     <div class="settings-label">ステップモード状況</div>
     <div id="pref-step-info" style="font-size:14px;color:var(--accent2);font-weight:700;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:8px;"></div>
-    <button onclick="resetStepProgress()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(255,107,107,.4);background:transparent;color:var(--accent);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">ステップをリセット</button>
+    <button onclick="openDailySetHistory()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(6,214,160,.4);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">📅 今日の単語セット履歴を見る</button>
+    <button onclick="resetStepProgress()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(255,107,107,.4);background:transparent;color:var(--accent);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:8px;">ステップをリセット</button>
   </div>
 
   <button class="pref-save-btn" onclick="savePrefSettings()">保存して戻る</button>
@@ -3362,31 +3532,48 @@ function updateSourceUI() {
   saveUnitSelection();
   updateSelectedCount();
 }
-function toggleUnit(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
-function toggleEiken(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
-function toggleMabutan(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
-function selectAllUnits() {
-  const btns = document.querySelectorAll('#unit-grid button[data-unit]');
-  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
-  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
-  saveUnitSelection(); updateSelectedCount();
+function toggleSrcExpand(groupId) {
+  const sub = document.getElementById('src-subs-' + groupId);
+  const btn = document.getElementById('src-exp-' + groupId);
+  if (!sub) return;
+  const open = sub.style.display === 'none' || sub.style.display === '';
+  sub.style.display = open ? 'flex' : 'none';
+  if (btn) btn.textContent = open ? '▾' : '▸';
 }
-function selectAllEiken() {
-  const btns = document.querySelectorAll('#eiken-grid button[data-eiken]');
-  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
-  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
-  saveUnitSelection(); updateSelectedCount();
-}
-function selectAllMabutan() {
-  const btns = document.querySelectorAll('#mabutan-grid button[data-mabutan]');
-  const allActive = Array.from(btns).every(b => b.classList.contains('active'));
-  btns.forEach(b => { if(allActive) b.classList.remove('active'); else b.classList.add('active'); });
-  saveUnitSelection(); updateSelectedCount();
-}
-function selectAllShogakusei() {
-  const subBtns = document.querySelectorAll('[data-sg-sub]');
+function toggleSrcMidAll(btn) {
+  const mid = btn.dataset.srcMid;
+  const subBtns = document.querySelectorAll(`[data-src-parent="${mid}"]`);
   const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
   subBtns.forEach(b => b.classList.toggle('active', !allActive));
+  btn.classList.toggle('active', !allActive);
+  saveUnitSelection(); updateSelectedCount();
+}
+function syncSrcMidBtn(mid) {
+  const midBtn = document.querySelector(`[data-src-mid="${mid}"]`);
+  if (!midBtn) return;
+  const anyActive = Array.from(document.querySelectorAll(`[data-src-parent="${mid}"].active`)).length > 0;
+  midBtn.classList.toggle('active', anyActive);
+}
+function toggleUnit(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
+function toggleEiken(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
+function toggleMabutan(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
+function selectAllUnits(select = true) {
+  document.querySelectorAll('#unit-grid [data-unit]').forEach(b => b.classList.toggle('active', select));
+  document.querySelectorAll('#unit-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
+  saveUnitSelection(); updateSelectedCount();
+}
+function selectAllEiken(select = true) {
+  document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => b.classList.toggle('active', select));
+  document.querySelectorAll('#eiken-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
+  saveUnitSelection(); updateSelectedCount();
+}
+function selectAllMabutan(select = true) {
+  document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => b.classList.toggle('active', select));
+  document.querySelectorAll('#mabutan-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
+  saveUnitSelection(); updateSelectedCount();
+}
+function selectAllShogakusei(select = true) {
+  document.querySelectorAll('[data-sg-sub]').forEach(b => b.classList.toggle('active', select));
   Object.keys(SG_SUBS).forEach(mid => syncSgMidBtn(mid, false));
   saveUnitSelection(); updateSelectedCount();
 }
@@ -3396,15 +3583,20 @@ function buildDeckRaw(shuffle = true) {
   const eikenOn = document.getElementById('chk-eiken').checked;
   const mabutanOn = document.getElementById('chk-mabutan').checked;
   const shogakuseiOn = document.getElementById('chk-shogakusei').checked;
-  const selectedUnits = Array.from(document.querySelectorAll('#unit-grid button.active')).map(b => b.dataset.unit);
-  const selectedEikenGroups = Array.from(document.querySelectorAll('#eiken-grid button.active')).map(b => b.dataset.eiken);
-  const selectedMabutanGroups = Array.from(document.querySelectorAll('#mabutan-grid button.active')).map(b => b.dataset.mabutan);
+  const selectedUnits = Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit);
+  const selectedEikenGroups = Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken);
+  const selectedMabutanGroups = Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan);
   const selectedSgSubs = getSelectedSgSubs(false);
   const result = [];
   if (minilaboOn) MINILABO.filter(w => selectedUnits.includes(w['出典_ミニラボ'])).forEach(w => result.push({...w, _source: 'ミニラボ'}));
   if (eikenOn) EIKEN.filter(w => selectedEikenGroups.some(g => eikenInGroup(w, g))).forEach(w => result.push({...w, _source: '英検5級'}));
   if (mabutanOn) MABUTAN.filter(w => selectedMabutanGroups.some(g => mabutanInGroup(w, g))).forEach(w => result.push({...w, _source: 'まぶたん'}));
-  if (shogakuseiOn) SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, selectedSgSubs)).forEach(w => result.push({...w, _source: '小学生英語'}));
+  if (shogakuseiOn) {
+    const sgFiltered = selectedSgSubs.length > 0
+      ? SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, selectedSgSubs))
+      : SHOGAKUSEI;
+    sgFiltered.forEach(w => result.push({...w, _source: '小学生英語'}));
+  }
   const origEl = document.getElementById('chk-original');
   if (origEl && origEl.checked) {
     const selectedOrigGrps = getSelectedOrigGroups();
@@ -3426,6 +3618,35 @@ function buildDeckRaw(shuffle = true) {
 
 function buildDeck() { return buildDeckRaw(true); }
 
+// ===== v55: ステップモード（出典ごとに独立進行・今日の固定セット）=====
+function buildStepModeDeckBySource() {
+  const prefs = getUserPrefSettings();
+  const stepSize = prefs.stepUnlockSize || 5;
+  const baseDeck = buildDeckRaw(false);
+  if (!baseDeck.length) return null;
+  const sources = [...new Set(baseDeck.map(w => w._source))];
+  const stepSources = {};
+  let combinedWords = [];
+  const bannerParts = [];
+  sources.forEach(source => {
+    const sourceDeck = baseDeck.filter(w => w._source === source);
+    const totalPool = sourceDeck.length;
+    const unlocked = getStepUnlockedForSource(source, totalPool);
+    const todayEntry = ensureTodayWordSetForSource(source, sourceDeck, unlocked, stepSize);
+    const wordMap = new Map(sourceDeck.map(w => [w['単語'], w]));
+    let words = todayEntry.words.map(w => wordMap.get(w)).filter(Boolean);
+    if (!words.length) words = sourceDeck.slice(0, unlocked); // 最終フォールバック
+    stepSources[source] = { pool: totalPool, unlocked, sourceDeck, correct: 0, wrong: 0 };
+    combinedWords = combinedWords.concat(words);
+    bannerParts.push(`${source} ${unlocked}/${totalPool}語`);
+  });
+  return {
+    deck: combinedWords.sort(() => Math.random() - 0.5),
+    stepSources,
+    bannerText: bannerParts.join('・') + ' 解禁中'
+  };
+}
+
 function updateSelectedCount() {
   const deck = buildDeck();
   document.getElementById('selected-count').textContent = `${deck.length}語が選択されています`;
@@ -3438,29 +3659,55 @@ function startFlash() {
   const prefs = getUserPrefSettings();
   const learningMode = prefs.learningMode || 'free';
   const stepBanner = document.getElementById('step-banner');
+  const bannerText = stepBanner ? stepBanner.querySelector('.step-banner-text') : null;
+  const pauseBtn = document.getElementById('flash-pause-btn');
+  const isPaused = isStepPaused();
 
   let baseDeck;
-  if (learningMode === 'step') {
-    // ステップモード：順序を保持してから先頭N語を取る
-    baseDeck = buildDeckRaw(false); // シャッフルなし（自然順）
-    if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getStepUnlocked(totalPool);
-    const stepDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+  if (learningMode === 'custom' && !isPaused) {
+    // カスタムプールモード
+    let pool = getCustomPool();
+    if (!pool.length) { initCustomPool(); pool = getCustomPool(); }
+    if (!pool.length) { alert('カスタムプールが空です。設定を確認してください。'); return; }
+    baseDeck = buildCustomPoolDeck();
+    if (!baseDeck.length) { alert('プール内の単語が見つかりません。'); return; }
     state._stepMode = true;
-    state._stepPool = totalPool;
-    state._stepUnlocked = unlocked;
+    state._stepPool = pool.length;
+    state._stepUnlocked = pool.length;
+    state._customPoolMode = true;
     if (stepBanner) {
-      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}語 解放中`;
+      if (bannerText) bannerText.textContent = `カスタムプール：${pool.length}語`;
+      if (pauseBtn) pauseBtn.style.display = '';
       stepBanner.classList.add('visible');
     }
-    state.deck = buildWeightedDeck(stepDeck);
-    if (!state.deck.length) state.deck = stepDeck;
+    state.deck = buildWeightedDeck(baseDeck);
+    if (!state.deck.length) state.deck = baseDeck;
+  } else if (learningMode === 'step' && !isPaused) {
+    // ステップモード（出典ごとに独立進行・今日の固定セットを出題）
+    const stepInfo = buildStepModeDeckBySource();
+    if (!stepInfo || !stepInfo.deck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
+    baseDeck = stepInfo.deck;
+    state._stepMode = true;
+    state._stepSources = stepInfo.stepSources;
+    state._customPoolMode = false;
+    if (stepBanner) {
+      if (bannerText) bannerText.textContent = stepInfo.bannerText;
+      if (pauseBtn) pauseBtn.style.display = '';
+      stepBanner.classList.add('visible');
+    }
+    state.deck = buildWeightedDeck(baseDeck);
+    if (!state.deck.length) state.deck = baseDeck;
   } else {
+    // フリーモード or 一時停止中（フリー動作）
     baseDeck = buildDeck();
     if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
     state._stepMode = false;
-    if (stepBanner) stepBanner.classList.remove('visible');
+    state._customPoolMode = false;
+    if (stepBanner) {
+      if (bannerText) bannerText.textContent = isPaused ? '⏸ ポーズ中（フリー練習）' : '';
+      if (pauseBtn) pauseBtn.style.display = 'none';
+      stepBanner.classList.toggle('visible', isPaused);
+    }
     // フリーモード：新規単語をwordsPerSession件に制限・苦手復習単語は別途追加
     const wps = parseInt(prefs.wordsPerSession) || 0;
     let limitedBase;
@@ -3641,7 +3888,7 @@ function checkAnswer() {
     state.correct++;
     sessionCorrect++;
     const wasAlreadyCorrect = hasEverBeenCorrect(wordStr);
-    const justEnteredHall = recordCorrect(wordStr);
+    const justEnteredHall = recordCorrect(wordStr, state.wrongThisCard === 0 && state.weakWrongCount === 0, word);
     const skipBtn = document.querySelector('.action-btn.btn-skip');
     if (skipBtn) skipBtn.disabled = false;
     // コイン付与
@@ -3672,7 +3919,13 @@ function checkAnswer() {
     const spellHL = document.getElementById('spell-highlight-area');
     if (!wasAlreadyCorrect && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
-    if (!needChallenge) document.getElementById('next-btn').style.display = 'block';
+    if (!needChallenge) {
+      document.getElementById('next-btn').style.display = 'block';
+      if (state.wrongThisCard > 0 || state.weakWrongCount > 0) {
+        const rab = document.getElementById('retry-again-btn');
+        if (rab) rab.style.display = 'block';
+      }
+    }
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
     if (justEnteredHall) { showHallAnimation(); }
@@ -3731,12 +3984,13 @@ function checkAnswer() {
     }
 
   } else {
-    // 通常モード: 不正解
-    stopTimer(); state.answered = true;
+    // 通常モード: 不正解 → リトライ可能 (STEP4)
+    stopTimer();
     mainInput.disabled = true;
     renderLetterBoxes(typed.toLowerCase(), correct);
     document.getElementById('card-answer-wrap').classList.add('visible');
-    state.wrong++; state.wrongWords.push(word);
+    state.wrong++;
+    if (!state.wrongWords.find(w => w['単語'] === wordStr)) state.wrongWords.push(word);
     state.wrongThisCard++;
     sessionWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい！';
@@ -3749,7 +4003,7 @@ function checkAnswer() {
     if (!wasAlreadyCorrectN && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     doSpellOut(wordStr);
-    // v51: 設定に応じて間違え時の表示を切り替え
+    // 設定に応じて間違え時の表示を切り替え
     const wdsC = getWrongDisplayPrefs();
     if (wdsC.pattern) { showPatternGroup(wordStr); }
     else { const pa = document.getElementById('pattern-group-area'); if (pa) pa.classList.remove('visible'); }
@@ -3762,9 +4016,39 @@ function checkAnswer() {
     document.getElementById('next-btn').style.display = 'block';
     document.getElementById('reveal-btn').style.display = 'none';
     updateHomeBadges();
-    // v52: 豆知識フェードイン（シェイク後）
     setTimeout(() => showTrivia(wordStr, word), 500);
+    // STEP4: 800ms後に入力リセット→リトライ可能（カードが変わってたらスキップ）
+    const retryCardIdx = state.current;
+    setTimeout(() => {
+      if (state.current !== retryCardIdx) return;
+      document.getElementById('card-answer-wrap').classList.remove('visible');
+      if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+      document.getElementById('next-btn').style.display = 'none';
+      const rabR = document.getElementById('retry-again-btn');
+      if (rabR) rabR.style.display = 'none';
+      mainInput.value = '';
+      mainInput.disabled = false;
+      fb.className = 'feedback-area';
+      fb.textContent = 'もう一度！';
+      if (voiceMode !== 'voice') mainInput.focus();
+    }, 800);
   }
+}
+
+function retryCurrentCard() {
+  const rab = document.getElementById('retry-again-btn');
+  if (rab) rab.style.display = 'none';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('reveal-btn').style.display = 'block';
+  document.getElementById('card-answer-wrap').classList.remove('visible');
+  const spellHL = document.getElementById('spell-highlight-area');
+  if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+  const fb = document.getElementById('feedback-area');
+  if (fb) { fb.className = 'feedback-area'; fb.textContent = ''; }
+  const mi = document.getElementById('main-input');
+  if (mi) { mi.value = ''; mi.disabled = false; }
+  state.answered = false;
+  if (voiceMode !== 'voice' && mi) mi.focus();
 }
 
 // ===== タイピングチャレンジ（3回以上間違えた後の強化練習）=====
@@ -3991,19 +4275,35 @@ function showResult() {
   else if (pct>=50){emoji='💪';title='もう少し！';}
   else {emoji='📚';title='もう一度チャレンジ！';}
 
-  // ステップモード解放チェック
-  if (state._stepMode && state._stepPool) {
-    const prefs2 = getUserPrefSettings();
-    const stepSize2 = prefs2.stepUnlockSize || 5;
-    if (pct >= 70) {
-      const newUnlocked = Math.min(state._stepUnlocked + stepSize2, state._stepPool);
-      saveStepUnlocked(newUnlocked);
-      if (newUnlocked > state._stepUnlocked) {
-        emoji = '🎉';
-        title = `次の${Math.min(stepSize2, state._stepPool - state._stepUnlocked)}語が解放されました！`;
-      } else {
-        emoji = '🏆'; title = '全語クリア！完璧！';
-      }
+  // ステップモード解放チェック（v55: 出典ごとに独立判定）
+  if (state._stepMode && (state._stepPool || state._stepSources)) {
+    if (state._customPoolMode) {
+      // v53: カスタムプールモード — 殿堂入りで補充（alert はcheckAndReplenishPool内で出す）
+      checkAndReplenishPool();
+      emoji = '⭐'; title = 'おつかれさま！';
+    } else {
+      const prefs2 = getUserPrefSettings();
+      const stepSize2 = prefs2.stepUnlockSize || 5;
+      const unlockedMsgs = [], clearedMsgs = [];
+      Object.keys(state._stepSources || {}).forEach(source => {
+        const s = state._stepSources[source];
+        const attempted = s.correct + s.wrong;
+        if (attempted === 0) return; // このセッションで出題されなかった出典はスキップ
+        const srcPct = Math.round((s.correct / attempted) * 100);
+        if (srcPct >= 70) {
+          const oldUnlocked = s.unlocked;
+          const newUnlocked = Math.min(oldUnlocked + stepSize2, s.pool);
+          saveStepUnlockedForSource(source, newUnlocked);
+          if (newUnlocked > oldUnlocked) {
+            addNewUnlockToTodaySet(source, s.sourceDeck, oldUnlocked, newUnlocked);
+            unlockedMsgs.push(`${source}：次の${newUnlocked - oldUnlocked}語が解放されました！`);
+          } else {
+            clearedMsgs.push(`${source}：全語クリア！完璧！`);
+          }
+        }
+      });
+      if (unlockedMsgs.length) { emoji = '🎉'; title = unlockedMsgs.join('\n'); }
+      else if (clearedMsgs.length) { emoji = '🏆'; title = clearedMsgs.join('\n'); }
     }
   }
 
@@ -4017,6 +4317,7 @@ function showResult() {
   showScreen('result-screen');
   updateHomeBadges();
   updateResumeBtn();
+  updateHomePauseBanner();
 }
 
 function endSessionPrompt() {
@@ -4156,6 +4457,7 @@ function retryWrong() {
 
 // ===== 覚えるモード =====
 let learnDeck = [], learnCurrent = 0, learnCurrentWord = null;
+let learn_stepMode = false, learn_stepPool = 0, learn_stepUnlocked = 0, learn_stepSources = null;
 
 function goToLearnSettings() {
   showScreen('settings-screen');
@@ -4172,25 +4474,50 @@ function startLearnMode() {
   const prefs = getUserPrefSettings();
   const learningMode = prefs.learningMode || 'free';
   const stepBanner = document.getElementById('learn-step-banner');
+  const bannerText = stepBanner ? stepBanner.querySelector('.step-banner-text') : null;
+  const pauseBtn = document.getElementById('learn-pause-btn');
+  const isPaused = isStepPaused();
 
   let deck;
-  if (learningMode === 'step') {
-    const baseDeck = buildDeckRaw(false); // フラッシュと同じプール（順序保持）
-    if (!baseDeck.length) { alert('条件に合う単語がありません。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getStepUnlocked(totalPool);
-    deck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
+  if (learningMode === 'custom' && !isPaused) {
+    // カスタムプールモード
+    let pool = getCustomPool();
+    if (!pool.length) { initCustomPool(); pool = getCustomPool(); }
+    if (!pool.length) { alert('カスタムプールが空です。'); return; }
+    deck = buildCustomPoolDeck();
+    if (!deck.length) { alert('プール内の単語が見つかりません。'); return; }
     if (stepBanner) {
-      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}語 解放中`;
+      if (bannerText) bannerText.textContent = `カスタムプール：${pool.length}語`;
+      if (pauseBtn) pauseBtn.style.display = '';
       stepBanner.classList.add('visible');
     }
+    learn_stepMode = true;
+    learn_stepPool = pool.length;
+    learn_stepUnlocked = pool.length;
+  } else if (learningMode === 'step' && !isPaused) {
+    // ステップモード（出典ごとに独立進行・今日の固定セットを出題）
+    const stepInfo = buildStepModeDeckBySource();
+    if (!stepInfo || !stepInfo.deck.length) { alert('条件に合う単語がありません。'); return; }
+    deck = stepInfo.deck;
+    if (stepBanner) {
+      if (bannerText) bannerText.textContent = stepInfo.bannerText;
+      if (pauseBtn) pauseBtn.style.display = '';
+      stepBanner.classList.add('visible');
+    }
+    learn_stepMode = true;
+    learn_stepSources = stepInfo.stepSources;
   } else {
-    // フリーモード：選択セクションから全部出題
+    // フリーモード or 一時停止中
     deck = buildDeck();
     if (!deck.length) { alert('条件に合う単語がありません。'); return; }
     const wps = parseInt(prefs.wordsPerSession) || 0;
     if (wps > 0 && deck.length > wps) deck = deck.slice(0, wps);
-    if (stepBanner) stepBanner.classList.remove('visible');
+    if (stepBanner) {
+      if (bannerText) bannerText.textContent = isPaused ? '⏸ ポーズ中（フリー練習）' : '';
+      if (pauseBtn) pauseBtn.style.display = 'none';
+      stepBanner.classList.toggle('visible', isPaused);
+    }
+    learn_stepMode = false;
   }
 
   learnDeck = deck;
@@ -4206,7 +4533,41 @@ function startLearnMode() {
   loadLearnCard();
 }
 function loadLearnCard() {
-  if (learnCurrent >= learnDeck.length) { alert('全部おわったよ！'); showScreen('home-screen'); return; }
+  if (learnCurrent >= learnDeck.length) {
+    if (learn_stepMode) {
+      const prefsEnd = getUserPrefSettings();
+      if (prefsEnd.learningMode === 'custom') {
+        checkAndReplenishPool();
+        alert('全部おわったよ！');
+      } else {
+        const stepSizeL = prefsEnd.stepUnlockSize || 5;
+        const unlockedMsgs = [], clearedMsgs = [];
+        Object.keys(learn_stepSources || {}).forEach(source => {
+          const s = learn_stepSources[source];
+          const oldUnlocked = s.unlocked;
+          const newUnlocked = Math.min(oldUnlocked + stepSizeL, s.pool);
+          saveStepUnlockedForSource(source, newUnlocked);
+          if (newUnlocked > oldUnlocked) {
+            addNewUnlockToTodaySet(source, s.sourceDeck, oldUnlocked, newUnlocked);
+            unlockedMsgs.push(`${source}：次の${newUnlocked - oldUnlocked}語が解放されました！`);
+          } else {
+            clearedMsgs.push(`${source}：全語クリア！完璧！`);
+          }
+        });
+        const msg = '全部おわったよ！\n' + [...unlockedMsgs, ...clearedMsgs].join('\n');
+        alert(msg);
+      }
+      learn_stepMode = false;
+      learn_stepSources = null;
+    } else {
+      alert('全部おわったよ！');
+    }
+    const stepBannerL = document.getElementById('learn-step-banner');
+    if (stepBannerL) stepBannerL.classList.remove('visible');
+    showScreen('home-screen');
+    updateHomePauseBanner();
+    return;
+  }
   learnCurrentWord = learnDeck[learnCurrent];
   const pct = (learnCurrent / learnDeck.length) * 100;
   document.getElementById('learn-progress-fill').style.width = pct + '%';
@@ -6770,17 +7131,25 @@ function hasEverBeenCorrect(word) {
   return getWordStatus(word).everCorrect === true;
 }
 
-function recordCorrect(word) {
+function recordCorrect(word, allowHall = true, wordObj = null) {
   const ws = getWordStatus(word);
   ws.count = (ws.count||0) + 1;
-  ws.streak = (ws.streak||0) + 1;
-  const justEnteredHall = !ws.hall && ws.streak >= 3;
+  if (allowHall) {
+    ws.streak = (ws.streak||0) + 1;
+  } else {
+    ws.streak = 0;
+  }
+  const justEnteredHall = allowHall && !ws.hall && ws.streak >= 3;
   if (justEnteredHall) ws.hall = true;
   ws.everCorrect = true;
   setWordStatus(word, ws);
   localStorage.setItem(up('total_questions'), (parseInt(localStorage.getItem(up('total_questions'))||'0')+1));
   localStorage.setItem(up('total_correct'), (parseInt(localStorage.getItem(up('total_correct'))||'0')+1));
   recordStudyDay();
+  if (wordObj && wordObj._source && typeof state !== 'undefined' && state._stepMode && !state._customPoolMode) {
+    bumpStepSourceStat(wordObj._source, true);
+    recordTodaySetResult(wordObj._source, word, true);
+  }
   return justEnteredHall;
 }
 
@@ -6828,6 +7197,10 @@ function recordWrong(word, meaning, typedStr, wordObj) {
   addToRecentMistakes(word, meaning);
   localStorage.setItem(up('total_questions'), (parseInt(localStorage.getItem(up('total_questions'))||'0')+1));
   recordStudyDay();
+  if (wordObj && wordObj._source && typeof state !== 'undefined' && state._stepMode && !state._customPoolMode) {
+    bumpStepSourceStat(wordObj._source, false);
+    recordTodaySetResult(wordObj._source, word, false);
+  }
 }
 
 function addToRecentMistakes(word, meaning) {
@@ -6896,24 +7269,76 @@ function updateHomeBadges() {
   badgeRow.style.display = total > 0 ? 'flex' : 'none';
   document.getElementById('badge-weak-num').textContent = weakWords.length + '語';
   document.getElementById('badge-hall-num').textContent = hallWords.length + '語';
+  updateHomePauseBanner();
+}
+
+function getWordRegistrationKey(w) {
+  // ソース内の登録順（若い番号ほど小さい値）を返す
+  const srcOrder = { 'ミニラボ': 0, '英検5級': 1, 'まぶたん': 2, '小学生英語': 3, 'オリジナル': 4 };
+  const srcIdx = (srcOrder[w['_source']] ?? 5) * 100000;
+  const src = w['_source'] || '';
+  if (src === 'ミニラボ') {
+    const m = (w['出典_ミニラボ'] || '').match(/Unit(\d+)/);
+    return srcIdx + (m ? parseInt(m[1]) : 0);
+  }
+  if (src === '英検5級') {
+    const m = (w['出典_英検5級'] || '').match(/No\.(\d+)/);
+    return srcIdx + (m ? parseInt(m[1]) : 0);
+  }
+  if (src === 'まぶたん') {
+    return srcIdx + getMabutanNum(w);
+  }
+  return srcIdx;
 }
 
 function buildWeightedDeck(baseDeck) {
-  // 同じセッションで同じ単語が2回出ないように1枚ずつ管理
-  // 苦手単語を優先的に前に配置、殿堂入りは20%の確率で含める
-  const weakOnes = baseDeck.filter(w => !isHallWord(w['単語']) && isWeakWord(w['単語']));
-  const normalOnes = baseDeck.filter(w => !isHallWord(w['単語']) && !isWeakWord(w['単語']));
-  const hallOnes = baseDeck.filter(w => isHallWord(w['単語']) && Math.random() < 0.2);
-  const shuffled = [
-    ...weakOnes.sort(() => Math.random() - 0.5),
-    ...normalOnes.sort(() => Math.random() - 0.5)
-  ];
-  // 殿堂入りをランダム位置に散りばめる
-  hallOnes.forEach(h => {
-    const pos = Math.floor(Math.random() * (shuffled.length + 1));
-    shuffled.splice(pos, 0, h);
+  // 3段階tier分類で出題頻度を調整
+  // tier1a（高頻度）: 直近不正解（streak=0, count>0）→ ランダム
+  // tier1b（高頻度）: 未挑戦（count=0）             → 登録番号順
+  // tier2 （中頻度）: 正解継続中・殿堂未達           → streak昇順
+  // tier3 （低頻度）: 殿堂入り                      → 20%のみ・ランダム位置
+  const tier1Mis = [], tier1New = [], tier2 = [], tier3 = [];
+  baseDeck.forEach(w => {
+    const ws = getWordStatus(w['単語']);
+    const entry = { w, count: ws.count || 0, mistakeCount: ws.mistakeCount || 0, streak: ws.streak || 0 };
+    if (ws.hall) {
+      tier3.push(entry);
+    } else if ((ws.streak || 0) >= 1) {
+      tier2.push(entry);
+    } else if ((ws.count || 0) === 0) {
+      tier1New.push(entry); // 未挑戦 → 登録順
+    } else {
+      tier1Mis.push(entry); // 直近不正解 → ランダム
+    }
   });
-  return shuffled;
+
+  // 直近不正解: ランダム順
+  const tMis = tier1Mis
+    .sort(() => Math.random() - 0.5)
+    .map(e => e.w);
+
+  // 未挑戦: ソース・番号の若い順
+  const tNew = tier1New
+    .sort((a, b) => getWordRegistrationKey(a.w) - getWordRegistrationKey(b.w))
+    .map(e => e.w);
+
+  // tier2: streak昇順（殿堂まで遠い語を先に）、同数はランダム
+  const t2 = tier2
+    .sort((a, b) => a.streak - b.streak || Math.random() - 0.5)
+    .map(e => e.w);
+
+  // tier3: 20%に間引いてランダム位置に散りばめ
+  const t3 = tier3
+    .filter(() => Math.random() < 0.2)
+    .sort(() => Math.random() - 0.5)
+    .map(e => e.w);
+
+  const result = [...tMis, ...tNew, ...t2];
+  t3.forEach(h => {
+    const pos = Math.floor(Math.random() * (result.length + 1));
+    result.splice(pos, 0, h);
+  });
+  return result;
 }
 
 const ALPHABET_COLORS = {
@@ -7574,16 +7999,19 @@ function restoreUnitSelection() {
       document.querySelectorAll('#unit-grid [data-unit]').forEach(b => {
         b.classList.toggle('active', sel.minilaboUnits.includes(b.dataset.unit));
       });
+      document.querySelectorAll('#unit-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
     if (sel.eikenUnits) {
       document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => {
         b.classList.toggle('active', sel.eikenUnits.includes(b.dataset.eiken));
       });
+      document.querySelectorAll('#eiken-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
     if (sel.mabutanUnits) {
       document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => {
         b.classList.toggle('active', sel.mabutanUnits.includes(b.dataset.mabutan));
       });
+      document.querySelectorAll('#mabutan-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
     if (sel.shogakuseiSubs) {
       document.querySelectorAll('[data-sg-sub]').forEach(b => {
@@ -7904,6 +8332,78 @@ function resetAllRecords() {
   renderRecords();
 }
 
+// ===== v52: データエクスポート/インポート =====
+function exportUserData() {
+  const prefix = 'u' + currentUser + '_';
+  const names = getUserNames();
+  const userName = names[currentUser - 1] || ('ユーザー' + currentUser);
+  const payload = { version: 52, exportedUser: currentUser, userName };
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(prefix)) payload[k] = localStorage.getItem(k);
+  }
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  a.href = url;
+  a.download = 'wordsuck_' + userName + '_' + today + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importUserData() {
+  document.getElementById('import-file-input').click();
+}
+
+async function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  let payload;
+  try { payload = JSON.parse(await file.text()); } catch {
+    alert('ファイルの読み込みに失敗しました。JSONファイルを選んでください。');
+    return;
+  }
+  if (!payload.version || !payload.exportedUser) {
+    alert('WordSuckのエクスポートデータではないファイルです。');
+    return;
+  }
+  const names = getUserNames();
+  const importedName = payload.userName || ('ユーザー' + payload.exportedUser);
+  const targetName = names[currentUser - 1] || ('ユーザー' + currentUser);
+  if (!confirm(`「${importedName}」のデータをユーザー${currentUser}（${targetName}）に上書きインポートしますか？\n現在のデータはすべて消えます。`)) return;
+
+  const srcPrefix = 'u' + payload.exportedUser + '_';
+  const dstPrefix = 'u' + currentUser + '_';
+
+  const delKeys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(dstPrefix)) delKeys.push(k);
+  }
+  delKeys.forEach(k => localStorage.removeItem(k));
+
+  let count = 0;
+  for (const [k, v] of Object.entries(payload)) {
+    if (k.startsWith(srcPrefix)) {
+      localStorage.setItem(dstPrefix + k.slice(srcPrefix.length), v);
+      count++;
+    }
+  }
+
+  if (payload.userName) {
+    const ns = getUserNames();
+    ns[currentUser - 1] = payload.userName;
+    saveUserNames(ns);
+  }
+
+  alert(`インポート完了！${count}件のデータを読み込みました。`);
+  updateHomeBadges();
+  renderRecords();
+}
+
 // ===== 音声入力（Whisper） =====
 
 let voiceMode = 'type';
@@ -8144,7 +8644,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ===== v52: 豆知識表示システム =====
-const TRIVIA_TYPES = ['etymology', 'pattern', 'phonetics'];
+const TRIVIA_TYPES = ['pattern', 'phonetics'];
 const TRIVIA_TYPE_LABELS = { etymology: '語源', pattern: '同パターンの仲間', phonetics: '発音記号' };
 let triviaTypeIndex = 0;
 let currentTriviaWord = '';
@@ -8204,8 +8704,6 @@ async function showTrivia(wordStr, wordObj) {
       if (dislikeBtn) dislikeBtn.classList.remove('disliked');
       return;
     }
-    // パターン仲間が少なければ語源にフォールバック
-    await fetchTriviaFromAPI(wordStr, wordObj, 'etymology');
     return;
   }
 
@@ -8541,8 +9039,10 @@ function checkTodayAnswer() {
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
     const ws = getWordStatus(word['単語']);
     ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
-    if (ws.streak >= 3) ws.hall = true;
+    const justEnteredHall = !ws.hall && ws.streak >= 3;
+    if (justEnteredHall) ws.hall = true;
     setWordStatus(word['単語'], ws);
+    if (justEnteredHall) checkAndReplenishPool();
   } else {
     todayTestWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
@@ -8639,19 +9139,25 @@ function loadPrefScreen() {
   // ステップ状況
   const stepSection = document.getElementById('pref-step-status');
   const stepUnlockSection = document.getElementById('pref-step-unlock-section');
+  const customPoolSection = document.getElementById('pref-custom-pool-section');
   const stepInfo = document.getElementById('pref-step-info');
   if (mode === 'step') {
     if (stepSection) stepSection.style.display = 'block';
     if (stepUnlockSection) stepUnlockSection.style.display = 'block';
-    const unlocked = getStepUnlocked(0);
-    if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
+    if (customPoolSection) customPoolSection.style.display = 'none';
+    if (stepInfo) stepInfo.textContent = getStepStatusText();
+  } else if (mode === 'custom') {
+    if (stepSection) stepSection.style.display = 'none';
+    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
+    if (customPoolSection) customPoolSection.style.display = 'block';
+    loadCustomPoolPrefUI();
   } else {
     if (stepSection) stepSection.style.display = 'none';
     if (stepUnlockSection) stepUnlockSection.style.display = 'none';
+    if (customPoolSection) customPoolSection.style.display = 'none';
   }
-  // フリーモード時のみ単語数セクション表示
   const countSection = document.getElementById('pref-count-section');
-  if (countSection) countSection.style.display = mode === 'step' ? 'none' : 'block';
+  if (countSection) countSection.style.display = (mode === 'step' || mode === 'custom') ? 'none' : 'block';
 }
 
 function selectPrefMode(btn) {
@@ -8660,14 +9166,26 @@ function selectPrefMode(btn) {
   const mode = btn.dataset.prefMode;
   const stepSection = document.getElementById('pref-step-status');
   const stepUnlockSection = document.getElementById('pref-step-unlock-section');
+  const customPoolSection = document.getElementById('pref-custom-pool-section');
   const countSection = document.getElementById('pref-count-section');
-  if (stepSection) stepSection.style.display = mode === 'step' ? 'block' : 'none';
-  if (stepUnlockSection) stepUnlockSection.style.display = mode === 'step' ? 'block' : 'none';
-  if (countSection) countSection.style.display = mode === 'step' ? 'none' : 'block';
   if (mode === 'step') {
+    if (stepSection) stepSection.style.display = 'block';
+    if (stepUnlockSection) stepUnlockSection.style.display = 'block';
+    if (customPoolSection) customPoolSection.style.display = 'none';
+    if (countSection) countSection.style.display = 'none';
     const stepInfo = document.getElementById('pref-step-info');
-    const unlocked = getStepUnlocked(0);
-    if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
+    if (stepInfo) stepInfo.textContent = getStepStatusText();
+  } else if (mode === 'custom') {
+    if (stepSection) stepSection.style.display = 'none';
+    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
+    if (customPoolSection) customPoolSection.style.display = 'block';
+    if (countSection) countSection.style.display = 'none';
+    loadCustomPoolPrefUI();
+  } else {
+    if (stepSection) stepSection.style.display = 'none';
+    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
+    if (customPoolSection) customPoolSection.style.display = 'none';
+    if (countSection) countSection.style.display = 'block';
   }
 }
 function selectPrefStepUnlock(btn) {
@@ -8707,23 +9225,175 @@ function savePrefSettings() {
     wrongDisplaySettings: wrongDisplayBtns,
     spelloutSpeed: speedBtn ? speedBtn.dataset.prefSpeed : 'normal',
     stepUnlockSize: stepUnlockBtn ? parseInt(stepUnlockBtn.dataset.prefStepUnlock) : 5,
+    customStep: readCustomPoolPrefUI(),
   };
   saveUserPrefToStorage(prefs);
   showScreen('home-screen');
+  updateHomePauseBanner();
 }
 
-// ===== ステップモード進捗管理 =====
+// ===== ステップモード進捗管理（v55: 出典ごとに独立進行）=====
 
-function getStepUnlocked(poolSize) {
+function getStepUnlockedMap() {
+  try { return JSON.parse(localStorage.getItem(up('step_unlocked_by_source')) || '{}'); }
+  catch { return {}; }
+}
+function saveStepUnlockedMap(map) {
+  localStorage.setItem(up('step_unlocked_by_source'), JSON.stringify(map));
+}
+
+// 出典ごとの解禁数を取得。まだこの出典のカウンターが無ければ、
+// 「これまでに1回でも回答した単語数」からstepSize単位に切り上げて初期値を作る（旧・単一カウンターからの移行）
+function getStepUnlockedForSource(source, poolSize) {
   const prefs = getUserPrefSettings();
   const stepSize = prefs.stepUnlockSize || 5;
-  const saved = parseInt(localStorage.getItem(up('step_unlocked')) || '0');
-  if (saved === 0) return Math.min(stepSize, poolSize || stepSize);
-  return poolSize > 0 ? Math.min(saved, poolSize) : saved;
+  const map = getStepUnlockedMap();
+  if (map[source] === undefined) {
+    const answeredCount = getAllDataWords()
+      .filter(w => w._source === source && (getWordStatus(w['単語']).count || 0) > 0).length;
+    const seeded = answeredCount === 0 ? stepSize : Math.ceil(answeredCount / stepSize) * stepSize;
+    map[source] = poolSize > 0 ? Math.min(seeded, poolSize) : seeded;
+    saveStepUnlockedMap(map);
+  }
+  return poolSize > 0 ? Math.min(map[source], poolSize) : map[source];
 }
 
-function saveStepUnlocked(count) {
-  localStorage.setItem(up('step_unlocked'), String(count));
+function saveStepUnlockedForSource(source, count) {
+  const map = getStepUnlockedMap();
+  map[source] = count;
+  saveStepUnlockedMap(map);
+}
+
+function getStepStatusText() {
+  const map = getStepUnlockedMap();
+  const sources = Object.keys(map);
+  if (!sources.length) {
+    const prefs = getUserPrefSettings();
+    const stepSize = prefs.stepUnlockSize || 5;
+    return `現在 ${stepSize} 語が解放されています`;
+  }
+  return '現在の解禁状況：' + sources.map(s => `${s} ${map[s]}語`).join('・');
+}
+
+// セッション中の出典ごとの正誤カウント（今日のセットの「7割クリア」判定に使用）
+function bumpStepSourceStat(source, isCorrect) {
+  if (typeof state === 'undefined' || !state._stepSources || !state._stepSources[source]) return;
+  if (isCorrect) state._stepSources[source].correct++;
+  else state._stepSources[source].wrong++;
+}
+
+// ===== v55: 今日の固定単語セット（出典ごと・日付ごとに履歴保存）=====
+function getDailySetHistory() {
+  try { return JSON.parse(localStorage.getItem(up('daily_word_sets')) || '{}'); }
+  catch { return {}; }
+}
+function saveDailySetHistory(hist) {
+  const dates = Object.keys(hist).sort();
+  while (dates.length > 30) delete hist[dates.shift()]; // 直近30日分だけ保持
+  localStorage.setItem(up('daily_word_sets'), JSON.stringify(hist));
+}
+
+// その日・その出典の固定セットを取得。無ければ前日セットのキャリーオーバーで新規作成する
+function ensureTodayWordSetForSource(source, sourceDeck, unlockedNow, stepSize) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  if (!hist[today]) hist[today] = {};
+  if (hist[today][source]) return hist[today][source];
+
+  const pastDates = Object.keys(hist).filter(d => d !== today && hist[d][source]).sort();
+  const prevDate = pastDates.length ? pastDates[pastDates.length - 1] : null;
+  const prev = prevDate ? hist[prevDate][source] : null;
+  // 前日セットのうち、1回でも間違えた単語をキャリーオーバー
+  const carryover = prev ? prev.words.filter(w => prev.stats[w] && prev.stats[w].wrong > 0) : [];
+
+  let seedWords = [...carryover];
+  if (!seedWords.length) {
+    // キャリーオーバーが無い（初回 or 前日全問正解）→ 直近の解禁バッチをフォールバックにする
+    seedWords = sourceDeck.slice(Math.max(0, unlockedNow - stepSize), unlockedNow).map(w => w['単語']);
+  }
+  const words = [...new Set(seedWords)];
+  const origin = {};
+  words.forEach(w => { origin[w] = carryover.includes(w) ? 'carry' : 'new'; });
+  const entry = { words, origin, stats: {}, unlockedCount: unlockedNow };
+  hist[today][source] = entry;
+  saveDailySetHistory(hist);
+  return entry;
+}
+
+// 同日中にさらに解禁された分を、今日の固定セットへ追加で合流させる
+function addNewUnlockToTodaySet(source, sourceDeck, oldUnlocked, newUnlocked) {
+  if (newUnlocked <= oldUnlocked) return;
+  const newWords = sourceDeck.slice(oldUnlocked, newUnlocked).map(w => w['単語']);
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  if (!hist[today]) hist[today] = {};
+  const entry = hist[today][source] || { words: [], origin: {}, stats: {}, unlockedCount: newUnlocked };
+  newWords.forEach(w => {
+    if (!entry.words.includes(w)) { entry.words.push(w); entry.origin[w] = 'new'; }
+  });
+  entry.unlockedCount = newUnlocked;
+  hist[today][source] = entry;
+  saveDailySetHistory(hist);
+}
+
+// 今日のセット内の単語を正誤記録に反映（翌日のキャリーオーバー判定に使う）
+function recordTodaySetResult(source, wordStr, isCorrect) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  const entry = hist[today] && hist[today][source];
+  if (!entry || !entry.words.includes(wordStr)) return;
+  const st = entry.stats[wordStr] || { correct: 0, wrong: 0 };
+  if (isCorrect) st.correct++; else st.wrong++;
+  entry.stats[wordStr] = st;
+  saveDailySetHistory(hist);
+}
+
+// ===== v55: 単語セット履歴画面 =====
+function openDailySetHistory() {
+  showScreen('daily-history-screen');
+  renderDailySetHistory();
+}
+
+function formatHistoryDateLabel(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const today = todayDate();
+  const yd = new Date(); yd.setDate(yd.getDate() - 1);
+  const yesterdayStr = yd.toISOString().slice(0, 10);
+  if (dateStr === today) return `今日（${m}/${d}）`;
+  if (dateStr === yesterdayStr) return `昨日（${m}/${d}）`;
+  return `${m}/${d}`;
+}
+
+function renderDailySetHistory() {
+  const container = document.getElementById('daily-history-list');
+  if (!container) return;
+  const hist = getDailySetHistory();
+  const dates = Object.keys(hist).sort().reverse().slice(0, 7); // 直近7日分
+  if (!dates.length) {
+    container.innerHTML = '<div class="rec-empty">まだ記録がありません。ステップモードで練習すると、ここに今日の単語セットが記録されます。</div>';
+    return;
+  }
+  container.innerHTML = dates.map(date => {
+    const daySources = hist[date];
+    const sourceBlocks = Object.keys(daySources).map(source => {
+      const entry = daySources[source];
+      if (!entry.words.length) return '';
+      const chips = entry.words.map(w => {
+        const st = entry.stats[w] || { correct: 0, wrong: 0 };
+        const badge = entry.origin[w] === 'carry' ? '🔁' : '🆕';
+        const resultMark = st.wrong > 0 ? ` ✗${st.wrong}` : (st.correct > 0 ? ' ✓' : '');
+        return `<button class="pattern-word-chip" onclick="speakWord('${w.replace(/'/g, "\\'")}')">${badge}${w}${resultMark}</button>`;
+      }).join('');
+      return `<div style="margin-top:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">${source}（${entry.words.length}語）</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${chips}</div>
+      </div>`;
+    }).join('');
+    return `<div class="rec-section">
+      <div class="rec-title">${formatHistoryDateLabel(date)}の単語セット</div>
+      ${sourceBlocks || '<div class="rec-empty">記録なし</div>'}
+    </div>`;
+  }).join('');
 }
 
 function getSentenceStepUnlocked(poolSize) {
@@ -8740,8 +9410,13 @@ function saveSentenceStepUnlocked(count) {
 
 function resetStepProgress() {
   if (!confirm('ステップの進行状況をリセットしますか？')) return;
-  localStorage.removeItem(up('step_unlocked'));
+  localStorage.removeItem(up('step_unlocked')); // 旧・単一カウンター（下位互換のため削除）
+  localStorage.removeItem(up('step_unlocked_by_source'));
   localStorage.removeItem(up('step_sent_unlocked'));
+  // 今日の固定セットも作り直す（過去の履歴は残す）
+  const hist = getDailySetHistory();
+  delete hist[todayDate()];
+  saveDailySetHistory(hist);
   const stepInfo = document.getElementById('pref-step-info');
   const prefs = getUserPrefSettings();
   const stepSize = prefs.stepUnlockSize || 5;
@@ -8848,6 +9523,579 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// ===== v53 STEP1: カスタムプール管理 =====
+
+const CP_SOURCES = [
+  { key: 'ミニラボ',   getData: () => (typeof MINILABO !== 'undefined' ? MINILABO : []) },
+  { key: '英検5級',   getData: () => (typeof EIKEN !== 'undefined' ? EIKEN : []) },
+  { key: 'まぶたん',  getData: () => (typeof MABUTAN !== 'undefined' ? MABUTAN : []) },
+  { key: '小学生英語', getData: () => (typeof SHOGAKUSEI !== 'undefined' ? SHOGAKUSEI : []) },
+  { key: 'オリジナル', getData: () => loadOriginalWords() },
+];
+
+function getCustomPoolSettings() {
+  const prefs = getUserPrefSettings();
+  return prefs.customStep || { enabled: false, poolSize: 30, initDist: {}, unlockThreshold: 10, replenishDist: {} };
+}
+
+function getCustomPool() {
+  try { return JSON.parse(localStorage.getItem(up('custom_pool')) || '[]'); } catch { return []; }
+}
+function saveCustomPool(pool) { localStorage.setItem(up('custom_pool'), JSON.stringify(pool)); }
+
+function getCustomPoolQueues() {
+  try { return JSON.parse(localStorage.getItem(up('custom_pool_queues')) || '{}'); } catch { return {}; }
+}
+function saveCustomPoolQueues(q) { localStorage.setItem(up('custom_pool_queues'), JSON.stringify(q)); }
+
+function getAllWordsBySource() {
+  const result = {};
+  let sel = {};
+  try { sel = JSON.parse(localStorage.getItem(up('unit_selection')) || '{}'); } catch {}
+
+  CP_SOURCES.forEach(s => {
+    let data = s.getData();
+
+    if (s.key === 'ミニラボ') {
+      if (sel.minilabo === false) { result[s.key] = []; return; }
+      const units = sel.minilaboUnits || [];
+      if (units.length > 0) data = data.filter(w => units.includes(w['出典_ミニラボ']));
+    } else if (s.key === '英検5級') {
+      if (sel.eiken === false) { result[s.key] = []; return; }
+      const units = sel.eikenUnits || [];
+      if (units.length > 0) data = data.filter(w => units.some(g => eikenInGroup(w, g)));
+    } else if (s.key === 'まぶたん') {
+      if (sel.mabutan === false) { result[s.key] = []; return; }
+      const units = sel.mabutanUnits || [];
+      if (units.length > 0) data = data.filter(w => units.some(g => mabutanInGroup(w, g)));
+    } else if (s.key === '小学生英語') {
+      if (sel.shogakusei === false) { result[s.key] = []; return; }
+      const subs = sel.shogakuseiSubs || [];
+      if (subs.length > 0) data = data.filter(w => sgWordMatchesSubs(w, subs));
+    } else if (s.key === 'オリジナル') {
+      if (sel.original === false) { result[s.key] = []; return; }
+    }
+
+    const words = data.map(w => w['単語']).filter(Boolean);
+    const unique = [...new Set(words)];
+    result[s.key] = unique;
+  });
+  return result;
+}
+
+function initCustomPool() {
+  const settings = getCustomPoolSettings();
+  if (getUserPrefSettings().learningMode !== 'custom') return;
+  const allBySource = getAllWordsBySource();
+  const gradSet = new Set(getHallWordsFromData().map(w => w['単語']));
+  const pool = [];
+  const queues = {};
+  for (const src of CP_SOURCES.map(s => s.key)) {
+    const cnt = settings.initDist[src] || 0;
+    if (!cnt) continue;
+    const words = (allBySource[src] || []).filter(w => !gradSet.has(w));
+    const shuffled = [...words].sort(() => Math.random() - 0.5);
+    pool.push(...shuffled.slice(0, cnt));
+    queues[src] = shuffled.slice(cnt);
+  }
+  saveCustomPool([...new Set(pool)]);
+  saveCustomPoolQueues(queues);
+}
+
+function reinitCustomPool() {
+  if (!confirm('プールをリセットして再構築します。現在のプール内容は消えます。よろしいですか？')) return;
+  localStorage.removeItem(up('custom_pool'));
+  localStorage.removeItem(up('custom_pool_queues'));
+  initCustomPool();
+  const pool = getCustomPool();
+  const el = document.getElementById('pref-custom-pool-status');
+  if (el) el.textContent = `プールを再構築しました（${pool.length}語）`;
+  updateCustomPoolShortageWarning();
+}
+
+// ② 選択範囲内の単語が不足していてpoolSizeを維持できない場合の注意書き
+function updateCustomPoolShortageWarning() {
+  const el = document.getElementById('pref-custom-pool-shortage');
+  if (!el) return;
+  const settings = getCustomPoolSettings();
+  const pool = getCustomPool();
+  if (pool.length > 0 && pool.length < (settings.poolSize || 0)) {
+    el.textContent = '⚠️ 選択している範囲内の単語が不足しています。出題ソースの範囲を広げてください。';
+    el.classList.add('visible');
+  } else {
+    el.textContent = '';
+    el.classList.remove('visible');
+  }
+}
+
+function buildCustomPoolDeck() {
+  const pool = getCustomPool();
+  if (!pool.length) return [];
+  const allWords = getAllDataWords();
+  const wordMap = {};
+  allWords.forEach(w => { if (w['単語']) wordMap[w['単語'].toLowerCase()] = w; });
+  const result = [];
+  pool.forEach(wStr => {
+    const obj = wordMap[wStr.toLowerCase()];
+    if (obj) result.push({ ...obj });
+  });
+  return result.sort(() => Math.random() - 0.5);
+}
+
+function checkAndReplenishPool() {
+  const settings = getCustomPoolSettings();
+  if (getUserPrefSettings().learningMode !== 'custom') return;
+  const pool = getCustomPool();
+  const threshold = settings.unlockThreshold || 10;
+  const hallPool = pool.filter(w => isHallWord(w));
+  if (hallPool.length < threshold) return;
+
+  // 前回チェック以降にしきい値を超えて殿堂入りが溜まっていた場合も、
+  // バッチ単位（しきい値の倍数）で処理することでpoolSizeを正しく維持する。
+  // しきい値未満の余り分は殿堂入りしたまま次回のチェックに持ち越す。
+  const batches = Math.floor(hallPool.length / threshold);
+  const removeCount = batches * threshold;
+  const hallToRemove = new Set(hallPool.slice(0, removeCount));
+  let newPool = pool.filter(w => !hallToRemove.has(w));
+
+  const queues = getCustomPoolQueues();
+  const allBySource = getAllWordsBySource();
+  const gradSet = new Set(getHallWordsFromData().map(w => w['単語']));
+  const toAdd = [];
+  let shortfall = 0;
+
+  for (const src of CP_SOURCES.map(s => s.key)) {
+    const cnt = (settings.replenishDist[src] || 0) * batches;
+    if (!cnt) continue;
+    const q = queues[src] || [];
+    const alreadyIn = new Set([...newPool, ...toAdd]);
+    let available = q.filter(w => !gradSet.has(w) && !alreadyIn.has(w));
+    if (available.length < cnt) {
+      const all = (allBySource[src] || []).filter(w => !gradSet.has(w) && !alreadyIn.has(w) && !q.includes(w));
+      available = [...available, ...all.sort(() => Math.random() - 0.5)];
+    }
+    queues[src] = available.slice(cnt);
+    const picked = available.slice(0, cnt);
+    toAdd.push(...picked);
+    if (picked.length < cnt) shortfall += (cnt - picked.length);
+  }
+
+  // ① 新規（未挑戦）単語が不足する分は、苦手単語（間違えたことがあり、まだ殿堂入りしていない単語）で補充
+  if (shortfall > 0) {
+    const alreadyIn = new Set([...newPool, ...toAdd]);
+    const weakCandidates = [...new Set(Object.values(allBySource).flat())]
+      .filter(w => !gradSet.has(w) && !alreadyIn.has(w))
+      .filter(w => (getWordStatus(w).mistakeCount || 0) > 0)
+      .sort(() => Math.random() - 0.5);
+    toAdd.push(...weakCandidates.slice(0, shortfall));
+  }
+
+  newPool = [...new Set([...newPool, ...toAdd])].slice(0, settings.poolSize);
+  saveCustomPool(newPool);
+  saveCustomPoolQueues(queues);
+  updateCustomPoolShortageWarning();
+  if (toAdd.length > 0) {
+    alert(`殿堂入り ${removeCount}語達成！\n新しい ${toAdd.length}語 がプールに追加されました。\n現在のプール：${newPool.length}語`);
+  }
+}
+
+// カスタムプール設定UI
+function loadCustomPoolPrefUI() {
+  const settings = getCustomPoolSettings();
+
+  const poolSizeEl = document.getElementById('pref-pool-size');
+  if (poolSizeEl) poolSizeEl.value = settings.poolSize || 30;
+
+  const thresholdEl = document.getElementById('pref-unlock-threshold');
+  if (thresholdEl) thresholdEl.value = settings.unlockThreshold || 10;
+
+  renderCustomPoolSourceRows('pref-init-dist-rows', settings.initDist || {}, 'init');
+  renderCustomPoolSourceRows('pref-replenish-dist-rows', settings.replenishDist || {}, 'replenish');
+
+  const pool = getCustomPool();
+  const statusEl = document.getElementById('pref-custom-pool-status');
+  if (statusEl) {
+    if (pool.length) {
+      const hallInPool = pool.filter(w => isHallWord(w)).length;
+      statusEl.textContent = `現在のプール：${pool.length}語（殿堂入り済み：${hallInPool}語）`;
+    } else {
+      statusEl.textContent = '（プール未構築 — 保存後「プールをリセット・再構築」で初期化してください）';
+    }
+  }
+  updateCustomPoolShortageWarning();
+}
+
+function renderCustomPoolSourceRows(containerId, distObj, mode) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const allBySource = getAllWordsBySource();
+  container.innerHTML = '';
+  CP_SOURCES.forEach(s => {
+    const total = (allBySource[s.key] || []).length;
+    if (total === 0) return;
+    const val = distObj[s.key] || 0;
+    const row = document.createElement('div');
+    row.className = 'cp-source-row';
+    row.innerHTML = `
+      <div class="cp-source-label">${s.key}<span class="cp-source-sub">（計${total}語）</span></div>
+      <input type="number" class="cp-source-input" min="0" max="${total}" value="${val}"
+        data-cp-src="${s.key}" data-cp-mode="${mode}" oninput="${mode === 'init' ? 'validatePoolDist()' : 'validateReplenishDist()'}">
+      <span style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">語</span>`;
+    container.appendChild(row);
+  });
+}
+
+function toggleCustomPoolUI() {
+  // 廃止：学習モード選択で表示制御するため不要
+}
+
+function validatePoolDist() {
+  const poolSize = parseInt(document.getElementById('pref-pool-size')?.value) || 30;
+  const inputs = document.querySelectorAll('[data-cp-src][data-cp-mode="init"]');
+  const total = Array.from(inputs).reduce((s, el) => s + (parseInt(el.value) || 0), 0);
+  const el = document.getElementById('pref-init-validation');
+  if (!el) return;
+  if (total === poolSize) {
+    el.textContent = `OK（合計 ${total} 語）`;
+    el.style.color = '#06d6a0';
+  } else {
+    el.textContent = `合計 ${total} 語 — プール合計（${poolSize}）と一致させてください`;
+    el.style.color = 'var(--accent)';
+  }
+}
+
+function validateReplenishDist() {
+  const threshold = parseInt(document.getElementById('pref-unlock-threshold')?.value) || 10;
+  const inputs = document.querySelectorAll('[data-cp-src][data-cp-mode="replenish"]');
+  const total = Array.from(inputs).reduce((s, el) => s + (parseInt(el.value) || 0), 0);
+  const el = document.getElementById('pref-replenish-validation');
+  if (!el) return;
+  if (total === threshold) {
+    el.textContent = `OK（合計 ${total} 語）`;
+    el.style.color = '#06d6a0';
+  } else {
+    el.textContent = `合計 ${total} 語 — 殿堂入りしきい値（${threshold}）と一致させてください`;
+    el.style.color = 'var(--accent)';
+  }
+}
+
+function readCustomPoolPrefUI() {
+  const poolSize = parseInt(document.getElementById('pref-pool-size')?.value) || 30;
+  const unlockThreshold = parseInt(document.getElementById('pref-unlock-threshold')?.value) || 10;
+  const initDist = {};
+  document.querySelectorAll('[data-cp-src][data-cp-mode="init"]').forEach(el => {
+    const v = parseInt(el.value) || 0;
+    if (v > 0) initDist[el.dataset.cpSrc] = v;
+  });
+  const replenishDist = {};
+  document.querySelectorAll('[data-cp-src][data-cp-mode="replenish"]').forEach(el => {
+    const v = parseInt(el.value) || 0;
+    if (v > 0) replenishDist[el.dataset.cpSrc] = v;
+  });
+  return { enabled: true, poolSize, initDist, unlockThreshold, replenishDist };
+}
+
+// ===== v53 STEP2: ステップモード一時停止/再開 =====
+
+function isStepPaused() {
+  return localStorage.getItem(up('step_paused')) === 'true';
+}
+
+function pauseStepMode() {
+  const prefs = getUserPrefSettings();
+  const mode = prefs.learningMode || 'free';
+  if (mode !== 'step' && mode !== 'custom') return;
+  localStorage.setItem(up('step_paused'), 'true');
+  alert('ステップモードを一時停止しました。\nホーム画面から「再開」ボタンで戻れます。');
+  showScreen('home-screen');
+  updateHomePauseBanner();
+}
+
+function resumeStepMode() {
+  localStorage.removeItem(up('step_paused'));
+  // ポーズ中に殿堂入りした単語があれば補充チェック
+  const prefsR = getUserPrefSettings();
+  if (prefsR.learningMode === 'custom') {
+    checkAndReplenishPool();
+  }
+  updateHomePauseBanner();
+  alert('ステップモードを再開しました！');
+}
+
+function updateHomePauseBanner() {
+  const banner = document.getElementById('home-step-pause-banner');
+  if (!banner) return;
+  const prefs = getUserPrefSettings();
+  const isStepMode = (prefs.learningMode || 'free') === 'step';
+  const paused = isStepPaused();
+  banner.classList.toggle('visible', isStepMode && paused);
+}
+
+// ===== v53 STEP3: 豆知識拡張（派生語・類義語）=====
+
+// 豆知識タイプを拡張
+const TRIVIA_TYPES_V53 = ['pattern', 'phonetics', 'derivatives', 'synonyms'];
+const TRIVIA_TYPE_LABELS_V53 = {
+  etymology: '語源',
+  pattern: '同パターンの仲間',
+  phonetics: '発音記号',
+  derivatives: '派生語・複合語',
+  synonyms: '類義語の使い分け',
+};
+
+// 豆知識キャッシュ（単語×タイプごとに生成結果を保存）
+function getTriviaCache() {
+  try { return JSON.parse(localStorage.getItem(up('trivia_cache')) || '{}'); } catch { return {}; }
+}
+function saveTriviaCache(cache) {
+  try { localStorage.setItem(up('trivia_cache'), JSON.stringify(cache)); } catch {}
+}
+function getCachedTrivia(wordStr, type) {
+  const cache = getTriviaCache();
+  return cache[wordStr + ':' + type] || null;
+}
+function setCachedTrivia(wordStr, type, text) {
+  const cache = getTriviaCache();
+  cache[wordStr + ':' + type] = text;
+  saveTriviaCache(cache);
+}
+
+// 既存の TRIVIA_TYPES / TRIVIA_TYPE_LABELS を拡張で上書き
+(function() {
+  if (typeof TRIVIA_TYPES !== 'undefined') {
+    TRIVIA_TYPES.splice(0, TRIVIA_TYPES.length, ...TRIVIA_TYPES_V53);
+  }
+  if (typeof TRIVIA_TYPE_LABELS !== 'undefined') {
+    Object.assign(TRIVIA_TYPE_LABELS, TRIVIA_TYPE_LABELS_V53);
+  }
+})();
+
+// v53: 豆知識取得 — キャッシュ優先、新タイプ対応
+async function fetchTriviaFromAPI_v53(wordStr, wordObj, type) {
+  const area = document.getElementById('trivia-area');
+  const textEl = document.getElementById('trivia-text');
+  const structEl = document.getElementById('trivia-structured');
+  const typeEl = document.getElementById('trivia-type-badge');
+  if (!area || !textEl) return;
+
+  // キャッシュ確認
+  const cached = getCachedTrivia(wordStr, type);
+  if (cached) {
+    currentTriviaText = cached;
+    currentTriviaType = type;
+    if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS_V53[type] || '豆知識';
+    renderTriviaContent(type, cached, textEl, structEl);
+    area.classList.add('visible');
+    const lb = document.getElementById('trivia-like-btn');
+    const db = document.getElementById('trivia-dislike-btn');
+    const ratings = getTriviaRatings(wordStr);
+    if (lb) lb.classList.toggle('liked', ratings.liked.some(r => r.text === cached));
+    if (db) db.classList.remove('disliked');
+    return;
+  }
+
+  const apiKey = localStorage.getItem('wordsuck_claude_api_key');
+  if (!apiKey) return;
+
+  const meaning = (wordObj && wordObj['意味']) ? wordObj['意味'] : '';
+  let prompt = '';
+
+  if (type === 'etymology') {
+    prompt = `英語「${wordStr}」（意味：${meaning}）の語源や覚え方を、小学生・中学生にわかりやすく日本語で1〜2文で説明してください。「teach+er＝教える人」のような「なるほど！」と思える説明だけ書いてください。無理やりな語呂合わせや強引な説明はNGです。豆知識テキストだけ出力してください。`;
+  } else if (type === 'phonetics') {
+    prompt = `英語「${wordStr}」の発音記号と発音のコツを、小学生・中学生向けに日本語で1〜2文で説明してください。発音記号は必ず含め、よく知っている音に例えてわかりやすく説明してください。豆知識テキストだけ出力してください。`;
+  } else if (type === 'derivatives') {
+    prompt = `英語「${wordStr}」（意味：${meaning}）から派生した語や複合語を3〜5個あげてください。形式は必ず「word（日本語訳）」を読点で区切って出力してください。例：friendship（友情）、friendly（友好的な）、unfriendly（不親切な）。それだけ出力してください。`;
+  } else if (type === 'synonyms') {
+    prompt = `英語「${wordStr}」（意味：${meaning}）と意味が近い英単語を3〜4個あげてください。形式は必ず各行「英語|日本語訳|ニュアンス・使い場面（15字以内）」で改行区切りで出力してください。例：big|大きい|日常会話でよく使う\nlarge|大きい|フォーマル・数値サイズ向き。それだけ出力してください。`;
+  }
+
+  currentTriviaType = type;
+  if (textEl) textEl.textContent = type === 'derivatives' || type === 'synonyms' ? '' : '読み込み中...';
+  if (structEl) { structEl.style.display = type === 'derivatives' || type === 'synonyms' ? 'block' : 'none'; structEl.innerHTML = '<div style="font-size:12px;color:var(--text-muted);font-family:\'Noto Sans JP\',sans-serif;">読み込み中...</div>'; }
+  if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS_V53[type] || '豆知識';
+  area.classList.add('visible');
+  const lb = document.getElementById('trivia-like-btn');
+  const db = document.getElementById('trivia-dislike-btn');
+  if (lb) lb.classList.remove('liked');
+  if (db) db.classList.remove('disliked');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) {
+      renderTriviaContent(type, null, textEl, structEl);
+      return;
+    }
+    const data = await res.json();
+    const text = (data.content?.[0]?.text || '').trim();
+    if (text) {
+      currentTriviaText = text;
+      setCachedTrivia(wordStr, type, text);
+      renderTriviaContent(type, text, textEl, structEl);
+    } else {
+      renderTriviaContent(type, null, textEl, structEl);
+    }
+  } catch {
+    renderTriviaContent(type, null, textEl, structEl);
+  }
+}
+
+function renderTriviaContent(type, text, textEl, structEl) {
+  if (!text) {
+    if (textEl) textEl.textContent = '（取得できませんでした）';
+    if (structEl) { structEl.style.display = 'none'; structEl.innerHTML = ''; }
+    return;
+  }
+  if (type === 'derivatives') {
+    if (textEl) textEl.textContent = '';
+    if (structEl) {
+      structEl.style.display = 'block';
+      // 「word（meaning）」形式をパース
+      const items = text.split(/[、,，]\s*/).map(s => s.trim()).filter(Boolean);
+      structEl.innerHTML = items.map(item => {
+        const m = item.match(/^(.+?)（(.+?)）/);
+        const word = m ? m[1].trim() : item;
+        const meaning = m ? m[2].trim() : '';
+        return `<div class="trivia-struct-item">
+          <span class="trivia-struct-word">${escHtml(word)}</span>
+          <span class="trivia-struct-meaning">${escHtml(meaning)}</span>
+          <button class="trivia-speak-btn" onclick="speakWord('${escAttr(word)}')" title="発音を聞く">🔊</button>
+        </div>`;
+      }).join('');
+    }
+  } else if (type === 'synonyms') {
+    if (textEl) textEl.textContent = '';
+    if (structEl) {
+      structEl.style.display = 'block';
+      const lines = text.split('\n').map(s => s.trim()).filter(s => s.includes('|'));
+      structEl.innerHTML = lines.map(line => {
+        const parts = line.split('|');
+        const word = (parts[0] || '').trim();
+        const meaning = (parts[1] || '').trim();
+        const nuance = (parts[2] || '').trim();
+        return `<div class="trivia-struct-item">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="trivia-struct-word">${escHtml(word)}</span>
+              <button class="trivia-speak-btn" onclick="speakWord('${escAttr(word)}')" title="発音を聞く">🔊</button>
+            </div>
+            <div class="trivia-struct-meaning">${escHtml(meaning)}</div>
+            ${nuance ? `<div class="trivia-struct-nuance">${escHtml(nuance)}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+  } else {
+    if (textEl) textEl.textContent = text;
+    if (structEl) { structEl.style.display = 'none'; structEl.innerHTML = ''; }
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  // onclick="speakWord('...')" 内で安全に使えるよう ' を &#39; に変換
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+}
+
+// 既存の fetchTriviaFromAPI を v53 版に差し替え
+const _origFetchTrivia = typeof fetchTriviaFromAPI === 'function' ? fetchTriviaFromAPI : null;
+fetchTriviaFromAPI = fetchTriviaFromAPI_v53;
+
+// showTrivia の差し替え（v53 版：新タイプ対応 + キャッシュ対応）
+async function showTrivia_v53(wordStr, wordObj) {
+  const area = document.getElementById('trivia-area');
+  const textEl = document.getElementById('trivia-text');
+  const structEl = document.getElementById('trivia-structured');
+  const typeEl = document.getElementById('trivia-type-badge');
+  if (!area || !textEl) return;
+
+  area.classList.remove('visible');
+  currentTriviaWord = wordStr;
+
+  const ratings = getTriviaRatings(wordStr);
+
+  // 👍済みの豆知識があれば優先
+  if (ratings.liked.length > 0) {
+    const item = ratings.liked[Math.floor(Math.random() * ratings.liked.length)];
+    currentTriviaText = item.text;
+    currentTriviaType = item.type;
+    if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS_V53[item.type] || '豆知識';
+    renderTriviaContent(item.type, item.text, textEl, structEl);
+    area.classList.add('visible');
+    const lb = document.getElementById('trivia-like-btn');
+    const db = document.getElementById('trivia-dislike-btn');
+    if (lb) lb.classList.add('liked');
+    if (db) db.classList.remove('disliked');
+    return;
+  }
+
+  // ローテーション（v53 タイプリスト）
+  const types = TRIVIA_TYPES_V53;
+  const type = types[triviaTypeIndex % types.length];
+  triviaTypeIndex++;
+
+  if (type === 'pattern') {
+    const result = getPatternSiblings(wordStr);
+    if (result && result.siblings.length > 1) {
+      const text = `-${result.suffix}グループ：${result.siblings.slice(0, 5).join('・')}`;
+      currentTriviaText = text;
+      currentTriviaType = 'pattern';
+      if (textEl) textEl.textContent = text;
+      if (structEl) { structEl.style.display = 'none'; structEl.innerHTML = ''; }
+      if (typeEl) typeEl.textContent = TRIVIA_TYPE_LABELS_V53.pattern;
+      area.classList.add('visible');
+      const lb = document.getElementById('trivia-like-btn');
+      const db = document.getElementById('trivia-dislike-btn');
+      if (lb) lb.classList.remove('liked');
+      if (db) db.classList.remove('disliked');
+      return;
+    }
+    return;
+  }
+
+  await fetchTriviaFromAPI_v53(wordStr, wordObj, type);
+}
+
+// showTrivia を v53 版で上書き
+showTrivia = showTrivia_v53;
+
+// 👎のdislike も trivia-type-refresh に対応（既存の rateTriviaIgnore を拡張）
+const _origRateTriviaIgnore = typeof rateTriviaIgnore === 'function' ? rateTriviaIgnore : null;
+function rateTriviaIgnore_v53() {
+  if (!currentTriviaWord || !currentTriviaText || currentTriviaText === '読み込み中...') return;
+  const ratings = getTriviaRatings(currentTriviaWord);
+  if (!ratings.rejected.some(r => r.text === currentTriviaText)) {
+    ratings.rejected.push({ type: currentTriviaType, text: currentTriviaText });
+  }
+  ratings.liked = ratings.liked.filter(r => r.text !== currentTriviaText);
+  saveTriviaRatings(currentTriviaWord, ratings);
+  const area = document.getElementById('trivia-area');
+  if (area) area.classList.remove('visible');
+  const word = state.deck && state.deck[state.current];
+  if (word) {
+    const nextType = TRIVIA_TYPES_V53[triviaTypeIndex % TRIVIA_TYPES_V53.length];
+    triviaTypeIndex++;
+    setTimeout(() => fetchTriviaFromAPI_v53(currentTriviaWord, word, nextType), 300);
+  }
+}
+rateTriviaIgnore = rateTriviaIgnore_v53;
+
 </script>
 </body>
 </html>
