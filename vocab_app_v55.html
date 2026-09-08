@@ -614,37 +614,19 @@
         <div class="source-name">ミニラボ（教科書）</div>
         <div class="source-count">166語</div>
       </div>
-      <div id="unit-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
-        <div style="display:flex;gap:6px;margin-bottom:2px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllUnits(true)">全選択</button>
-          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ml-g1" onclick="toggleSrcMidAll(this)">Unit1〜5</button>
-            <button class="sg-expand-btn" id="src-exp-ml-g1" onclick="toggleSrcExpand('ml-g1')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ml-g1">
-            <button class="unit-btn active" data-unit="Unit1" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit1</button>
-            <button class="unit-btn active" data-unit="Unit2" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit2</button>
-            <button class="unit-btn active" data-unit="Unit3" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit3</button>
-            <button class="unit-btn active" data-unit="Unit4" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit4</button>
-            <button class="unit-btn active" data-unit="Unit5" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit5</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ml-g2" onclick="toggleSrcMidAll(this)">Unit6〜10</button>
-            <button class="sg-expand-btn" id="src-exp-ml-g2" onclick="toggleSrcExpand('ml-g2')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ml-g2">
-            <button class="unit-btn active" data-unit="Unit6" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit6</button>
-            <button class="unit-btn active" data-unit="Unit7" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit7</button>
-            <button class="unit-btn active" data-unit="Unit8" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit8</button>
-            <button class="unit-btn active" data-unit="Unit9" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit9</button>
-            <button class="unit-btn active" data-unit="Unit10" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit10</button>
-          </div>
-        </div>
+      <div id="unit-grid" class="unit-grid">
+        <button class="unit-btn unit-all-btn" onclick="selectAllUnits(true)">全選択</button>
+        <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
+        <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)">Unit1</button>
+        <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)">Unit2</button>
+        <button class="unit-btn active" data-unit="Unit3" onclick="toggleUnit(this)">Unit3</button>
+        <button class="unit-btn active" data-unit="Unit4" onclick="toggleUnit(this)">Unit4</button>
+        <button class="unit-btn active" data-unit="Unit5" onclick="toggleUnit(this)">Unit5</button>
+        <button class="unit-btn active" data-unit="Unit6" onclick="toggleUnit(this)">Unit6</button>
+        <button class="unit-btn active" data-unit="Unit7" onclick="toggleUnit(this)">Unit7</button>
+        <button class="unit-btn active" data-unit="Unit8" onclick="toggleUnit(this)">Unit8</button>
+        <button class="unit-btn active" data-unit="Unit9" onclick="toggleUnit(this)">Unit9</button>
+        <button class="unit-btn active" data-unit="Unit10" onclick="toggleUnit(this)">Unit10</button>
       </div>
     </div>
 
@@ -657,32 +639,14 @@
         <div class="source-name">英検5級</div>
         <div class="source-count">107語</div>
       </div>
-      <div id="eiken-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
-        <div style="display:flex;gap:6px;margin-bottom:2px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllEiken(true)">全選択</button>
-          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ek-g1" onclick="toggleSrcMidAll(this)">1〜50</button>
-            <button class="sg-expand-btn" id="src-exp-ek-g1" onclick="toggleSrcExpand('ek-g1')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ek-g1">
-            <button class="unit-btn active" data-eiken="1-25" data-src-parent="ek-g1" onclick="toggleEiken(this)">1〜25</button>
-            <button class="unit-btn active" data-eiken="26-50" data-src-parent="ek-g1" onclick="toggleEiken(this)">26〜50</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ek-g2" onclick="toggleSrcMidAll(this)">51〜107</button>
-            <button class="sg-expand-btn" id="src-exp-ek-g2" onclick="toggleSrcExpand('ek-g2')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ek-g2">
-            <button class="unit-btn active" data-eiken="51-75" data-src-parent="ek-g2" onclick="toggleEiken(this)">51〜75</button>
-            <button class="unit-btn active" data-eiken="76-100" data-src-parent="ek-g2" onclick="toggleEiken(this)">76〜100</button>
-            <button class="unit-btn active" data-eiken="101-107" data-src-parent="ek-g2" onclick="toggleEiken(this)">101〜107</button>
-          </div>
-        </div>
+      <div id="eiken-grid" class="unit-grid">
+        <button class="unit-btn unit-all-btn" onclick="selectAllEiken(true)">全選択</button>
+        <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
+        <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)">1〜25</button>
+        <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)">26〜50</button>
+        <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)">51〜75</button>
+        <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)">76〜100</button>
+        <button class="unit-btn active" data-eiken="101-107" onclick="toggleEiken(this)">101〜107</button>
       </div>
     </div>
 
@@ -695,64 +659,16 @@
         <div class="source-name">まぶたん（中1）</div>
         <div class="source-count">343語</div>
       </div>
-      <div id="mabutan-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
-        <div style="display:flex;gap:6px;margin-bottom:2px;">
+      <div id="mabutan-grid" style="display:flex;flex-direction:column;gap:8px;padding-left:30px;">
+        <div style="display:flex;gap:6px;">
           <button class="unit-btn unit-all-btn" onclick="selectAllMabutan(true)">全選択</button>
           <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllMabutan(false)">全解除</button>
         </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g1" onclick="toggleSrcMidAll(this)">1〜80</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g1" onclick="toggleSrcExpand('mb-g1')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g1">
-            <button class="unit-btn active" data-mabutan="1-16" data-src-parent="mb-g1" onclick="toggleMabutan(this)">1〜16</button>
-            <button class="unit-btn active" data-mabutan="17-32" data-src-parent="mb-g1" onclick="toggleMabutan(this)">17〜32</button>
-            <button class="unit-btn active" data-mabutan="33-48" data-src-parent="mb-g1" onclick="toggleMabutan(this)">33〜48</button>
-            <button class="unit-btn active" data-mabutan="49-64" data-src-parent="mb-g1" onclick="toggleMabutan(this)">49〜64</button>
-            <button class="unit-btn active" data-mabutan="65-80" data-src-parent="mb-g1" onclick="toggleMabutan(this)">65〜80</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g2" onclick="toggleSrcMidAll(this)">81〜160</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g2" onclick="toggleSrcExpand('mb-g2')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g2">
-            <button class="unit-btn active" data-mabutan="81-96" data-src-parent="mb-g2" onclick="toggleMabutan(this)">81〜96</button>
-            <button class="unit-btn active" data-mabutan="97-112" data-src-parent="mb-g2" onclick="toggleMabutan(this)">97〜112</button>
-            <button class="unit-btn active" data-mabutan="113-128" data-src-parent="mb-g2" onclick="toggleMabutan(this)">113〜128</button>
-            <button class="unit-btn active" data-mabutan="129-144" data-src-parent="mb-g2" onclick="toggleMabutan(this)">129〜144</button>
-            <button class="unit-btn active" data-mabutan="145-160" data-src-parent="mb-g2" onclick="toggleMabutan(this)">145〜160</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g3" onclick="toggleSrcMidAll(this)">161〜240</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g3" onclick="toggleSrcExpand('mb-g3')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g3">
-            <button class="unit-btn active" data-mabutan="161-176" data-src-parent="mb-g3" onclick="toggleMabutan(this)">161〜176</button>
-            <button class="unit-btn active" data-mabutan="177-192" data-src-parent="mb-g3" onclick="toggleMabutan(this)">177〜192</button>
-            <button class="unit-btn active" data-mabutan="193-208" data-src-parent="mb-g3" onclick="toggleMabutan(this)">193〜208</button>
-            <button class="unit-btn active" data-mabutan="209-224" data-src-parent="mb-g3" onclick="toggleMabutan(this)">209〜224</button>
-            <button class="unit-btn active" data-mabutan="225-240" data-src-parent="mb-g3" onclick="toggleMabutan(this)">225〜240</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g4" onclick="toggleSrcMidAll(this)">241〜343</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g4" onclick="toggleSrcExpand('mb-g4')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g4">
-            <button class="unit-btn active" data-mabutan="241-256" data-src-parent="mb-g4" onclick="toggleMabutan(this)">241〜256</button>
-            <button class="unit-btn active" data-mabutan="257-272" data-src-parent="mb-g4" onclick="toggleMabutan(this)">257〜272</button>
-            <button class="unit-btn active" data-mabutan="273-288" data-src-parent="mb-g4" onclick="toggleMabutan(this)">273〜288</button>
-            <button class="unit-btn active" data-mabutan="289-304" data-src-parent="mb-g4" onclick="toggleMabutan(this)">289〜304</button>
-            <button class="unit-btn active" data-mabutan="305-320" data-src-parent="mb-g4" onclick="toggleMabutan(this)">305〜320</button>
-            <button class="unit-btn active" data-mabutan="321-336" data-src-parent="mb-g4" onclick="toggleMabutan(this)">321〜336</button>
-            <button class="unit-btn active" data-mabutan="337-343" data-src-parent="mb-g4" onclick="toggleMabutan(this)">337〜343</button>
-          </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="number" id="mabutan-range-from" min="1" max="343" value="1" inputmode="numeric" oninput="saveUnitSelection();updateSelectedCount();" onblur="onMabutanRangeChange()" style="width:64px;padding:6px 8px;border-radius:8px;border:2px solid var(--surface);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;">
+          <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">番 〜</span>
+          <input type="number" id="mabutan-range-to" min="1" max="343" value="343" inputmode="numeric" oninput="saveUnitSelection();updateSelectedCount();" onblur="onMabutanRangeChange()" style="width:64px;padding:6px 8px;border-radius:8px;border:2px solid var(--surface);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;">
+          <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">番</span>
         </div>
       </div>
     </div>
@@ -1703,6 +1619,10 @@
         <button class="timer-btn" data-today-count="15" onclick="selectTodayCount(this)">15問</button>
       </div>
     </div>
+    <div class="settings-section">
+      <div class="settings-label" id="today-set-status">今日のセット：まだありません</div>
+      <button class="result-btn secondary" style="padding:10px;font-size:13px;" onclick="refreshTodayReflectionSet()">🔄 新しく練習した単語をセットに追加</button>
+    </div>
     <button onclick="startTodayTest()" class="start-btn" style="background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 24px rgba(16,185,129,.4);">スタート →</button>
   </div>
   <!-- クイズフェーズ -->
@@ -1776,6 +1696,10 @@
         </div>
         <button class="toggle-switch on" id="review-weak-toggle" onclick="this.classList.toggle('on');reviewWeakPriority=this.classList.contains('on');"></button>
       </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label" id="review-set-status">今日のセット：まだありません</div>
+      <button class="result-btn secondary" style="padding:10px;font-size:13px;" onclick="refreshTodayGrandReviewSet()">🔄 新しく練習した単語をセットに追加</button>
     </div>
     <button onclick="startReviewTest()" class="start-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 8px 24px rgba(245,158,11,.4);">スタート →</button>
   </div>
@@ -3450,6 +3374,33 @@ function mabutanInGroup(w, group) {
   const [lo, hi] = group.split('-').map(Number);
   return num >= lo && num <= hi;
 }
+const MABUTAN_RANGE_GROUPS = ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343'];
+function getMabutanRange() {
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  if (!fromEl || !toEl || fromEl.value === '' || toEl.value === '') return null;
+  let from = parseInt(fromEl.value, 10);
+  let to = parseInt(toEl.value, 10);
+  if (isNaN(from) || isNaN(to)) return null;
+  from = Math.max(1, Math.min(343, from));
+  to = Math.max(1, Math.min(343, to));
+  if (from > to) { const t = from; from = to; to = t; }
+  return [from, to];
+}
+function onMabutanRangeChange() {
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  if (fromEl && fromEl.value !== '') {
+    const from = parseInt(fromEl.value, 10);
+    if (!isNaN(from)) fromEl.value = Math.max(1, Math.min(343, from));
+  }
+  if (toEl && toEl.value !== '') {
+    const to = parseInt(toEl.value, 10);
+    if (!isNaN(to)) toEl.value = Math.max(1, Math.min(343, to));
+  }
+  saveUnitSelection();
+  updateSelectedCount();
+}
 function eikenInGroup(w, group) {
   const s = w['出典_英検5級'] || '';
   const m = s.match(/No\.(\d+)/);
@@ -3532,44 +3483,22 @@ function updateSourceUI() {
   saveUnitSelection();
   updateSelectedCount();
 }
-function toggleSrcExpand(groupId) {
-  const sub = document.getElementById('src-subs-' + groupId);
-  const btn = document.getElementById('src-exp-' + groupId);
-  if (!sub) return;
-  const open = sub.style.display === 'none' || sub.style.display === '';
-  sub.style.display = open ? 'flex' : 'none';
-  if (btn) btn.textContent = open ? '▾' : '▸';
-}
-function toggleSrcMidAll(btn) {
-  const mid = btn.dataset.srcMid;
-  const subBtns = document.querySelectorAll(`[data-src-parent="${mid}"]`);
-  const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
-  subBtns.forEach(b => b.classList.toggle('active', !allActive));
-  btn.classList.toggle('active', !allActive);
-  saveUnitSelection(); updateSelectedCount();
-}
-function syncSrcMidBtn(mid) {
-  const midBtn = document.querySelector(`[data-src-mid="${mid}"]`);
-  if (!midBtn) return;
-  const anyActive = Array.from(document.querySelectorAll(`[data-src-parent="${mid}"].active`)).length > 0;
-  midBtn.classList.toggle('active', anyActive);
-}
-function toggleUnit(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
-function toggleEiken(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
-function toggleMabutan(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
+function toggleUnit(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
+function toggleEiken(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
 function selectAllUnits(select = true) {
   document.querySelectorAll('#unit-grid [data-unit]').forEach(b => b.classList.toggle('active', select));
-  document.querySelectorAll('#unit-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllEiken(select = true) {
   document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => b.classList.toggle('active', select));
-  document.querySelectorAll('#eiken-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllMabutan(select = true) {
-  document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => b.classList.toggle('active', select));
-  document.querySelectorAll('#mabutan-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  if (!fromEl || !toEl) return;
+  if (select) { fromEl.value = 1; toEl.value = 343; }
+  else { fromEl.value = ''; toEl.value = ''; }
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllShogakusei(select = true) {
@@ -3585,12 +3514,12 @@ function buildDeckRaw(shuffle = true) {
   const shogakuseiOn = document.getElementById('chk-shogakusei').checked;
   const selectedUnits = Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit);
   const selectedEikenGroups = Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken);
-  const selectedMabutanGroups = Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan);
+  const mabutanRange = getMabutanRange();
   const selectedSgSubs = getSelectedSgSubs(false);
   const result = [];
   if (minilaboOn) MINILABO.filter(w => selectedUnits.includes(w['出典_ミニラボ'])).forEach(w => result.push({...w, _source: 'ミニラボ'}));
   if (eikenOn) EIKEN.filter(w => selectedEikenGroups.some(g => eikenInGroup(w, g))).forEach(w => result.push({...w, _source: '英検5級'}));
-  if (mabutanOn) MABUTAN.filter(w => selectedMabutanGroups.some(g => mabutanInGroup(w, g))).forEach(w => result.push({...w, _source: 'まぶたん'}));
+  if (mabutanOn && mabutanRange) MABUTAN.filter(w => { const num = getMabutanNum(w); return num >= mabutanRange[0] && num <= mabutanRange[1]; }).forEach(w => result.push({...w, _source: 'まぶたん'}));
   if (shogakuseiOn) {
     const sgFiltered = selectedSgSubs.length > 0
       ? SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, selectedSgSubs))
@@ -7171,7 +7100,7 @@ function getWordUnit(wordObj) {
   }
   if (src === 'まぶたん') {
     const no = getMabutanNum(wordObj);
-    for (const g of ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343']) {
+    for (const g of MABUTAN_RANGE_GROUPS) {
       const [lo, hi] = g.split('-').map(Number);
       if (no >= lo && no <= hi) return 'まぶたん ' + g;
     }
@@ -7977,7 +7906,7 @@ function saveUnitSelection() {
       original: document.getElementById('chk-original').checked,
       minilaboUnits: Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit),
       eikenUnits: Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken),
-      mabutanUnits: Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan),
+      mabutanRange: getMabutanRange(),
       shogakuseiSubs: getSelectedSgSubs(false),
       origGroups: getSelectedOrigGroups(),
     };
@@ -7999,19 +7928,19 @@ function restoreUnitSelection() {
       document.querySelectorAll('#unit-grid [data-unit]').forEach(b => {
         b.classList.toggle('active', sel.minilaboUnits.includes(b.dataset.unit));
       });
-      document.querySelectorAll('#unit-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
     if (sel.eikenUnits) {
       document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => {
         b.classList.toggle('active', sel.eikenUnits.includes(b.dataset.eiken));
       });
-      document.querySelectorAll('#eiken-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
-    if (sel.mabutanUnits) {
-      document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => {
-        b.classList.toggle('active', sel.mabutanUnits.includes(b.dataset.mabutan));
-      });
-      document.querySelectorAll('#mabutan-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
+    if (sel.mabutanRange !== undefined) {
+      const fromEl = document.getElementById('mabutan-range-from');
+      const toEl = document.getElementById('mabutan-range-to');
+      if (fromEl && toEl) {
+        fromEl.value = (sel.mabutanRange && sel.mabutanRange[0] != null) ? sel.mabutanRange[0] : '';
+        toEl.value = (sel.mabutanRange && sel.mabutanRange[1] != null) ? sel.mabutanRange[1] : '';
+      }
     }
     if (sel.shogakuseiSubs) {
       document.querySelectorAll('[data-sg-sub]').forEach(b => {
@@ -8043,10 +7972,16 @@ function recordUnitPractice() {
     });
   }
   if (document.getElementById('chk-mabutan').checked) {
-    document.querySelectorAll('#mabutan-grid [data-mabutan].active').forEach(b => {
-      const k = up('practice_mb_' + b.dataset.mabutan);
-      localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
-    });
+    const range = getMabutanRange();
+    if (range) {
+      MABUTAN_RANGE_GROUPS.forEach(g => {
+        const [lo, hi] = g.split('-').map(Number);
+        if (lo <= range[1] && hi >= range[0]) {
+          const k = up('practice_mb_' + g);
+          localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
+        }
+      });
+    }
   }
   if (document.getElementById('chk-shogakusei').checked) {
     document.querySelectorAll('[data-sg-sub].active').forEach(b => {
@@ -8220,7 +8155,7 @@ function renderRecords() {
     const cnt = parseInt(localStorage.getItem(up('practice_ek_'+g))||'0');
     unitRows.push({name:'英検 '+g, cnt, key:'ek_'+g});
   });
-  ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343'].forEach(g => {
+  MABUTAN_RANGE_GROUPS.forEach(g => {
     const cnt = parseInt(localStorage.getItem(up('practice_mb_'+g))||'0');
     unitRows.push({name:'まぶたん '+g, cnt, key:'mb_'+g});
   });
@@ -8808,6 +8743,7 @@ function rateTriviaIgnore() {
 // ===== 総復習テスト =====
 let reviewDeck = [], reviewIndex = 0, reviewCorrect = 0, reviewWrong = 0;
 let reviewCount = 20, reviewWeakPriority = true;
+let reviewUniqueWords = [], reviewFinalStatus = {};
 
 function selectReviewCount(btn) {
   document.querySelectorAll('[data-review-count]').forEach(b => b.classList.remove('active'));
@@ -8820,31 +8756,38 @@ function openReviewTestSetup() {
   document.getElementById('review-setup-area').style.display = 'flex';
   document.getElementById('review-quiz-area').style.display = 'none';
   document.getElementById('review-result-area').style.display = 'none';
+  updateGrandReviewSetStatus();
+}
+
+// 練習済み全単語を「苦手優先」で重み付けした候補順（重複除去済み）。今日の固定セットの候補プールとして使う
+function buildReviewPriorityOrder() {
+  const allWords = getAllDataWords();
+  const practicedWords = allWords.filter(w => (getWordStatus(w['単語']).count || 0) > 0);
+  if (!practicedWords.length) return [];
+  if (!reviewWeakPriority) return practicedWords.sort(() => Math.random() - 0.5);
+  const weakWords = practicedWords.filter(w => isWeakWord(w['単語']));
+  const others = practicedWords.filter(w => !isWeakWord(w['単語']));
+  // 弱い単語を3倍の重みで入れる
+  const weighted = [...weakWords, ...weakWords, ...weakWords, ...others].sort(() => Math.random() - 0.5);
+  const seen = new Set();
+  const ordered = [];
+  for (const w of weighted) {
+    if (!seen.has(w['単語'])) { seen.add(w['単語']); ordered.push(w); }
+  }
+  return ordered;
 }
 
 function startReviewTest() {
-  const allWords = getAllDataWords();
-  // 1回以上練習した単語のみ対象
-  const practicedWords = allWords.filter(w => (getWordStatus(w['単語']).count || 0) > 0);
-  if (!practicedWords.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
-  let pool;
-  if (reviewWeakPriority) {
-    const weakWords = practicedWords.filter(w => isWeakWord(w['単語']));
-    const others = practicedWords.filter(w => !isWeakWord(w['単語']));
-    // 弱い単語を3倍の重みで入れる
-    const weighted = [...weakWords, ...weakWords, ...weakWords, ...others];
-    pool = weighted.sort(() => Math.random() - 0.5);
-    // 重複除去しながら必要数取得
-    const seen = new Set();
-    reviewDeck = [];
-    for (const w of pool) {
-      if (!seen.has(w['単語'])) { seen.add(w['単語']); reviewDeck.push(w); }
-      if (reviewDeck.length >= reviewCount) break;
-    }
-  } else {
-    reviewDeck = practicedWords.sort(() => Math.random() - 0.5).slice(0, reviewCount);
-  }
-  if (!reviewDeck.length) { alert('条件に合う単語がありません。'); return; }
+  const candidatePool = buildReviewPriorityOrder();
+  if (!candidatePool.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
+  const wordMap = new Map(getAllDataWords().map(w => [w['単語'], w]));
+  const targetCount = reviewCount >= 9999 ? candidatePool.length : reviewCount;
+  const entry = ensureTodayGrandReviewSet(candidatePool, targetCount);
+  const words = entry.words.slice(0, targetCount).map(w => wordMap.get(w)).filter(Boolean);
+  if (!words.length) { alert('条件に合う単語がありません。'); return; }
+  reviewDeck = words.sort(() => Math.random() - 0.5);
+  reviewUniqueWords = reviewDeck.slice();
+  reviewFinalStatus = {};
   reviewIndex = 0; reviewCorrect = 0; reviewWrong = 0;
   document.getElementById('review-setup-area').style.display = 'none';
   document.getElementById('review-result-area').style.display = 'none';
@@ -8900,8 +8843,9 @@ function checkReviewAnswer() {
     boxes.appendChild(b);
   }
   const fb = document.getElementById('review-feedback');
+  reviewFinalStatus[word['単語']] = isOk ? 'correct' : 'wrong';
+  recordGrandReviewResult(word['単語'], isOk);
   if (isOk) {
-    reviewCorrect++;
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
     // 単語ステータス更新
     const ws = getWordStatus(word['単語']);
@@ -8909,11 +8853,12 @@ function checkReviewAnswer() {
     if (ws.streak >= 3) ws.hall = true;
     setWordStatus(word['単語'], ws);
   } else {
-    reviewWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
     const ws = getWordStatus(word['単語']);
     ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
     setWordStatus(word['単語'], ws);
+    // ①テスト中の再出題：数問（3〜5問）挟んで再度出題する
+    scheduleRetryInsertion(reviewDeck, reviewIndex, word);
   }
   speakWord(word['単語']);
   document.getElementById('review-next-btn').style.display = 'block';
@@ -8927,6 +8872,13 @@ function reviewNext() {
 
 function showReviewResult() {
   document.getElementById('review-quiz-area').style.display = 'none';
+  // 再出題があっても、各単語の最終正誤だけを結果に反映する
+  reviewCorrect = 0; reviewWrong = 0;
+  reviewUniqueWords.forEach(w => {
+    const st = reviewFinalStatus[w['単語']];
+    if (st === 'correct') reviewCorrect++;
+    else if (st === 'wrong') reviewWrong++;
+  });
   const total = reviewCorrect + reviewWrong;
   const pct = total > 0 ? Math.round(reviewCorrect / total * 100) : 0;
   document.getElementById('review-score-pct').textContent = pct + '%';
@@ -8947,6 +8899,7 @@ function showReviewResult() {
 let todayTestDeck = [], todayTestIndex = 0, todayTestCorrect = 0, todayTestWrong = 0;
 let todayTestCount = 5;
 let todayTestFromSession = false;
+let todayTestUniqueWords = [], todayTestFinalStatus = {};
 
 function selectTodayCount(btn) {
   document.querySelectorAll('[data-today-count]').forEach(b => b.classList.remove('active'));
@@ -8959,9 +8912,11 @@ function openTodayTestSetup() {
   document.getElementById('today-setup-area').style.display = 'flex';
   document.getElementById('today-quiz-area').style.display = 'none';
   document.getElementById('today-result-area').style.display = 'none';
+  updateReflectionSetStatus();
 }
 
-function startTodayTest() {
+// 振り返りテストの候補プール（優先順位：今日のセッション単語 → 苦手単語 → 過去練習済み単語）
+function buildReflectionCandidatePool() {
   const allWords = getAllDataWords();
   // 今日のセッション単語（重複除去）
   const uniqueMap = {};
@@ -8975,10 +8930,19 @@ function startTodayTest() {
   const practicedOthers = allWords.filter(w =>
     (getWordStatus(w['単語']).count || 0) > 0 && !combinedKeys.has(w['単語'])
   ).sort(() => Math.random() - 0.5);
-  // 優先順位：セッション → 苦手 → 練習済み
-  const pool = [...sessionUnique, ...weakWords, ...practicedOthers];
-  if (!pool.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
-  todayTestDeck = pool.slice(0, todayTestCount);
+  return [...sessionUnique, ...weakWords, ...practicedOthers];
+}
+
+function startTodayTest() {
+  const candidatePool = buildReflectionCandidatePool();
+  if (!candidatePool.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
+  const wordMap = new Map(getAllDataWords().map(w => [w['単語'], w]));
+  const entry = ensureTodayReflectionSet(candidatePool, todayTestCount);
+  const words = entry.words.slice(0, todayTestCount).map(w => wordMap.get(w)).filter(Boolean);
+  if (!words.length) { alert('条件に合う単語がありません。'); return; }
+  todayTestDeck = words.sort(() => Math.random() - 0.5);
+  todayTestUniqueWords = todayTestDeck.slice();
+  todayTestFinalStatus = {};
   todayTestIndex = 0; todayTestCorrect = 0; todayTestWrong = 0;
   document.getElementById('today-setup-area').style.display = 'none';
   document.getElementById('today-result-area').style.display = 'none';
@@ -9034,8 +8998,9 @@ function checkTodayAnswer() {
     boxes.appendChild(b);
   }
   const fb = document.getElementById('today-feedback');
+  todayTestFinalStatus[word['単語']] = isOk ? 'correct' : 'wrong';
+  recordReflectionSetResult(word['単語'], isOk);
   if (isOk) {
-    todayTestCorrect++;
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
     const ws = getWordStatus(word['単語']);
     ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
@@ -9044,11 +9009,12 @@ function checkTodayAnswer() {
     setWordStatus(word['単語'], ws);
     if (justEnteredHall) checkAndReplenishPool();
   } else {
-    todayTestWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
     const ws = getWordStatus(word['単語']);
     ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
     setWordStatus(word['単語'], ws);
+    // ①テスト中の再出題：数問（3〜5問）挟んで再度出題する
+    scheduleRetryInsertion(todayTestDeck, todayTestIndex, word);
   }
   speakWord(word['単語']);
   document.getElementById('today-next-btn').style.display = 'block';
@@ -9062,6 +9028,13 @@ function todayNext() {
 
 function showTodayResult() {
   document.getElementById('today-quiz-area').style.display = 'none';
+  // 再出題があっても、各単語の最終正誤だけを結果に反映する
+  todayTestCorrect = 0; todayTestWrong = 0;
+  todayTestUniqueWords.forEach(w => {
+    const st = todayTestFinalStatus[w['単語']];
+    if (st === 'correct') todayTestCorrect++;
+    else if (st === 'wrong') todayTestWrong++;
+  });
   const total = todayTestCorrect + todayTestWrong;
   const pct = total > 0 ? Math.round(todayTestCorrect / total * 100) : 0;
   document.getElementById('today-score-pct').textContent = pct + '%';
@@ -9348,6 +9321,159 @@ function recordTodaySetResult(source, wordStr, isCorrect) {
   saveDailySetHistory(hist);
 }
 
+// ===== v56: テスト中の再出題（振り返り・総復習 共通）=====
+// 不正解になった単語を、数問（3〜5問）挟んだ後に同じデッキ内へ再挿入する
+function scheduleRetryInsertion(deck, index, word) {
+  const offset = 3 + Math.floor(Math.random() * 3); // 3〜5問後
+  const insertAt = Math.min(index + offset, deck.length);
+  deck.splice(insertAt, 0, word);
+}
+
+// ===== v56: 振り返りテストの今日の固定セット（翌日引き継ぎ・卒業あり）=====
+const REFLECTION_SET_MAX = 15; // 振り返りテストの問題数選択肢の最大値
+
+// 前日の固定セットのうち「1回でも間違えた単語」をキャリーオーバーし、不足分を候補プールから補う
+function buildReflectionEntryWithCarryover(candidatePool, count) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  const SRC = '__reflection__';
+  const pastDates = Object.keys(hist).filter(d => d !== today && hist[d][SRC]).sort();
+  const prevDate = pastDates.length ? pastDates[pastDates.length - 1] : null;
+  const prev = prevDate ? hist[prevDate][SRC] : null;
+  const carryover = prev ? prev.words.filter(w => prev.stats[w] && prev.stats[w].wrong > 0) : [];
+  const words = [...new Set(carryover)];
+  const origin = {};
+  words.forEach(w => { origin[w] = 'carry'; });
+  for (const w of candidatePool) {
+    if (words.length >= count) break;
+    const key = w['単語'];
+    if (!words.includes(key)) { words.push(key); origin[key] = 'new'; }
+  }
+  return { words, origin, stats: {} };
+}
+
+// 振り返りテストの今日の固定セットを取得（無ければ前日キャリーオーバーで新規作成、既にあれば不足分だけ追加）
+function ensureTodayReflectionSet(candidatePool, count) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  if (!hist[today]) hist[today] = {};
+  const SRC = '__reflection__';
+  let entry = hist[today][SRC];
+  if (!entry) {
+    entry = buildReflectionEntryWithCarryover(candidatePool, count);
+    hist[today][SRC] = entry;
+    saveDailySetHistory(hist);
+  } else if (count > entry.words.length) {
+    const existing = new Set(entry.words);
+    for (const w of candidatePool) {
+      if (entry.words.length >= count) break;
+      const key = w['単語'];
+      if (!existing.has(key)) { entry.words.push(key); entry.origin[key] = 'new'; existing.add(key); }
+    }
+    saveDailySetHistory(hist);
+  }
+  return entry;
+}
+
+// 振り返りテストの今日のセット内の単語を正誤記録に反映（翌日のキャリーオーバー判定に使う）
+function recordReflectionSetResult(wordStr, isCorrect) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  const entry = hist[today] && hist[today]['__reflection__'];
+  if (!entry || !entry.words.includes(wordStr)) return;
+  const st = entry.stats[wordStr] || { correct: 0, wrong: 0 };
+  if (isCorrect) st.correct++; else st.wrong++;
+  entry.stats[wordStr] = st;
+  saveDailySetHistory(hist);
+}
+
+// 手動更新：今日新しく練習済みになった単語を、既存の振り返りセットに追加合流させる（作り直しはしない）
+function refreshTodayReflectionSet() {
+  const candidatePool = buildReflectionCandidatePool();
+  if (!candidatePool.length) { alert('まだ練習した単語がありません。'); return; }
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  const before = ((hist[today] || {})['__reflection__'] || { words: [] }).words.length;
+  const entry = ensureTodayReflectionSet(candidatePool, REFLECTION_SET_MAX);
+  const added = entry.words.length - before;
+  alert(added > 0 ? `新しく${added}語をセットに追加しました。` : '追加できる新しい単語はありませんでした。');
+  updateReflectionSetStatus();
+}
+
+// 設定画面に「今日のセット：n語（🔁引き継ぎ・🆕新規）」を表示する
+function updateReflectionSetStatus() {
+  const el = document.getElementById('today-set-status');
+  if (!el) return;
+  const hist = getDailySetHistory();
+  const entry = (hist[todayDate()] || {})['__reflection__'];
+  if (!entry || !entry.words.length) { el.textContent = '今日のセット：まだありません（スタートすると作成されます）'; return; }
+  const carryCount = entry.words.filter(w => entry.origin[w] === 'carry').length;
+  const newCount = entry.words.length - carryCount;
+  el.textContent = `今日のセット：${entry.words.length}語（🔁引き継ぎ${carryCount}・🆕新規${newCount}）`;
+}
+
+// ===== v56: 総復習テストの今日の固定セット（引き継ぎなし・追加のみ）=====
+const GRAND_REVIEW_SET_MAX = 50; // 手動更新ボタンで追加合流させる上限
+
+function ensureTodayGrandReviewSet(candidatePool, count) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  if (!hist[today]) hist[today] = {};
+  const SRC = '__grand_review__';
+  let entry = hist[today][SRC];
+  if (!entry) {
+    const words = candidatePool.slice(0, count).map(w => w['単語']);
+    const origin = {};
+    words.forEach(w => { origin[w] = 'new'; });
+    entry = { words, origin, stats: {} };
+    hist[today][SRC] = entry;
+    saveDailySetHistory(hist);
+  } else if (count > entry.words.length) {
+    const existing = new Set(entry.words);
+    for (const w of candidatePool) {
+      if (entry.words.length >= count) break;
+      const key = w['単語'];
+      if (!existing.has(key)) { entry.words.push(key); entry.origin[key] = 'new'; existing.add(key); }
+    }
+    saveDailySetHistory(hist);
+  }
+  return entry;
+}
+
+function recordGrandReviewResult(wordStr, isCorrect) {
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  const entry = hist[today] && hist[today]['__grand_review__'];
+  if (!entry || !entry.words.includes(wordStr)) return;
+  const st = entry.stats[wordStr] || { correct: 0, wrong: 0 };
+  if (isCorrect) st.correct++; else st.wrong++;
+  entry.stats[wordStr] = st;
+  saveDailySetHistory(hist);
+}
+
+// 手動更新：今日新しく練習済みになった単語を、既存の総復習セットに追加合流させる（作り直しはしない）
+function refreshTodayGrandReviewSet() {
+  const candidatePool = buildReviewPriorityOrder();
+  if (!candidatePool.length) { alert('まだ練習した単語がありません。'); return; }
+  const hist = getDailySetHistory();
+  const today = todayDate();
+  const before = ((hist[today] || {})['__grand_review__'] || { words: [] }).words.length;
+  const target = Math.min(GRAND_REVIEW_SET_MAX, candidatePool.length);
+  const entry = ensureTodayGrandReviewSet(candidatePool, target);
+  const added = entry.words.length - before;
+  alert(added > 0 ? `新しく${added}語をセットに追加しました。` : '追加できる新しい単語はありませんでした。');
+  updateGrandReviewSetStatus();
+}
+
+function updateGrandReviewSetStatus() {
+  const el = document.getElementById('review-set-status');
+  if (!el) return;
+  const hist = getDailySetHistory();
+  const entry = (hist[todayDate()] || {})['__grand_review__'];
+  if (!entry || !entry.words.length) { el.textContent = '今日のセット：まだありません（スタートすると作成されます）'; return; }
+  el.textContent = `今日のセット：${entry.words.length}語`;
+}
+
 // ===== v55: 単語セット履歴画面 =====
 function openDailySetHistory() {
   showScreen('daily-history-screen');
@@ -9373,6 +9499,7 @@ function renderDailySetHistory() {
     container.innerHTML = '<div class="rec-empty">まだ記録がありません。ステップモードで練習すると、ここに今日の単語セットが記録されます。</div>';
     return;
   }
+  const sourceLabels = { '__reflection__': '振り返りテスト', '__grand_review__': '総復習テスト' };
   container.innerHTML = dates.map(date => {
     const daySources = hist[date];
     const sourceBlocks = Object.keys(daySources).map(source => {
@@ -9384,8 +9511,9 @@ function renderDailySetHistory() {
         const resultMark = st.wrong > 0 ? ` ✗${st.wrong}` : (st.correct > 0 ? ' ✓' : '');
         return `<button class="pattern-word-chip" onclick="speakWord('${w.replace(/'/g, "\\'")}')">${badge}${w}${resultMark}</button>`;
       }).join('');
+      const label = sourceLabels[source] || source;
       return `<div style="margin-top:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">${source}（${entry.words.length}語）</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">${label}（${entry.words.length}語）</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${chips}</div>
       </div>`;
     }).join('');
@@ -9567,8 +9695,8 @@ function getAllWordsBySource() {
       if (units.length > 0) data = data.filter(w => units.some(g => eikenInGroup(w, g)));
     } else if (s.key === 'まぶたん') {
       if (sel.mabutan === false) { result[s.key] = []; return; }
-      const units = sel.mabutanUnits || [];
-      if (units.length > 0) data = data.filter(w => units.some(g => mabutanInGroup(w, g)));
+      const range = sel.mabutanRange;
+      if (range) data = data.filter(w => { const num = getMabutanNum(w); return num >= range[0] && num <= range[1]; });
     } else if (s.key === '小学生英語') {
       if (sel.shogakusei === false) { result[s.key] = []; return; }
       const subs = sel.shogakuseiSubs || [];
