@@ -51,6 +51,21 @@
   .unit-btn:disabled { opacity:.3; pointer-events:none; }
   .unit-btn.unit-all-btn.all-selected { border-color:var(--accent2); color:var(--accent2); }
   .unit-btn.unit-all-btn.all-selected:hover,.unit-btn.unit-all-btn.all-selected:active { background:rgba(255,209,102,.15); }
+  .unit-progress { display:block; font-size:9px; font-weight:700; opacity:.75; margin-top:1px; }
+  /* 教材別 単語一覧（わたしの記録） */
+  .wl-source { border-radius:12px; background:var(--surface); margin-bottom:6px; overflow:hidden; }
+  .wl-source-header, .wl-group-header { width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px; background:none; border:none; color:var(--text); font-size:13px; font-weight:800; font-family:'Noto Sans JP',sans-serif; cursor:pointer; text-align:left; }
+  .wl-group-header { padding-left:20px; font-size:12px; font-weight:700; border-top:1px solid rgba(255,255,255,.06); }
+  .wl-source-header span:first-child, .wl-group-header span:first-child { flex:1; }
+  .wl-progress { font-size:11px; color:var(--accent3); font-weight:700; white-space:nowrap; }
+  .wl-arrow { color:var(--text-muted); font-size:11px; }
+  .wl-groups, .wl-words { display:flex; flex-direction:column; }
+  .wl-word-row { display:flex; align-items:center; gap:8px; padding:6px 12px 6px 30px; border-top:1px solid rgba(255,255,255,.04); font-family:'Noto Sans JP',sans-serif; }
+  .wl-word-text { font-size:13px; font-weight:800; font-family:'Nunito',sans-serif; min-width:70px; }
+  .wl-word-meaning { flex:1; font-size:11px; color:var(--text-muted); }
+  .wl-word-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:8px; background:rgba(255,255,255,.08); color:var(--text-muted); white-space:nowrap; }
+  .wl-word-status.cleared { background:rgba(6,214,160,.15); color:var(--accent3); }
+  .wl-word-mistake { font-size:10px; color:var(--accent); white-space:nowrap; min-width:52px; text-align:right; }
   .selected-count { font-size:13px; color:var(--accent2); font-weight:700; text-align:center; padding:4px; font-family:'Noto Sans JP',sans-serif; }
   .priority-btns { display:flex; gap:8px; }
   .priority-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid transparent; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
@@ -608,16 +623,16 @@
       <div id="unit-grid" class="unit-grid">
         <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllUnits(true)">全選択</button>
         <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
-        <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)">Unit1</button>
-        <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)">Unit2</button>
-        <button class="unit-btn active" data-unit="Unit3" onclick="toggleUnit(this)">Unit3</button>
-        <button class="unit-btn active" data-unit="Unit4" onclick="toggleUnit(this)">Unit4</button>
-        <button class="unit-btn active" data-unit="Unit5" onclick="toggleUnit(this)">Unit5</button>
-        <button class="unit-btn active" data-unit="Unit6" onclick="toggleUnit(this)">Unit6</button>
-        <button class="unit-btn active" data-unit="Unit7" onclick="toggleUnit(this)">Unit7</button>
-        <button class="unit-btn active" data-unit="Unit8" onclick="toggleUnit(this)">Unit8</button>
-        <button class="unit-btn active" data-unit="Unit9" onclick="toggleUnit(this)">Unit9</button>
-        <button class="unit-btn active" data-unit="Unit10" onclick="toggleUnit(this)">Unit10</button>
+        <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)"><span class="unit-label">Unit1</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)"><span class="unit-label">Unit2</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit3" onclick="toggleUnit(this)"><span class="unit-label">Unit3</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit4" onclick="toggleUnit(this)"><span class="unit-label">Unit4</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit5" onclick="toggleUnit(this)"><span class="unit-label">Unit5</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit6" onclick="toggleUnit(this)"><span class="unit-label">Unit6</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit7" onclick="toggleUnit(this)"><span class="unit-label">Unit7</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit8" onclick="toggleUnit(this)"><span class="unit-label">Unit8</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit9" onclick="toggleUnit(this)"><span class="unit-label">Unit9</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit10" onclick="toggleUnit(this)"><span class="unit-label">Unit10</span><span class="unit-progress"></span></button>
       </div>
     </div>
 
@@ -633,11 +648,11 @@
       <div id="eiken-grid" class="unit-grid">
         <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllEiken(true)">全選択</button>
         <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
-        <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)">1〜25</button>
-        <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)">26〜50</button>
-        <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)">51〜75</button>
-        <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)">76〜100</button>
-        <button class="unit-btn active" data-eiken="101-107" onclick="toggleEiken(this)">101〜107</button>
+        <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)"><span class="unit-label">1〜25</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)"><span class="unit-label">26〜50</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)"><span class="unit-label">51〜75</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)"><span class="unit-label">76〜100</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="101-107" onclick="toggleEiken(this)"><span class="unit-label">101〜107</span><span class="unit-progress"></span></button>
       </div>
     </div>
 
@@ -661,6 +676,7 @@
           <input type="number" id="mabutan-range-to" min="1" max="343" value="343" inputmode="numeric" oninput="saveUnitSelection();updateSelectedCount();" onblur="onMabutanRangeChange()" style="width:64px;padding:6px 8px;border-radius:8px;border:2px solid var(--surface);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;">
           <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">番</span>
         </div>
+        <div id="mabutan-progress-label" style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;"></div>
       </div>
     </div>
 
@@ -681,7 +697,7 @@
         <!-- 数・時間 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)">数・時間</button>
+            <button class="sg-mid-btn" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)"><span class="unit-label">数・時間</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-数・時間" onclick="toggleSgExpand('数・時間')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-数・時間">
@@ -695,7 +711,7 @@
         <!-- 食べ物 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)">食べ物</button>
+            <button class="sg-mid-btn" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)"><span class="unit-label">食べ物</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-食べ物" onclick="toggleSgExpand('食べ物')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-食べ物">
@@ -708,7 +724,7 @@
         <!-- 生き物 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="生き物" onclick="toggleSgMidAll(this)">生き物</button>
+            <button class="sg-mid-btn" data-sg-mid="生き物" onclick="toggleSgMidAll(this)"><span class="unit-label">生き物</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-生き物" onclick="toggleSgExpand('生き物')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-生き物">
@@ -721,7 +737,7 @@
         <!-- 人・体 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="人・体" onclick="toggleSgMidAll(this)">人・体</button>
+            <button class="sg-mid-btn" data-sg-mid="人・体" onclick="toggleSgMidAll(this)"><span class="unit-label">人・体</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-人・体" onclick="toggleSgExpand('人・体')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-人・体">
@@ -734,7 +750,7 @@
         <!-- 学校・町 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)">学校・町</button>
+            <button class="sg-mid-btn" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)"><span class="unit-label">学校・町</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-学校・町" onclick="toggleSgExpand('学校・町')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-学校・町">
@@ -748,7 +764,7 @@
         <!-- 生活 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="生活" onclick="toggleSgMidAll(this)">生活</button>
+            <button class="sg-mid-btn" data-sg-mid="生活" onclick="toggleSgMidAll(this)"><span class="unit-label">生活</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-生活" onclick="toggleSgExpand('生活')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-生活">
@@ -762,7 +778,7 @@
         <!-- 自然 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="自然" onclick="toggleSgMidAll(this)">自然</button>
+            <button class="sg-mid-btn" data-sg-mid="自然" onclick="toggleSgMidAll(this)"><span class="unit-label">自然</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-自然" onclick="toggleSgExpand('自然')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-自然">
@@ -775,7 +791,7 @@
         <!-- 色・形 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="色・形" onclick="toggleSgMidAll(this)">色・形</button>
+            <button class="sg-mid-btn" data-sg-mid="色・形" onclick="toggleSgMidAll(this)"><span class="unit-label">色・形</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-色・形" onclick="toggleSgExpand('色・形')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-色・形">
@@ -1835,6 +1851,13 @@
   <!-- ツールチップ -->
   <div id="mastery-tooltip" class="mastery-tooltip"></div>
 
+  <!-- 教材別 単語一覧 -->
+  <div class="rec-section">
+    <div class="rec-title" style="color:var(--accent2);">教材別 単語一覧</div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:8px;">タップして開くと、Unit・カテゴリごとの単語とクリア状況が見られます</div>
+    <div id="word-list-sources"></div>
+  </div>
+
   <!-- データ管理 -->
   <div class="rec-section">
     <div class="rec-title" style="font-size:13px;color:var(--text-muted);">データ管理</div>
@@ -1890,15 +1913,6 @@
   </div>
 
   <!-- 1回の単語数 -->
-  <div class="settings-section" id="pref-count-section">
-    <div class="settings-label">1回に出す単語数（フリーモード時）</div>
-    <div style="display:flex;gap:8px;">
-      <button class="pref-count-btn" data-pref-count="5" onclick="selectPrefCount(this)">5語</button>
-      <button class="pref-count-btn" data-pref-count="10" onclick="selectPrefCount(this)">10語</button>
-      <button class="pref-count-btn" data-pref-count="15" onclick="selectPrefCount(this)">15語</button>
-      <button class="pref-count-btn active" data-pref-count="0" onclick="selectPrefCount(this)">全部</button>
-    </div>
-  </div>
 
   <!-- 1回に出す英文数 -->
   <div class="settings-section" id="pref-sentence-count-section">
@@ -3555,10 +3569,44 @@ function updateAllSelectAllHighlights() {
   syncAllSelectedHighlight('original-grid', '[data-orig-group]');
 }
 
+// クリア済み（殿堂入り）語数／総語数を返す
+function getClearProgress(words) {
+  const total = words.length;
+  const done = words.filter(w => isHallWord(w['単語'])).length;
+  return { done, total };
+}
+// 中くくり（Unit・カテゴリ）ごとの「◯語中◯語クリア」進捗表示
+function updateUnitProgressLabels() {
+  document.querySelectorAll('#unit-grid [data-unit]').forEach(btn => {
+    const { done, total } = getClearProgress(MINILABO.filter(w => w['出典_ミニラボ'] === btn.dataset.unit));
+    const span = btn.querySelector('.unit-progress');
+    if (span) span.textContent = `${done}/${total}`;
+  });
+  document.querySelectorAll('#eiken-grid [data-eiken]').forEach(btn => {
+    const { done, total } = getClearProgress(EIKEN.filter(w => eikenInGroup(w, btn.dataset.eiken)));
+    const span = btn.querySelector('.unit-progress');
+    if (span) span.textContent = `${done}/${total}`;
+  });
+  const mbLabel = document.getElementById('mabutan-progress-label');
+  if (mbLabel) {
+    const range = getMabutanRange();
+    const words = range ? MABUTAN.filter(w => { const n = getMabutanNum(w); return n >= range[0] && n <= range[1]; }) : [];
+    const { done, total } = getClearProgress(words);
+    mbLabel.textContent = total > 0 ? `選択範囲：${done}/${total}語クリア` : '';
+  }
+  document.querySelectorAll('#shogakusei-grid [data-sg-mid]').forEach(btn => {
+    const subs = SG_SUBS[btn.dataset.sgMid] || [];
+    const { done, total } = getClearProgress(SHOGAKUSEI.filter(w => subs.includes(SG_WORD_SUBS[w['単語']])));
+    const span = btn.querySelector('.unit-progress');
+    if (span) span.textContent = `${done}/${total}`;
+  });
+}
+
 function updateSelectedCount() {
   const deck = buildDeck();
   document.getElementById('selected-count').textContent = `${deck.length}語が選択されています`;
   updateAllSelectAllHighlights();
+  updateUnitProgressLabels();
 }
 
 function toggleTimer() {}
@@ -3597,22 +3645,8 @@ function startFlash() {
       if (pauseBtn) pauseBtn.style.display = 'none';
       stepBanner.classList.toggle('visible', isPaused);
     }
-    // フリーモード：新規単語をwordsPerSession件に制限・苦手復習単語は別途追加
-    const wps = parseInt(prefs.wordsPerSession) || 0;
-    let limitedBase;
-    if (wps > 0) {
-      const newWords = baseDeck.filter(w => !hasEverBeenCorrect(w['単語']));
-      const reviewWords = baseDeck.filter(w => hasEverBeenCorrect(w['単語']) && isWeakWord(w['単語']));
-      const newLimited = newWords.slice(0, wps);
-      const combined = [...newLimited, ...reviewWords];
-      const seen = new Set();
-      limitedBase = combined.filter(w => { const k = w['単語']; if (seen.has(k)) return false; seen.add(k); return true; });
-      if (!limitedBase.length) limitedBase = baseDeck.slice(0, wps);
-    } else {
-      limitedBase = baseDeck;
-    }
-    state.deck = buildWeightedDeck(limitedBase);
-    if (!state.deck.length) state.deck = limitedBase;
+    state.deck = buildWeightedDeck(baseDeck);
+    if (!state.deck.length) state.deck = baseDeck;
   }
 
   // スペルアウト速度を設定に同期
@@ -4378,8 +4412,6 @@ function startLearnMode() {
     // フリーモード or 一時停止中
     deck = buildDeck();
     if (!deck.length) { alert('条件に合う単語がありません。'); return; }
-    const wps = parseInt(prefs.wordsPerSession) || 0;
-    if (wps > 0 && deck.length > wps) deck = deck.slice(0, wps);
     if (stepBanner) {
       if (bannerText) bannerText.textContent = isPaused ? '⏸ ポーズ中（フリー練習）' : '';
       if (pauseBtn) pauseBtn.style.display = 'none';
@@ -8179,6 +8211,107 @@ function renderRecords() {
 
   // 習熟度マップ
   renderMasteryMap();
+
+  // 教材別 単語一覧
+  renderWordListSources();
+}
+
+// ===== v56: 教材別 単語一覧（わたしの記録） =====
+const RECORD_SOURCES = [
+  {
+    key: 'ミニラボ',
+    getGroups: () => ['Unit1','Unit2','Unit3','Unit4','Unit5','Unit6','Unit7','Unit8','Unit9','Unit10']
+      .map(u => ({ name: u, words: MINILABO.filter(w => w['出典_ミニラボ'] === u) })),
+  },
+  {
+    key: '英検5級',
+    getGroups: () => ['1-25','26-50','51-75','76-100','101-107']
+      .map(g => ({ name: g.replace('-', '〜'), words: EIKEN.filter(w => eikenInGroup(w, g)) })),
+  },
+  {
+    key: 'まぶたん',
+    getGroups: () => MABUTAN_RANGE_GROUPS
+      .map(g => ({ name: g.replace('-', '〜'), words: MABUTAN.filter(w => mabutanInGroup(w, g)) })),
+  },
+  {
+    key: '小学生英語',
+    getGroups: () => Object.keys(SG_SUBS)
+      .map(mid => ({ name: mid, words: SHOGAKUSEI.filter(w => SG_SUBS[mid].includes(SG_WORD_SUBS[w['単語']])) })),
+  },
+  {
+    key: 'オリジナル',
+    getGroups: () => {
+      const words = loadOriginalWords();
+      const groupNames = [...new Set(words.map(w => w['_group'] || 'その他'))];
+      return groupNames.map(g => ({ name: g, words: words.filter(w => (w['_group'] || 'その他') === g) }));
+    },
+  },
+];
+function getRecordSourceGroups(si) {
+  return RECORD_SOURCES[si].getGroups().filter(g => g.words.length > 0);
+}
+function renderWordListSources() {
+  const container = document.getElementById('word-list-sources');
+  if (!container) return;
+  container.innerHTML = RECORD_SOURCES.map((src, si) => {
+    const groups = getRecordSourceGroups(si);
+    if (!groups.length) return '';
+    const { done, total } = getClearProgress(groups.flatMap(g => g.words));
+    return `
+    <div class="wl-source">
+      <button class="wl-source-header" onclick="toggleWlSource(${si})">
+        <span>${src.key}</span>
+        <span class="wl-progress">${done}/${total}クリア</span>
+        <span class="wl-arrow" id="wl-src-arrow-${si}">▸</span>
+      </button>
+      <div class="wl-groups" id="wl-src-${si}" style="display:none;">
+        ${groups.map((g, gi) => {
+          const gp = getClearProgress(g.words);
+          return `
+          <div class="wl-group">
+            <button class="wl-group-header" onclick="toggleWlGroup(${si},${gi})">
+              <span>${g.name}</span>
+              <span class="wl-progress">${gp.done}/${gp.total}クリア</span>
+              <span class="wl-arrow" id="wl-grp-arrow-${si}-${gi}">▸</span>
+            </button>
+            <div class="wl-words" id="wl-words-${si}-${gi}" style="display:none;" data-rendered="0"></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleWlSource(si) {
+  const el = document.getElementById('wl-src-' + si);
+  const arrow = document.getElementById('wl-src-arrow-' + si);
+  if (!el) return;
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'flex' : 'none';
+  if (arrow) arrow.textContent = open ? '▾' : '▸';
+}
+// カテゴリ（Unit・範囲）を開いた時にだけ単語一覧を描画する（遅延表示）
+function toggleWlGroup(si, gi) {
+  const el = document.getElementById(`wl-words-${si}-${gi}`);
+  const arrow = document.getElementById(`wl-grp-arrow-${si}-${gi}`);
+  if (!el) return;
+  const open = el.style.display === 'none';
+  if (open && el.dataset.rendered !== '1') {
+    const words = getRecordSourceGroups(si)[gi].words;
+    el.innerHTML = words.map(w => {
+      const st = getWordStatus(w['単語']);
+      const cleared = !!st.hall;
+      const mc = st.mistakeCount || 0;
+      return `<div class="wl-word-row">
+        <span class="wl-word-text">${w['単語']}</span>
+        <span class="wl-word-meaning">${w['意味'] || ''}</span>
+        <span class="wl-word-status ${cleared ? 'cleared' : ''}">${cleared ? 'クリア済み' : 'まだ'}</span>
+        <span class="wl-word-mistake">${mc}回間違い</span>
+      </div>`;
+    }).join('');
+    el.dataset.rendered = '1';
+  }
+  el.style.display = open ? 'flex' : 'none';
+  if (arrow) arrow.textContent = open ? '▾' : '▸';
 }
 
 function speakWord(word) {
@@ -9016,11 +9149,6 @@ function loadPrefScreen() {
   document.querySelectorAll('[data-pref-mode]').forEach(b => {
     b.classList.toggle('active', b.dataset.prefMode === mode);
   });
-  // 単語数
-  const wps = String(prefs.wordsPerSession !== undefined ? prefs.wordsPerSession : 0);
-  document.querySelectorAll('[data-pref-count]').forEach(b => {
-    b.classList.toggle('active', b.dataset.prefCount === wps);
-  });
   // 英文数 (v51)
   const sps = String(prefs.sentencesPerSession !== undefined ? prefs.sentencesPerSession : 0);
   document.querySelectorAll('[data-pref-sent-count]').forEach(b => {
@@ -9058,8 +9186,6 @@ function loadPrefScreen() {
     if (stepSection) stepSection.style.display = 'none';
     if (stepUnlockSection) stepUnlockSection.style.display = 'none';
   }
-  const countSection = document.getElementById('pref-count-section');
-  if (countSection) countSection.style.display = (mode === 'step') ? 'none' : 'block';
 }
 
 function selectPrefMode(btn) {
@@ -9068,25 +9194,18 @@ function selectPrefMode(btn) {
   const mode = btn.dataset.prefMode;
   const stepSection = document.getElementById('pref-step-status');
   const stepUnlockSection = document.getElementById('pref-step-unlock-section');
-  const countSection = document.getElementById('pref-count-section');
   if (mode === 'step') {
     if (stepSection) stepSection.style.display = 'block';
     if (stepUnlockSection) stepUnlockSection.style.display = 'block';
-    if (countSection) countSection.style.display = 'none';
     const stepInfo = document.getElementById('pref-step-info');
     if (stepInfo) stepInfo.textContent = getStepStatusText();
   } else {
     if (stepSection) stepSection.style.display = 'none';
     if (stepUnlockSection) stepUnlockSection.style.display = 'none';
-    if (countSection) countSection.style.display = 'block';
   }
 }
 function selectPrefStepUnlock(btn) {
   document.querySelectorAll('[data-pref-step-unlock]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function selectPrefCount(btn) {
-  document.querySelectorAll('[data-pref-count]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 function selectPrefSentCount(btn) {
@@ -9104,7 +9223,6 @@ function selectPrefSpeed(btn) {
 
 function savePrefSettings() {
   const modeBtn = document.querySelector('[data-pref-mode].active');
-  const countBtn = document.querySelector('[data-pref-count].active');
   const sentCountBtn = document.querySelector('[data-pref-sent-count].active');
   const unitEndBtn = document.querySelector('[data-pref-unit-end].active');
   const speedBtn = document.querySelector('[data-pref-speed].active');
@@ -9112,7 +9230,6 @@ function savePrefSettings() {
   const wrongDisplayBtns = [...document.querySelectorAll('[data-wrong-display].active')].map(b => b.dataset.wrongDisplay);
   const prefs = {
     learningMode: modeBtn ? modeBtn.dataset.prefMode : 'free',
-    wordsPerSession: countBtn ? parseInt(countBtn.dataset.prefCount) : 0,
     sentencesPerSession: sentCountBtn ? parseInt(sentCountBtn.dataset.prefSentCount) : 0,
     unitEndPolicy: unitEndBtn ? unitEndBtn.dataset.prefUnitEnd : 'stop',
     wrongDisplaySettings: wrongDisplayBtns,
