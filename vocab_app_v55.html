@@ -49,8 +49,8 @@
   .unit-btn { padding:6px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
   .unit-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
   .unit-btn:disabled { opacity:.3; pointer-events:none; }
-  .unit-btn.unit-all-btn { border-color:var(--accent2); color:var(--accent2); }
-  .unit-btn.unit-all-btn:hover,.unit-btn.unit-all-btn:active { background:rgba(255,209,102,.15); }
+  .unit-btn.unit-all-btn.all-selected { border-color:var(--accent2); color:var(--accent2); }
+  .unit-btn.unit-all-btn.all-selected:hover,.unit-btn.unit-all-btn.all-selected:active { background:rgba(255,209,102,.15); }
   .selected-count { font-size:13px; color:var(--accent2); font-weight:700; text-align:center; padding:4px; font-family:'Noto Sans JP',sans-serif; }
   .priority-btns { display:flex; gap:8px; }
   .priority-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid transparent; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
@@ -606,7 +606,7 @@
         <div class="source-count">166語</div>
       </div>
       <div id="unit-grid" class="unit-grid">
-        <button class="unit-btn unit-all-btn" onclick="selectAllUnits(true)">全選択</button>
+        <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllUnits(true)">全選択</button>
         <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
         <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)">Unit1</button>
         <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)">Unit2</button>
@@ -631,7 +631,7 @@
         <div class="source-count">107語</div>
       </div>
       <div id="eiken-grid" class="unit-grid">
-        <button class="unit-btn unit-all-btn" onclick="selectAllEiken(true)">全選択</button>
+        <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllEiken(true)">全選択</button>
         <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
         <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)">1〜25</button>
         <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)">26〜50</button>
@@ -652,7 +652,7 @@
       </div>
       <div id="mabutan-grid" style="display:flex;flex-direction:column;gap:8px;padding-left:30px;">
         <div style="display:flex;gap:6px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllMabutan(true)">全選択</button>
+          <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllMabutan(true)">全選択</button>
           <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllMabutan(false)">全解除</button>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
@@ -675,7 +675,7 @@
       </div>
       <div id="shogakusei-grid" style="display:none;flex-direction:column;gap:6px;">
         <div style="margin-bottom:2px;display:flex;gap:6px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllShogakusei(true)">全選択</button>
+          <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllShogakusei(true)">全選択</button>
           <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllShogakusei(false)">全解除</button>
         </div>
         <!-- 数・時間 -->
@@ -1254,7 +1254,7 @@
             <span style="font-size:12px;color:var(--text-muted);">166語</span>
           </label>
           <div id="ls-minilabo-grid" class="unit-grid" style="padding-left:30px;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsMinilabo()">全選択</button>
+            <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsMinilabo()">全選択</button>
             <button class="unit-btn" data-ls-ml="Unit1" onclick="toggleLsMinilabo(this)">Unit1</button>
             <button class="unit-btn" data-ls-ml="Unit2" onclick="toggleLsMinilabo(this)">Unit2</button>
             <button class="unit-btn" data-ls-ml="Unit3" onclick="toggleLsMinilabo(this)">Unit3</button>
@@ -1276,7 +1276,7 @@
             <span style="font-size:12px;color:var(--text-muted);">107語</span>
           </label>
           <div id="ls-eiken-grid" class="unit-grid" style="padding-left:30px;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsEiken()">全選択</button>
+            <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsEiken()">全選択</button>
             <button class="unit-btn" data-ls-eiken="1-25" onclick="toggleLsEiken(this)">1〜25</button>
             <button class="unit-btn" data-ls-eiken="26-50" onclick="toggleLsEiken(this)">26〜50</button>
             <button class="unit-btn" data-ls-eiken="51-75" onclick="toggleLsEiken(this)">51〜75</button>
@@ -1293,7 +1293,7 @@
             <span style="font-size:12px;color:var(--text-muted);">343語</span>
           </label>
           <div id="ls-mabutan-grid" class="unit-grid" style="padding-left:30px;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsMabutan()">全選択</button>
+            <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsMabutan()">全選択</button>
             <button class="unit-btn" data-ls-mabutan="1-16" onclick="toggleLsMabutan(this)">1〜16</button>
             <button class="unit-btn" data-ls-mabutan="17-32" onclick="toggleLsMabutan(this)">17〜32</button>
             <button class="unit-btn" data-ls-mabutan="33-48" onclick="toggleLsMabutan(this)">33〜48</button>
@@ -1327,7 +1327,7 @@
             <span style="font-size:12px;color:var(--text-muted);">332語</span>
           </label>
           <div id="ls-shogakusei-grid" style="padding-left:16px;display:none;flex-direction:column;gap:6px;">
-            <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn" onclick="selectAllLsShogakusei()">全選択</button></div>
+            <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsShogakusei()">全選択</button></div>
             <!-- 数・時間 -->
             <div class="sg-group">
               <div class="sg-mid-header">
@@ -3382,7 +3382,7 @@ function renderOriginalGroupButtons() {
   if (!groups.length) { grid.style.display = 'none'; return; }
   grid.style.display = origOn ? 'flex' : 'none';
   const activeGroups = getSelectedOrigGroups();
-  grid.innerHTML = `<button class="unit-btn unit-all-btn" onclick="selectAllOrigGroups()">全選択</button>` +
+  grid.innerHTML = `<button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllOrigGroups()">全選択</button>` +
     groups.map(g => `<button class="unit-btn ${activeGroups.includes(g) ? 'active' : ''}" data-orig-group="${g}" onclick="toggleOrigGroup(this)">${g}</button>`).join('');
 }
 function renderLsOrigGroupButtons() {
@@ -3392,7 +3392,7 @@ function renderLsOrigGroupButtons() {
   const lsOn = document.getElementById('ls-chk-original') && document.getElementById('ls-chk-original').checked;
   if (!groups.length) { grid.style.display = 'none'; return; }
   grid.style.display = lsOn ? 'flex' : 'none';
-  grid.innerHTML = `<button class="unit-btn unit-all-btn" onclick="selectAllLsOrigGroups()">全選択</button>` +
+  grid.innerHTML = `<button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsOrigGroups()">全選択</button>` +
     groups.map(g => `<button class="unit-btn active" data-ls-orig-group="${g}" onclick="toggleLsOrigGroup(this)">${g}</button>`).join('');
 }
 function toggleOrigGroup(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
@@ -3526,9 +3526,39 @@ function buildStepModeDeckBySource() {
   };
 }
 
+// 「全選択」ボタンは、対象範囲を実際に全部選択している時だけハイライトする
+function syncAllSelectedHighlight(gridId, itemSelector) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const allBtn = grid.querySelector('.select-all-btn');
+  if (!allBtn) return;
+  const items = grid.querySelectorAll(itemSelector);
+  const allSelected = items.length > 0 && Array.from(items).every(b => b.classList.contains('active'));
+  allBtn.classList.toggle('all-selected', allSelected);
+}
+// まぶたんは個別ボタンではなく番号範囲指定のため専用に判定する
+function syncMabutanAllHighlight() {
+  const grid = document.getElementById('mabutan-grid');
+  if (!grid) return;
+  const allBtn = grid.querySelector('.select-all-btn');
+  if (!allBtn) return;
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  const allSelected = !!fromEl && !!toEl && parseInt(fromEl.value, 10) === 1 && parseInt(toEl.value, 10) === 343;
+  allBtn.classList.toggle('all-selected', allSelected);
+}
+function updateAllSelectAllHighlights() {
+  syncAllSelectedHighlight('unit-grid', '[data-unit]');
+  syncAllSelectedHighlight('eiken-grid', '[data-eiken]');
+  syncMabutanAllHighlight();
+  syncAllSelectedHighlight('shogakusei-grid', '[data-sg-sub]');
+  syncAllSelectedHighlight('original-grid', '[data-orig-group]');
+}
+
 function updateSelectedCount() {
   const deck = buildDeck();
   document.getElementById('selected-count').textContent = `${deck.length}語が選択されています`;
+  updateAllSelectAllHighlights();
 }
 
 function toggleTimer() {}
@@ -5650,6 +5680,11 @@ function updateListenCount() {
   }
   const el = document.getElementById('ls-selected-count');
   if (el) el.textContent = count + '語が選択されています';
+  syncAllSelectedHighlight('ls-minilabo-grid', '[data-ls-ml]');
+  syncAllSelectedHighlight('ls-eiken-grid', '[data-ls-eiken]');
+  syncAllSelectedHighlight('ls-mabutan-grid', '[data-ls-mabutan]');
+  syncAllSelectedHighlight('ls-shogakusei-grid', '[data-ls-sg-sub]');
+  syncAllSelectedHighlight('ls-original-grid', '[data-ls-orig-group]');
 }
 
 function selectListenInterval(btn) {
