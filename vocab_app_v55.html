@@ -151,6 +151,13 @@
   .btn-retry-again { background:linear-gradient(135deg,#a29bfe,#6c5ce7); color:#fff; box-shadow:0 6px 20px rgba(108,92,231,.3); }
   .btn-reveal { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); box-shadow:0 6px 20px rgba(255,209,102,.3); }
 
+  /* v56: 常時表示の「わからない」3択キーボードメニュー */
+  .answer-menu { display:flex; gap:8px; margin-top:8px; }
+  .answer-menu-btn { flex:1; padding:10px 6px; border-radius:14px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:all .15s; }
+  .answer-menu-btn.menu-active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.12); box-shadow:0 0 0 2px rgba(255,209,102,.25); }
+  .answer-menu-btn.menu-disabled { opacity:.35; pointer-events:none; }
+  .kbd-menu-active { outline:3px solid var(--accent2) !important; outline-offset:2px; }
+
   @media (min-width: 768px) {
     #home-screen { padding: 40px 40px; gap: 20px; }
     .mode-cards { max-width: 680px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -863,6 +870,11 @@
         <input type="text" id="main-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="ここに入力してEnter">
         <button onclick="checkAnswer()">確認</button>
       </div>
+      <div class="answer-menu" id="flash-answer-menu">
+        <button type="button" class="answer-menu-btn" id="flash-menu-speak" onclick="activateAnswerMenuByClick('flash',0)">🔊 発音を聞く</button>
+        <button type="button" class="answer-menu-btn" id="flash-menu-reveal" onclick="activateAnswerMenuByClick('flash',1)">👁 答えを見る</button>
+        <button type="button" class="answer-menu-btn" id="flash-menu-next" onclick="activateAnswerMenuByClick('flash',2)">➡ 次へ</button>
+      </div>
     </div>
     <div id="spell-highlight-area"></div>
     <div id="pattern-group-area" class="pattern-group-area">
@@ -1050,7 +1062,7 @@
   <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
     <div id="learn-status" style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;height:20px;"></div>
     <div style="display:flex;gap:10px;width:100%;" id="learn-action-row">
-      <button class="action-btn" onclick="learnAgain()" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
+      <button class="action-btn" id="learn-again-btn" onclick="learnAgain()" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
       <button class="action-btn btn-next" onclick="learnNext()" style="flex:1;display:none;" id="learn-next-btn">覚えた！</button>
     </div>
     <button id="learn-replay-btn" onclick="replayLearnSpellOut()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;"></button>
@@ -1107,7 +1119,7 @@
         <button id="smem-replay-btn" onclick="smemReplay()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button>
         <div style="display:flex;gap:10px;width:100%;" id="smem-action-row">
           <button onclick="smemAgain()" class="action-btn" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
-          <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;">覚えた！</button>
+          <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;" id="smem-next-btn">覚えた！</button>
         </div>
         <div id="smem-speak-area" style="display:none;flex-direction:column;gap:8px;align-items:center;width:100%;padding-top:4px;border-top:1px solid var(--surface);">
           <div style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;" id="smem-voice-status">発音練習する</div>
@@ -1237,6 +1249,11 @@
         <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">英文を入力してEnterまたはボタンで確認</div>
         <input type="text" id="entype-input" class="entype-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="text" placeholder="Type the English sentence...">
         <button class="entype-submit-btn" onclick="submitEntypeAnswer()">答え合わせ ✓</button>
+        <div class="answer-menu" id="entype-answer-menu">
+          <button type="button" class="answer-menu-btn" id="entype-menu-speak" onclick="activateAnswerMenuByClick('entype',0)">🔊 発音を聞く</button>
+          <button type="button" class="answer-menu-btn" id="entype-menu-reveal" onclick="activateAnswerMenuByClick('entype',1)">👁 答えを見る</button>
+          <button type="button" class="answer-menu-btn" id="entype-menu-next" onclick="activateAnswerMenuByClick('entype',2)">➡ 次へ</button>
+        </div>
         <div id="entype-feedback" style="min-height:24px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;"></div>
         <div id="entype-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;">
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;font-family:'Noto Sans JP',sans-serif;">正解</div>
@@ -3682,7 +3699,7 @@ function loadCard() {
   if (word['優先度'] === '🔴') dot.classList.add('high');
   else if (word['優先度'] === '🟡') dot.classList.add('mid');
   else dot.classList.add('low');
-  document.getElementById('card-source').textContent = word._source || '';
+  document.getElementById('card-source').textContent = getWordSourceLabel(word);
   document.getElementById('card-meaning-main').textContent = word['意味'];
   document.getElementById('pos-badge').textContent = posLabel(word['品詞']);
   document.getElementById('card-answer-wrap').classList.remove('visible');
@@ -3748,11 +3765,17 @@ function loadCard() {
   cardStartTime = Date.now();
   resetVoiceUI();
   if (voiceMode !== 'voice') setTimeout(() => mainInput.focus(), 150);
+  resetAnswerMenu('flash');
 }
 
 const mainInput = document.getElementById('main-input');
 mainInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
+    if (answerMenuIndex >= 0 && getAnswerMenuKeyForActiveScreen() === 'flash') {
+      e.preventDefault();
+      activateAnswerMenu('flash');
+      return;
+    }
     if (state.answered) {
       const nextBtn = document.getElementById('next-btn');
       if (nextBtn && nextBtn.style.display !== 'none') nextCard();
@@ -3954,8 +3977,10 @@ function checkAnswer() {
       fb.className = 'feedback-area';
       fb.textContent = 'もう一度！';
       if (voiceMode !== 'voice') mainInput.focus();
+      resetAnswerMenu('flash');
     }, 800);
   }
+  renderAnswerMenu('flash');
 }
 
 function retryCurrentCard() {
@@ -3972,6 +3997,7 @@ function retryCurrentCard() {
   if (mi) { mi.value = ''; mi.disabled = false; }
   state.answered = false;
   if (voiceMode !== 'voice' && mi) mi.focus();
+  resetAnswerMenu('flash');
 }
 
 // ===== タイピングチャレンジ（3回以上間違えた後の強化練習）=====
@@ -4170,6 +4196,7 @@ function revealAnswer() {
     if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
   }
   updateHomeBadges();
+  renderAnswerMenu('flash');
 }
 function skipCard() {
   if (state.isWeak && !state.answered) return;
@@ -4278,7 +4305,7 @@ function loadStestCard() {
   const pct = stestIndex / stestTotal * 100;
   document.getElementById('stest-progress-fill').style.width = pct + '%';
   document.getElementById('stest-progress-text').textContent = (stestIndex+1) + '/' + stestTotal;
-  document.getElementById('stest-source').textContent = word._source || '';
+  document.getElementById('stest-source').textContent = getWordSourceLabel(word);
   document.getElementById('stest-meaning').textContent = word['意味'];
   document.getElementById('stest-answer-wrap').classList.remove('visible');
   document.getElementById('stest-word-answer').textContent = word['単語'];
@@ -4469,7 +4496,7 @@ function loadLearnCard() {
   document.getElementById('learn-progress-text').textContent = (learnCurrent+1) + '/' + learnDeck.length;
   document.getElementById('learn-meaning').textContent = learnCurrentWord['意味'];
   document.getElementById('learn-pos-badge').textContent = posLabel(learnCurrentWord['品詞']);
-  document.getElementById('learn-card-source').textContent = learnCurrentWord._source || '';
+  document.getElementById('learn-card-source').textContent = getWordSourceLabel(learnCurrentWord);
   document.getElementById('learn-word-display').style.display = 'none';
   document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
   document.getElementById('learn-replay-btn').style.display = 'none';
@@ -4477,6 +4504,7 @@ function loadLearnCard() {
   document.getElementById('learn-next-btn').style.display = 'none';
   renderLearnEmptyBoxes();
   setTimeout(() => startLearnSpellOut(), 600);
+  resetAnswerMenu('learn');
 }
 function renderLearnEmptyBoxes() {
   const word = learnCurrentWord ? learnCurrentWord['単語'] : '';
@@ -4509,6 +4537,8 @@ function startLearnSpellOut() {
       document.getElementById('learn-action-row').style.display = 'flex';
       document.getElementById('learn-next-btn').style.display = 'block';
       document.getElementById('learn-status').textContent = '覚えた？';
+      answerMenuIndex = 0;
+      renderAnswerMenu('learn');
       return;
     }
     const item = items[idx];
@@ -4550,6 +4580,7 @@ function replayLearnSpellOut() {
   document.getElementById('learn-replay-btn').style.display = 'none';
   document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
   setTimeout(() => startLearnSpellOut(), 300);
+  resetAnswerMenu('learn');
 }
 function learnAgain() { replayLearnSpellOut(); }
 function learnNext() { learnCurrent++; loadLearnCard(); }
@@ -4832,9 +4863,19 @@ function loadEntypeCard() {
   document.getElementById('entype-reveal-btn').style.display = 'block';
   // Enterキーで答え合わせ
   const inp = document.getElementById('entype-input');
-  inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); submitEntypeAnswer(); } };
+  inp.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (answerMenuIndex >= 0 && getAnswerMenuKeyForActiveScreen() === 'entype') {
+        activateAnswerMenu('entype');
+        return;
+      }
+      submitEntypeAnswer();
+    }
+  };
   // スマホではキーボードが出るまで少し待ってfocus
   setTimeout(() => inp.focus(), 100);
+  resetAnswerMenu('entype');
 }
 
 function submitEntypeAnswer() {
@@ -4869,8 +4910,10 @@ function submitEntypeAnswer() {
       document.getElementById('entype-input').focus();
       // 再送信ボタンを再表示
       document.getElementById('entype-reveal-btn').style.display = 'block';
+      resetAnswerMenu('entype');
     }, 800);
   }
+  renderAnswerMenu('entype');
 }
 
 function entypeReveal() {
@@ -4889,6 +4932,7 @@ function entypeReveal() {
     st.count = (st.count || 0) + 1; st.streak = 0;
     setSentStatus(currentEntypeSentence.en, st);
   }
+  renderAnswerMenu('entype');
 }
 function entypeNext() { entypeCurrent++; loadEntypeCard(); }
 function entypeSkip() { entypeCurrent++; loadEntypeCard(); }
@@ -5445,6 +5489,7 @@ function loadSmemCard() {
   document.getElementById('smem-speak-area').style.display = 'none';
   document.getElementById('smem-speak-result').style.display = 'none';
   smemStopRecordingClean();
+  resetAnswerMenu('smem');
   setTimeout(() => {
     speakSentence(currentSmemSentence.en, () => {
       document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
@@ -5457,6 +5502,8 @@ function loadSmemCard() {
       document.getElementById('smem-voice-timer').textContent = '';
       const smemMicBtn = document.getElementById('smem-mic-btn');
       if (smemMicBtn) { smemMicBtn.disabled = false; smemMicBtn.classList.remove('recording'); }
+      answerMenuIndex = 0;
+      renderAnswerMenu('smem');
     }, sentenceSpeed);
   }, 400);
 }
@@ -5470,6 +5517,7 @@ function smemAgain() {
   document.getElementById('smem-action-row').style.display = 'none';
   document.getElementById('smem-speak-area').style.display = 'none';
   document.getElementById('smem-speak-result').style.display = 'none';
+  resetAnswerMenu('smem');
   smemStopRecordingClean();
   setTimeout(() => {
     speakSentence(currentSmemSentence.en, () => {
@@ -5483,6 +5531,8 @@ function smemAgain() {
       document.getElementById('smem-voice-timer').textContent = '';
       const smemMicBtn = document.getElementById('smem-mic-btn');
       if (smemMicBtn) { smemMicBtn.disabled = false; smemMicBtn.classList.remove('recording'); }
+      answerMenuIndex = 0;
+      renderAnswerMenu('smem');
     }, sentenceSpeed);
   }, 300);
 }
@@ -7080,6 +7130,27 @@ function getWordUnit(wordObj) {
   return src;
 }
 
+// v56: 出題中カードのバッジ表示用（範囲グループではなく正確な番号/Unitを表示）
+function getWordSourceLabel(wordObj) {
+  if (!wordObj) return '';
+  const src = wordObj._source || '';
+  if (src === 'ミニラボ') return 'ミニラボ ' + (wordObj['出典_ミニラボ'] || '');
+  if (src === '英検5級') {
+    const s = wordObj['出典_英検5級'] || '';
+    const m = s.match(/No\.(\d+)/);
+    return m ? '英検5級 ' + m[1] + '番' : '英検5級';
+  }
+  if (src === 'まぶたん') {
+    const no = getMabutanNum(wordObj);
+    return no ? 'まぶたん ' + no + '番' : 'まぶたん';
+  }
+  if (src === '小学生英語' || src === 'オリジナル') {
+    const grp = wordObj['_group'] || '';
+    return grp ? src + ' ' + grp : src;
+  }
+  return src;
+}
+
 function recordWrong(word, meaning, typedStr, wordObj) {
   const ws = getWordStatus(word);
   ws.count = (ws.count||0) + 1;
@@ -7974,6 +8045,7 @@ function resetForWeakRetry(wordStr) {
   const weakHintArea = document.getElementById('weak-hint-area');
   if (weakHintArea) weakHintArea.style.display = 'none';
   mainInput.focus();
+  resetAnswerMenu('flash');
 }
 
 function startWeakOnlyMode() {
@@ -8632,15 +8704,161 @@ async function handleOCRPhoto(event) {
   }
 }
 
-// ===== スペースキーで次へ =====
+// ===== v56: 出題画面キーボードメニュー（常時表示の「発音を聞く／答えを見る／次へ」・「音声を聞く／次へ」） =====
+// flash/entype: 入力欄と同時に常時表示される3択（floorIndex=-1で入力欄にフォーカスが戻る）
+// learn/smem: 入力欄がない暗記系の2択（floorIndex=0。既存の action-row 等のボタンをそのまま流用）
+const ANSWER_MENUS = {
+  flash: {
+    floorIndex: -1,
+    items: [
+      { id: 'flash-menu-speak', keepOpen: true,
+        available: () => true,
+        action: () => { const w = state.deck[state.current]; if (w) speakWord(w['単語']); } },
+      { id: 'flash-menu-reveal', keepOpen: false,
+        available: () => { const b = document.getElementById('reveal-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => revealAnswer() },
+      { id: 'flash-menu-next', keepOpen: false,
+        available: () => { const b = document.getElementById('next-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => nextCard() }
+    ]
+  },
+  entype: {
+    floorIndex: -1,
+    items: [
+      { id: 'entype-menu-speak', keepOpen: true,
+        available: () => true,
+        action: () => { if (currentEntypeSentence) speakSentence(currentEntypeSentence.en, null, 'normal'); } },
+      { id: 'entype-menu-reveal', keepOpen: false,
+        available: () => { const b = document.getElementById('entype-reveal-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => entypeReveal() },
+      { id: 'entype-menu-next', keepOpen: false,
+        available: () => { const b = document.getElementById('entype-next-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => entypeNext() }
+    ]
+  },
+  learn: {
+    floorIndex: 0,
+    items: [
+      { id: 'learn-again-btn', keepOpen: true, reused: true,
+        available: () => { const r = document.getElementById('learn-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => learnAgain() },
+      { id: 'learn-next-btn', keepOpen: false, reused: true,
+        available: () => { const r = document.getElementById('learn-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => learnNext() }
+    ]
+  },
+  smem: {
+    floorIndex: 0,
+    items: [
+      { id: 'smem-replay-btn', keepOpen: true, reused: true,
+        available: () => { const r = document.getElementById('smem-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => smemReplay() },
+      { id: 'smem-next-btn', keepOpen: false, reused: true,
+        available: () => { const r = document.getElementById('smem-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => smemNext() }
+    ]
+  }
+};
+
+let answerMenuIndex = -1;
+
+function getAnswerMenuKeyForActiveScreen() {
+  const el = document.querySelector('.screen.active');
+  if (!el) return null;
+  if (el.id === 'flash-screen') return 'flash';
+  if (el.id === 'entype-screen') return 'entype';
+  if (el.id === 'learn-screen') return 'learn';
+  if (el.id === 'sentence-memory-screen') return 'smem';
+  return null;
+}
+
+function renderAnswerMenu(key) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  menu.items.forEach((item, i) => {
+    const btn = document.getElementById(item.id);
+    if (!btn) return;
+    const avail = item.available();
+    if (item.reused) {
+      btn.classList.toggle('kbd-menu-active', i === answerMenuIndex);
+    } else {
+      btn.classList.toggle('menu-active', i === answerMenuIndex);
+      btn.classList.toggle('menu-disabled', !avail);
+    }
+  });
+}
+
+function resetAnswerMenu(key) {
+  const menu = ANSWER_MENUS[key];
+  answerMenuIndex = menu ? menu.floorIndex : -1;
+  renderAnswerMenu(key);
+}
+
+function moveAnswerMenu(key, delta) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  let idx = answerMenuIndex + delta;
+  if (idx < menu.floorIndex) idx = menu.floorIndex;
+  if (idx > menu.items.length - 1) idx = menu.items.length - 1;
+  answerMenuIndex = idx;
+  renderAnswerMenu(key);
+}
+
+function activateAnswerMenu(key) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu || answerMenuIndex < 0) return false;
+  const item = menu.items[answerMenuIndex];
+  if (!item || !item.available()) return false;
+  item.action();
+  if (!item.keepOpen) answerMenuIndex = menu.floorIndex;
+  renderAnswerMenu(key);
+  return true;
+}
+
+function activateAnswerMenuByClick(key, idx) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  const item = menu.items[idx];
+  if (!item || !item.available()) return;
+  answerMenuIndex = idx;
+  item.action();
+  if (!item.keepOpen) answerMenuIndex = menu.floorIndex;
+  renderAnswerMenu(key);
+}
+
+// ===== スペース／矢印キーでの出題画面操作 =====
 document.addEventListener('keydown', (e) => {
-  if (e.key !== ' ') return;
-  const focused = document.activeElement;
-  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
   const activeScreen = document.querySelector('.screen.active');
   if (!activeScreen) return;
+  const menuKey = getAnswerMenuKeyForActiveScreen();
+  const focused = document.activeElement;
+  const focusedInputLive = !!(focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA') && !focused.disabled);
+
+  // 矢印キーでメニュー移動（入力欄フォーカス中でも上下矢印は入力に影響しないため常に処理する）
+  if (menuKey) {
+    const isUpDown = e.key === 'ArrowDown' || e.key === 'ArrowUp';
+    const isLeftRight = e.key === 'ArrowLeft' || e.key === 'ArrowRight';
+    if (isUpDown || ((menuKey === 'learn' || menuKey === 'smem') && isLeftRight)) {
+      e.preventDefault();
+      const delta = (e.key === 'ArrowDown' || e.key === 'ArrowRight') ? 1 : -1;
+      moveAnswerMenu(menuKey, delta);
+      return;
+    }
+    // Enter: 入力欄に生きたフォーカスがある場合はその場のkeydownハンドラ側で処理済み
+    if (e.key === 'Enter' && answerMenuIndex >= 0 && !focusedInputLive) {
+      e.preventDefault();
+      activateAnswerMenu(menuKey);
+      return;
+    }
+  }
+
+  if (e.key !== ' ') return;
+  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
   if (activeScreen.id === 'flash-screen' && state.answered) {
     e.preventDefault(); nextCard();
+  } else if (activeScreen.id === 'entype-screen') {
+    const nb = document.getElementById('entype-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); entypeNext(); }
   } else if (activeScreen.id === 'session-test-screen') {
     const nb = document.getElementById('stest-next-btn');
     if (nb && nb.style.display !== 'none') { e.preventDefault(); stestNext(); }
@@ -8873,7 +9091,7 @@ function loadReviewCard() {
   const pct = reviewIndex / reviewDeck.length * 100;
   document.getElementById('review-progress-fill').style.width = pct + '%';
   document.getElementById('review-progress-text').textContent = (reviewIndex+1) + '/' + reviewDeck.length;
-  document.getElementById('review-source').textContent = word._source || '';
+  document.getElementById('review-source').textContent = getWordSourceLabel(word);
   document.getElementById('review-meaning').textContent = word['意味'];
   document.getElementById('review-answer-wrap').classList.remove('visible');
   document.getElementById('review-word-answer').textContent = word['単語'];
@@ -9028,7 +9246,7 @@ function loadTodayCard() {
   const pct = todayTestIndex / todayTestDeck.length * 100;
   document.getElementById('today-progress-fill').style.width = pct + '%';
   document.getElementById('today-progress-text').textContent = (todayTestIndex+1) + '/' + todayTestDeck.length;
-  document.getElementById('today-source').textContent = word._source || '';
+  document.getElementById('today-source').textContent = getWordSourceLabel(word);
   document.getElementById('today-meaning').textContent = word['意味'];
   document.getElementById('today-answer-wrap').classList.remove('visible');
   document.getElementById('today-word-answer').textContent = word['単語'];
