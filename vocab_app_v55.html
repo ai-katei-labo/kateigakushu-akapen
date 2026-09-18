@@ -919,10 +919,9 @@
     </div>
   </div>
   <div class="action-row">
-    <button class="action-btn btn-skip" onclick="skipCard()">スキップ</button>
     <button class="action-btn btn-retry-again" id="retry-again-btn" onclick="retryCurrentCard()" style="display:none;">もう一度</button>
     <button class="action-btn btn-next" id="next-btn" onclick="nextCard()" style="display:none;">次へ →</button>
-    <button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button>
+    <div style="display:none;"><button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button></div>
   </div>
 </div>
 
@@ -1261,9 +1260,8 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="entypeSkip()" class="action-btn btn-skip">スキップ</button>
         <button onclick="entypeNext()" id="entype-next-btn" class="action-btn btn-next" style="display:none;">次へ →</button>
-        <button onclick="entypeReveal()" id="entype-reveal-btn" class="action-btn btn-reveal">答えを見る</button>
+        <div style="display:none;"><button onclick="entypeReveal()" id="entype-reveal-btn" class="action-btn btn-reveal">答えを見る</button></div>
       </div>
     </div>
   </div>
@@ -1888,16 +1886,6 @@
   </div>
 </div>
 
-<!-- DAILY WORD SET HISTORY SCREEN -->
-<div id="daily-history-screen" class="screen">
-  <div class="screen-header">
-    <button class="back-btn" onclick="showScreen('user-pref-screen')">‹</button>
-    <div class="screen-title">📅 今日の単語セット履歴</div>
-  </div>
-  <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;padding:0 2px 4px;">ステップモードで出典ごとに固定された「その日のセット」を、直近の日付から振り返れます。🆕＝その日新しく解禁／🔁＝前日から持ち越し</div>
-  <div id="daily-history-list" style="display:flex;flex-direction:column;gap:14px;"></div>
-</div>
-
 <!-- USER PREF SCREEN -->
 <div id="user-pref-screen" class="screen">
   <div class="screen-header">
@@ -1977,7 +1965,6 @@
   <div class="settings-section" id="pref-step-status" style="display:none;">
     <div class="settings-label">ステップモード状況</div>
     <div id="pref-step-info" style="font-size:14px;color:var(--accent2);font-weight:700;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:8px;"></div>
-    <button onclick="openDailySetHistory()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(6,214,160,.4);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">📅 今日の単語セット履歴を見る</button>
     <button onclick="resetStepProgress()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(255,107,107,.4);background:transparent;color:var(--accent);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:8px;">ステップをリセット</button>
   </div>
 
@@ -3741,7 +3728,7 @@ function loadCard() {
   if (trainRes) { trainRes.textContent = ''; trainRes.style.display = 'none'; trainRes.className = ''; }
   const challengeArea = document.getElementById('typing-challenge-area');
   if (challengeArea) challengeArea.style.display = 'none';
-  const skipBtn = document.querySelector('.action-btn.btn-skip');
+  const skipBtn = document.getElementById('flash-skip-btn');
   if (skipBtn) skipBtn.disabled = false;
 
   const rpa = document.getElementById('reveal-pronounce-area');
@@ -3817,6 +3804,7 @@ function renderEmptyBoxes() {
 
 function checkAnswer() {
   if (state.answered) return;
+  if (answerMenuIndex !== ANSWER_MENUS.flash.floorIndex) resetAnswerMenu('flash');
   const typed = mainInput.value.trim();
   if (!typed) return;
   const word = state.deck[state.current];
@@ -3835,7 +3823,7 @@ function checkAnswer() {
     sessionCorrect++;
     const wasAlreadyCorrect = hasEverBeenCorrect(wordStr);
     const justEnteredHall = recordCorrect(wordStr, state.wrongThisCard === 0 && state.weakWrongCount === 0, word);
-    const skipBtn = document.querySelector('.action-btn.btn-skip');
+    const skipBtn = document.getElementById('flash-skip-btn');
     if (skipBtn) skipBtn.disabled = false;
     // コイン付与
     const cardSec = cardStartTime ? Math.max(1, Math.round((Date.now()-cardStartTime)/1000)) : 5;
@@ -3890,7 +3878,7 @@ function checkAnswer() {
     document.getElementById('card-answer-wrap').classList.add('visible');
     const spellHL = document.getElementById('spell-highlight-area');
     if (!wasAlreadyCorrectW && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
-    const skipBtn = document.querySelector('.action-btn.btn-skip');
+    const skipBtn = document.getElementById('flash-skip-btn');
     if (skipBtn) skipBtn.disabled = true;
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     updateHomeBadges();
@@ -4132,7 +4120,7 @@ function revealAnswer() {
   if (state.isWeak) { speakWord(wordStr); } else { doSpellOut(wordStr); }
   if (state.isWeak) {
     state.weakWrongCount++;
-    const skipBtn = document.querySelector('.action-btn.btn-skip');
+    const skipBtn = document.getElementById('flash-skip-btn');
     if (skipBtn) skipBtn.disabled = true;
     document.getElementById('next-btn').style.display = 'none';
     const fb2 = document.getElementById('feedback-area');
@@ -4196,7 +4184,7 @@ function revealAnswer() {
     if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
   }
   updateHomeBadges();
-  renderAnswerMenu('flash');
+  resetAnswerMenu('flash');
 }
 function skipCard() {
   if (state.isWeak && !state.answered) return;
@@ -4879,6 +4867,7 @@ function loadEntypeCard() {
 }
 
 function submitEntypeAnswer() {
+  if (answerMenuIndex !== ANSWER_MENUS.entype.floorIndex) resetAnswerMenu('entype');
   const typed = (document.getElementById('entype-input').value || '').trim();
   if (!typed) return;
   if (entypeAllCorrect) return;
@@ -4913,7 +4902,7 @@ function submitEntypeAnswer() {
       resetAnswerMenu('entype');
     }, 800);
   }
-  renderAnswerMenu('entype');
+  resetAnswerMenu('entype');
 }
 
 function entypeReveal() {
@@ -4932,7 +4921,7 @@ function entypeReveal() {
     st.count = (st.count || 0) + 1; st.streak = 0;
     setSentStatus(currentEntypeSentence.en, st);
   }
-  renderAnswerMenu('entype');
+  resetAnswerMenu('entype');
 }
 function entypeNext() { entypeCurrent++; loadEntypeCard(); }
 function entypeSkip() { entypeCurrent++; loadEntypeCard(); }
@@ -7017,7 +7006,7 @@ function showPatternGroup(word) {
   const label = area.querySelector('.pattern-group-label');
   if (label) label.textContent = `-${suffix}グループ`;
   wordsEl.innerHTML = siblings.map(uw =>
-    `<button class="pattern-word-chip" onclick="speakWord('${uw.replace(/'/g, "\\'")}')">${uw}</button>`
+    `<button class="pattern-word-chip" tabindex="-1" onclick="speakWord('${uw.replace(/'/g, "\\'")}')">${uw}</button>`
   ).join('');
   area.classList.add('visible');
 }
@@ -8802,6 +8791,22 @@ function moveAnswerMenu(key, delta) {
   if (idx > menu.items.length - 1) idx = menu.items.length - 1;
   answerMenuIndex = idx;
   renderAnswerMenu(key);
+  focusAnswerMenuSelection(key);
+}
+
+// v56: 左右キー操作のたびにDOMフォーカスを「3択メニューのボタン」か「入力欄」だけに固定し、
+// 「同じパターンの仲間」などページ内の他のボタンへ矢印キー移動が漏れないようにする
+function focusAnswerMenuSelection(key) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  if (answerMenuIndex >= 0) {
+    const item = menu.items[answerMenuIndex];
+    const btn = item && document.getElementById(item.id);
+    if (btn) btn.focus();
+    return;
+  }
+  if (key === 'flash') { mainInput.focus(); }
+  else if (key === 'entype') { const el = document.getElementById('entype-input'); if (el) el.focus(); }
 }
 
 function activateAnswerMenu(key) {
@@ -8826,6 +8831,22 @@ function activateAnswerMenuByClick(key, idx) {
   renderAnswerMenu(key);
 }
 
+// v56: 入力欄に文字が打たれたら、メニューのハイライト（発音を聞く等）を解除して入力欄に選択を戻す
+// これによりEnterキーが常にスペル確定（checkAnswer/submitEntypeAnswer）に届くようにする
+mainInput.addEventListener('input', () => {
+  if (getAnswerMenuKeyForActiveScreen() === 'flash' && answerMenuIndex !== ANSWER_MENUS.flash.floorIndex) {
+    resetAnswerMenu('flash');
+  }
+});
+const entypeInputEl = document.getElementById('entype-input');
+if (entypeInputEl) {
+  entypeInputEl.addEventListener('input', () => {
+    if (getAnswerMenuKeyForActiveScreen() === 'entype' && answerMenuIndex !== ANSWER_MENUS.entype.floorIndex) {
+      resetAnswerMenu('entype');
+    }
+  });
+}
+
 // ===== スペース／矢印キーでの出題画面操作 =====
 document.addEventListener('keydown', (e) => {
   const activeScreen = document.querySelector('.screen.active');
@@ -8834,13 +8855,12 @@ document.addEventListener('keydown', (e) => {
   const focused = document.activeElement;
   const focusedInputLive = !!(focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA') && !focused.disabled);
 
-  // 矢印キーでメニュー移動（入力欄フォーカス中でも上下矢印は入力に影響しないため常に処理する）
+  // 左右キーでメニュー移動（入力欄フォーカス中でも常に処理する）
   if (menuKey) {
-    const isUpDown = e.key === 'ArrowDown' || e.key === 'ArrowUp';
     const isLeftRight = e.key === 'ArrowLeft' || e.key === 'ArrowRight';
-    if (isUpDown || ((menuKey === 'learn' || menuKey === 'smem') && isLeftRight)) {
+    if (isLeftRight) {
       e.preventDefault();
-      const delta = (e.key === 'ArrowDown' || e.key === 'ArrowRight') ? 1 : -1;
+      const delta = (e.key === 'ArrowRight') ? 1 : -1;
       moveAnswerMenu(menuKey, delta);
       return;
     }
@@ -9726,56 +9746,6 @@ function updateGrandReviewSetStatus() {
   const entry = (hist[todayDate()] || {})['__grand_review__'];
   if (!entry || !entry.words.length) { el.textContent = '今日のセット：まだありません（スタートすると作成されます）'; return; }
   el.textContent = `今日のセット：${entry.words.length}語`;
-}
-
-// ===== v55: 単語セット履歴画面 =====
-function openDailySetHistory() {
-  showScreen('daily-history-screen');
-  renderDailySetHistory();
-}
-
-function formatHistoryDateLabel(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const today = todayDate();
-  const yd = new Date(); yd.setDate(yd.getDate() - 1);
-  const yesterdayStr = yd.toISOString().slice(0, 10);
-  if (dateStr === today) return `今日（${m}/${d}）`;
-  if (dateStr === yesterdayStr) return `昨日（${m}/${d}）`;
-  return `${m}/${d}`;
-}
-
-function renderDailySetHistory() {
-  const container = document.getElementById('daily-history-list');
-  if (!container) return;
-  const hist = getDailySetHistory();
-  const dates = Object.keys(hist).sort().reverse().slice(0, 7); // 直近7日分
-  if (!dates.length) {
-    container.innerHTML = '<div class="rec-empty">まだ記録がありません。ステップモードで練習すると、ここに今日の単語セットが記録されます。</div>';
-    return;
-  }
-  const sourceLabels = { '__reflection__': '振り返りテスト', '__grand_review__': '総復習テスト' };
-  container.innerHTML = dates.map(date => {
-    const daySources = hist[date];
-    const sourceBlocks = Object.keys(daySources).map(source => {
-      const entry = daySources[source];
-      if (!entry.words.length) return '';
-      const chips = entry.words.map(w => {
-        const st = entry.stats[w] || { correct: 0, wrong: 0 };
-        const badge = entry.origin[w] === 'carry' ? '🔁' : '🆕';
-        const resultMark = st.wrong > 0 ? ` ✗${st.wrong}` : (st.correct > 0 ? ' ✓' : '');
-        return `<button class="pattern-word-chip" onclick="speakWord('${w.replace(/'/g, "\\'")}')">${badge}${w}${resultMark}</button>`;
-      }).join('');
-      const label = sourceLabels[source] || source;
-      return `<div style="margin-top:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--accent2);font-family:'Noto Sans JP',sans-serif;">${label}（${entry.words.length}語）</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${chips}</div>
-      </div>`;
-    }).join('');
-    return `<div class="rec-section">
-      <div class="rec-title">${formatHistoryDateLabel(date)}の単語セット</div>
-      ${sourceBlocks || '<div class="rec-empty">記録なし</div>'}
-    </div>`;
-  }).join('');
 }
 
 function getSentenceStepUnlocked(poolSize) {
