@@ -49,8 +49,23 @@
   .unit-btn { padding:6px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
   .unit-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
   .unit-btn:disabled { opacity:.3; pointer-events:none; }
-  .unit-btn.unit-all-btn { border-color:var(--accent2); color:var(--accent2); }
-  .unit-btn.unit-all-btn:hover,.unit-btn.unit-all-btn:active { background:rgba(255,209,102,.15); }
+  .unit-btn.unit-all-btn.all-selected { border-color:var(--accent2); color:var(--accent2); }
+  .unit-btn.unit-all-btn.all-selected:hover,.unit-btn.unit-all-btn.all-selected:active { background:rgba(255,209,102,.15); }
+  .unit-progress { display:block; font-size:9px; font-weight:700; opacity:.75; margin-top:1px; }
+  /* 教材別 単語一覧（わたしの記録） */
+  .wl-source { border-radius:12px; background:var(--surface); margin-bottom:6px; overflow:hidden; }
+  .wl-source-header, .wl-group-header { width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px; background:none; border:none; color:var(--text); font-size:13px; font-weight:800; font-family:'Noto Sans JP',sans-serif; cursor:pointer; text-align:left; }
+  .wl-group-header { padding-left:20px; font-size:12px; font-weight:700; border-top:1px solid rgba(255,255,255,.06); }
+  .wl-source-header span:first-child, .wl-group-header span:first-child { flex:1; }
+  .wl-progress { font-size:11px; color:var(--accent3); font-weight:700; white-space:nowrap; }
+  .wl-arrow { color:var(--text-muted); font-size:11px; }
+  .wl-groups, .wl-words { display:flex; flex-direction:column; }
+  .wl-word-row { display:flex; align-items:center; gap:8px; padding:6px 12px 6px 30px; border-top:1px solid rgba(255,255,255,.04); font-family:'Noto Sans JP',sans-serif; }
+  .wl-word-text { font-size:13px; font-weight:800; font-family:'Nunito',sans-serif; min-width:70px; }
+  .wl-word-meaning { flex:1; font-size:11px; color:var(--text-muted); }
+  .wl-word-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:8px; background:rgba(255,255,255,.08); color:var(--text-muted); white-space:nowrap; }
+  .wl-word-status.cleared { background:rgba(6,214,160,.15); color:var(--accent3); }
+  .wl-word-mistake { font-size:10px; color:var(--accent); white-space:nowrap; min-width:52px; text-align:right; }
   .selected-count { font-size:13px; color:var(--accent2); font-weight:700; text-align:center; padding:4px; font-family:'Noto Sans JP',sans-serif; }
   .priority-btns { display:flex; gap:8px; }
   .priority-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid transparent; background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
@@ -136,6 +151,13 @@
   .btn-retry-again { background:linear-gradient(135deg,#a29bfe,#6c5ce7); color:#fff; box-shadow:0 6px 20px rgba(108,92,231,.3); }
   .btn-reveal { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); box-shadow:0 6px 20px rgba(255,209,102,.3); }
 
+  /* v56: 常時表示の「わからない」3択キーボードメニュー */
+  .answer-menu { display:flex; gap:8px; margin-top:8px; }
+  .answer-menu-btn { flex:1; padding:10px 6px; border-radius:14px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:all .15s; }
+  .answer-menu-btn.menu-active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.12); box-shadow:0 0 0 2px rgba(255,209,102,.25); }
+  .answer-menu-btn.menu-disabled { opacity:.35; pointer-events:none; }
+  .kbd-menu-active { outline:3px solid var(--accent2) !important; outline-offset:2px; }
+
   @media (min-width: 768px) {
     #home-screen { padding: 40px 40px; gap: 20px; }
     .mode-cards { max-width: 680px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -154,7 +176,7 @@
   #result-screen { align-items:center; justify-content:center; gap:28px; padding:40px 24px; }
   .result-emoji { font-size:72px; animation:bounce .6s ease; }
   @keyframes bounce { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
-  .result-title { font-size:28px; font-weight:900; text-align:center; }
+  .result-title { font-size:28px; font-weight:900; text-align:center; white-space:pre-line; }
   .result-score-card { background:var(--card); border-radius:var(--radius); padding:28px 32px; text-align:center; width:100%; max-width:320px; }
   .score-big { font-size:64px; font-weight:900; background:linear-gradient(135deg,var(--accent2),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; }
   .score-label { font-size:13px; color:var(--text-muted); margin-top:4px; font-family:'Noto Sans JP',sans-serif; }
@@ -367,10 +389,6 @@
 
   /* ===== ユーザー設定画面 ===== */
   #user-pref-screen { gap:16px; max-width:440px; margin:0 auto; width:100%; padding-bottom:40px; }
-  .pref-mode-card { flex:1; padding:14px 10px; border-radius:14px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:all .2s; text-align:center; display:flex; flex-direction:column; gap:4px; }
-  .pref-mode-card.active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,209,102,.08); }
-  .pref-mode-title { font-size:15px; font-weight:800; font-family:'Nunito',sans-serif; }
-  .pref-mode-desc { font-size:11px; line-height:1.5; }
   .pref-count-btn { flex:1; padding:10px 6px; border-radius:12px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; text-align:center; }
   .pref-count-btn.active { border-color:var(--accent3); color:var(--accent3); background:rgba(6,214,160,.1); }
   .pref-toggle-btn { padding:8px 12px; border-radius:10px; border:2px solid var(--surface); background:var(--surface); color:var(--text-muted); font-size:12px; font-weight:700; font-family:'Nunito',sans-serif; cursor:pointer; transition:all .2s; }
@@ -385,22 +403,7 @@
   .entype-submit-btn:active { transform:scale(.97); }
 
   /* ===== ステップモード表示 ===== */
-  .step-banner { display:none; background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05)); border:1.5px solid rgba(212,175,55,.4); border-radius:12px; padding:8px 14px; font-size:13px; font-weight:700; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; }
-  .step-banner.visible { display:flex; align-items:center; gap:8px; }
-  .step-banner-text { flex:1; text-align:center; }
-  .step-pause-btn { font-size:11px; font-weight:700; color:var(--accent2); background:rgba(255,209,102,.15); border:1.5px solid rgba(255,209,102,.4); border-radius:8px; padding:3px 10px; cursor:pointer; font-family:'Noto Sans JP',sans-serif; white-space:nowrap; flex-shrink:0; }
   /* ===== v53: ステップ一時停止バナー ===== */
-  .step-pause-banner { display:none; background:linear-gradient(135deg,rgba(255,107,107,.12),rgba(255,107,107,.06)); border:1.5px solid rgba(255,107,107,.4); border-radius:12px; padding:10px 14px; font-size:13px; font-family:'Noto Sans JP',sans-serif; text-align:center; margin-bottom:8px; }
-  .step-pause-banner.visible { display:block; }
-  /* ===== v53: カスタムプール設定 ===== */
-  .cp-source-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-  .cp-source-label { flex:1; font-size:12px; font-family:'Noto Sans JP',sans-serif; color:var(--text); }
-  .cp-source-sub { font-size:10px; color:var(--text-muted); }
-  .cp-source-input { width:56px; padding:5px 6px; border-radius:8px; border:1.5px solid rgba(255,255,255,.2); background:var(--surface); color:var(--text); font-size:14px; text-align:center; font-family:'Nunito',sans-serif; }
-  .cp-validation { font-size:11px; color:var(--accent); padding:4px 0; font-family:'Noto Sans JP',sans-serif; min-height:16px; }
-  .cp-status { font-size:12px; color:var(--accent2); font-family:'Noto Sans JP',sans-serif; padding:6px 0; }
-  .cp-shortage-warning { display:none; font-size:12px; color:#ff6b6b; background:rgba(255,107,107,.1); border:1.5px solid rgba(255,107,107,.35); border-radius:10px; padding:8px 10px; font-family:'Noto Sans JP',sans-serif; line-height:1.5; margin-top:4px; }
-  .cp-shortage-warning.visible { display:block; }
   /* ===== v53: 豆知識構造表示 ===== */
   #trivia-structured { display:none; }
   .trivia-struct-item { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.07); }
@@ -477,11 +480,6 @@
     <div id="home-user-bar" style="font-size:12px;color:var(--gold);font-family:'Noto Sans JP',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px;" onclick="openUserSelectFromHome()">▶ 切り替え</div>
     <button onclick="showScreen('user-pref-screen');loadPrefScreen();" style="font-size:11px;font-weight:700;color:var(--text-muted);background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:3px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">⚙ 設定</button>
   </div>
-  </div>
-  <!-- v53: ステップモード一時停止中バナー -->
-  <div id="home-step-pause-banner" class="step-pause-banner">
-    <span>⏸ ステップモード一時停止中</span>
-    <button onclick="resumeStepMode()" style="margin-left:10px;font-size:12px;font-weight:700;color:#06d6a0;background:rgba(6,214,160,.12);border:1.5px solid rgba(6,214,160,.4);border-radius:8px;padding:3px 12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">▶ 再開</button>
   </div>
   <div class="mode-cards">
     <div class="mode-card flash" onclick="goToLearnSettings()" style="border-color:var(--accent3);">
@@ -614,37 +612,19 @@
         <div class="source-name">ミニラボ（教科書）</div>
         <div class="source-count">166語</div>
       </div>
-      <div id="unit-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
-        <div style="display:flex;gap:6px;margin-bottom:2px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllUnits(true)">全選択</button>
-          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ml-g1" onclick="toggleSrcMidAll(this)">Unit1〜5</button>
-            <button class="sg-expand-btn" id="src-exp-ml-g1" onclick="toggleSrcExpand('ml-g1')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ml-g1">
-            <button class="unit-btn active" data-unit="Unit1" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit1</button>
-            <button class="unit-btn active" data-unit="Unit2" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit2</button>
-            <button class="unit-btn active" data-unit="Unit3" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit3</button>
-            <button class="unit-btn active" data-unit="Unit4" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit4</button>
-            <button class="unit-btn active" data-unit="Unit5" data-src-parent="ml-g1" onclick="toggleUnit(this)">Unit5</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ml-g2" onclick="toggleSrcMidAll(this)">Unit6〜10</button>
-            <button class="sg-expand-btn" id="src-exp-ml-g2" onclick="toggleSrcExpand('ml-g2')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ml-g2">
-            <button class="unit-btn active" data-unit="Unit6" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit6</button>
-            <button class="unit-btn active" data-unit="Unit7" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit7</button>
-            <button class="unit-btn active" data-unit="Unit8" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit8</button>
-            <button class="unit-btn active" data-unit="Unit9" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit9</button>
-            <button class="unit-btn active" data-unit="Unit10" data-src-parent="ml-g2" onclick="toggleUnit(this)">Unit10</button>
-          </div>
-        </div>
+      <div id="unit-grid" class="unit-grid">
+        <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllUnits(true)">全選択</button>
+        <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllUnits(false)">全解除</button>
+        <button class="unit-btn active" data-unit="Unit1" onclick="toggleUnit(this)"><span class="unit-label">Unit1</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit2" onclick="toggleUnit(this)"><span class="unit-label">Unit2</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit3" onclick="toggleUnit(this)"><span class="unit-label">Unit3</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit4" onclick="toggleUnit(this)"><span class="unit-label">Unit4</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit5" onclick="toggleUnit(this)"><span class="unit-label">Unit5</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit6" onclick="toggleUnit(this)"><span class="unit-label">Unit6</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit7" onclick="toggleUnit(this)"><span class="unit-label">Unit7</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit8" onclick="toggleUnit(this)"><span class="unit-label">Unit8</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit9" onclick="toggleUnit(this)"><span class="unit-label">Unit9</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-unit="Unit10" onclick="toggleUnit(this)"><span class="unit-label">Unit10</span><span class="unit-progress"></span></button>
       </div>
     </div>
 
@@ -657,32 +637,14 @@
         <div class="source-name">英検5級</div>
         <div class="source-count">107語</div>
       </div>
-      <div id="eiken-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
-        <div style="display:flex;gap:6px;margin-bottom:2px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllEiken(true)">全選択</button>
-          <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ek-g1" onclick="toggleSrcMidAll(this)">1〜50</button>
-            <button class="sg-expand-btn" id="src-exp-ek-g1" onclick="toggleSrcExpand('ek-g1')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ek-g1">
-            <button class="unit-btn active" data-eiken="1-25" data-src-parent="ek-g1" onclick="toggleEiken(this)">1〜25</button>
-            <button class="unit-btn active" data-eiken="26-50" data-src-parent="ek-g1" onclick="toggleEiken(this)">26〜50</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="ek-g2" onclick="toggleSrcMidAll(this)">51〜107</button>
-            <button class="sg-expand-btn" id="src-exp-ek-g2" onclick="toggleSrcExpand('ek-g2')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-ek-g2">
-            <button class="unit-btn active" data-eiken="51-75" data-src-parent="ek-g2" onclick="toggleEiken(this)">51〜75</button>
-            <button class="unit-btn active" data-eiken="76-100" data-src-parent="ek-g2" onclick="toggleEiken(this)">76〜100</button>
-            <button class="unit-btn active" data-eiken="101-107" data-src-parent="ek-g2" onclick="toggleEiken(this)">101〜107</button>
-          </div>
-        </div>
+      <div id="eiken-grid" class="unit-grid">
+        <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllEiken(true)">全選択</button>
+        <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllEiken(false)">全解除</button>
+        <button class="unit-btn active" data-eiken="1-25" onclick="toggleEiken(this)"><span class="unit-label">1〜25</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="26-50" onclick="toggleEiken(this)"><span class="unit-label">26〜50</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="51-75" onclick="toggleEiken(this)"><span class="unit-label">51〜75</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="76-100" onclick="toggleEiken(this)"><span class="unit-label">76〜100</span><span class="unit-progress"></span></button>
+        <button class="unit-btn active" data-eiken="101-107" onclick="toggleEiken(this)"><span class="unit-label">101〜107</span><span class="unit-progress"></span></button>
       </div>
     </div>
 
@@ -695,65 +657,18 @@
         <div class="source-name">まぶたん（中1）</div>
         <div class="source-count">343語</div>
       </div>
-      <div id="mabutan-grid" style="display:flex;flex-direction:column;gap:6px;padding-left:30px;">
-        <div style="display:flex;gap:6px;margin-bottom:2px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllMabutan(true)">全選択</button>
+      <div id="mabutan-grid" style="display:flex;flex-direction:column;gap:8px;padding-left:30px;">
+        <div style="display:flex;gap:6px;">
+          <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllMabutan(true)">全選択</button>
           <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllMabutan(false)">全解除</button>
         </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g1" onclick="toggleSrcMidAll(this)">1〜80</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g1" onclick="toggleSrcExpand('mb-g1')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g1">
-            <button class="unit-btn active" data-mabutan="1-16" data-src-parent="mb-g1" onclick="toggleMabutan(this)">1〜16</button>
-            <button class="unit-btn active" data-mabutan="17-32" data-src-parent="mb-g1" onclick="toggleMabutan(this)">17〜32</button>
-            <button class="unit-btn active" data-mabutan="33-48" data-src-parent="mb-g1" onclick="toggleMabutan(this)">33〜48</button>
-            <button class="unit-btn active" data-mabutan="49-64" data-src-parent="mb-g1" onclick="toggleMabutan(this)">49〜64</button>
-            <button class="unit-btn active" data-mabutan="65-80" data-src-parent="mb-g1" onclick="toggleMabutan(this)">65〜80</button>
-          </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="number" id="mabutan-range-from" min="1" max="343" value="1" inputmode="numeric" oninput="saveUnitSelection();updateSelectedCount();" onblur="onMabutanRangeChange()" style="width:64px;padding:6px 8px;border-radius:8px;border:2px solid var(--surface);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;">
+          <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">番 〜</span>
+          <input type="number" id="mabutan-range-to" min="1" max="343" value="343" inputmode="numeric" oninput="saveUnitSelection();updateSelectedCount();" onblur="onMabutanRangeChange()" style="width:64px;padding:6px 8px;border-radius:8px;border:2px solid var(--surface);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;">
+          <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">番</span>
         </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g2" onclick="toggleSrcMidAll(this)">81〜160</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g2" onclick="toggleSrcExpand('mb-g2')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g2">
-            <button class="unit-btn active" data-mabutan="81-96" data-src-parent="mb-g2" onclick="toggleMabutan(this)">81〜96</button>
-            <button class="unit-btn active" data-mabutan="97-112" data-src-parent="mb-g2" onclick="toggleMabutan(this)">97〜112</button>
-            <button class="unit-btn active" data-mabutan="113-128" data-src-parent="mb-g2" onclick="toggleMabutan(this)">113〜128</button>
-            <button class="unit-btn active" data-mabutan="129-144" data-src-parent="mb-g2" onclick="toggleMabutan(this)">129〜144</button>
-            <button class="unit-btn active" data-mabutan="145-160" data-src-parent="mb-g2" onclick="toggleMabutan(this)">145〜160</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g3" onclick="toggleSrcMidAll(this)">161〜240</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g3" onclick="toggleSrcExpand('mb-g3')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g3">
-            <button class="unit-btn active" data-mabutan="161-176" data-src-parent="mb-g3" onclick="toggleMabutan(this)">161〜176</button>
-            <button class="unit-btn active" data-mabutan="177-192" data-src-parent="mb-g3" onclick="toggleMabutan(this)">177〜192</button>
-            <button class="unit-btn active" data-mabutan="193-208" data-src-parent="mb-g3" onclick="toggleMabutan(this)">193〜208</button>
-            <button class="unit-btn active" data-mabutan="209-224" data-src-parent="mb-g3" onclick="toggleMabutan(this)">209〜224</button>
-            <button class="unit-btn active" data-mabutan="225-240" data-src-parent="mb-g3" onclick="toggleMabutan(this)">225〜240</button>
-          </div>
-        </div>
-        <div class="sg-group">
-          <div class="sg-mid-header">
-            <button class="sg-mid-btn active" data-src-mid="mb-g4" onclick="toggleSrcMidAll(this)">241〜343</button>
-            <button class="sg-expand-btn" id="src-exp-mb-g4" onclick="toggleSrcExpand('mb-g4')">▾</button>
-          </div>
-          <div class="sg-sub-area" id="src-subs-mb-g4">
-            <button class="unit-btn active" data-mabutan="241-256" data-src-parent="mb-g4" onclick="toggleMabutan(this)">241〜256</button>
-            <button class="unit-btn active" data-mabutan="257-272" data-src-parent="mb-g4" onclick="toggleMabutan(this)">257〜272</button>
-            <button class="unit-btn active" data-mabutan="273-288" data-src-parent="mb-g4" onclick="toggleMabutan(this)">273〜288</button>
-            <button class="unit-btn active" data-mabutan="289-304" data-src-parent="mb-g4" onclick="toggleMabutan(this)">289〜304</button>
-            <button class="unit-btn active" data-mabutan="305-320" data-src-parent="mb-g4" onclick="toggleMabutan(this)">305〜320</button>
-            <button class="unit-btn active" data-mabutan="321-336" data-src-parent="mb-g4" onclick="toggleMabutan(this)">321〜336</button>
-            <button class="unit-btn active" data-mabutan="337-343" data-src-parent="mb-g4" onclick="toggleMabutan(this)">337〜343</button>
-          </div>
-        </div>
+        <div id="mabutan-progress-label" style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;"></div>
       </div>
     </div>
 
@@ -768,13 +683,13 @@
       </div>
       <div id="shogakusei-grid" style="display:none;flex-direction:column;gap:6px;">
         <div style="margin-bottom:2px;display:flex;gap:6px;">
-          <button class="unit-btn unit-all-btn" onclick="selectAllShogakusei(true)">全選択</button>
+          <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllShogakusei(true)">全選択</button>
           <button class="unit-btn unit-all-btn" style="border-color:var(--text-muted);color:var(--text-muted);" onclick="selectAllShogakusei(false)">全解除</button>
         </div>
         <!-- 数・時間 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)">数・時間</button>
+            <button class="sg-mid-btn" data-sg-mid="数・時間" onclick="toggleSgMidAll(this)"><span class="unit-label">数・時間</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-数・時間" onclick="toggleSgExpand('数・時間')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-数・時間">
@@ -788,7 +703,7 @@
         <!-- 食べ物 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)">食べ物</button>
+            <button class="sg-mid-btn" data-sg-mid="食べ物" onclick="toggleSgMidAll(this)"><span class="unit-label">食べ物</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-食べ物" onclick="toggleSgExpand('食べ物')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-食べ物">
@@ -801,7 +716,7 @@
         <!-- 生き物 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="生き物" onclick="toggleSgMidAll(this)">生き物</button>
+            <button class="sg-mid-btn" data-sg-mid="生き物" onclick="toggleSgMidAll(this)"><span class="unit-label">生き物</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-生き物" onclick="toggleSgExpand('生き物')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-生き物">
@@ -814,7 +729,7 @@
         <!-- 人・体 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="人・体" onclick="toggleSgMidAll(this)">人・体</button>
+            <button class="sg-mid-btn" data-sg-mid="人・体" onclick="toggleSgMidAll(this)"><span class="unit-label">人・体</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-人・体" onclick="toggleSgExpand('人・体')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-人・体">
@@ -827,7 +742,7 @@
         <!-- 学校・町 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)">学校・町</button>
+            <button class="sg-mid-btn" data-sg-mid="学校・町" onclick="toggleSgMidAll(this)"><span class="unit-label">学校・町</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-学校・町" onclick="toggleSgExpand('学校・町')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-学校・町">
@@ -841,7 +756,7 @@
         <!-- 生活 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="生活" onclick="toggleSgMidAll(this)">生活</button>
+            <button class="sg-mid-btn" data-sg-mid="生活" onclick="toggleSgMidAll(this)"><span class="unit-label">生活</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-生活" onclick="toggleSgExpand('生活')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-生活">
@@ -855,7 +770,7 @@
         <!-- 自然 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="自然" onclick="toggleSgMidAll(this)">自然</button>
+            <button class="sg-mid-btn" data-sg-mid="自然" onclick="toggleSgMidAll(this)"><span class="unit-label">自然</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-自然" onclick="toggleSgExpand('自然')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-自然">
@@ -868,7 +783,7 @@
         <!-- 色・形 -->
         <div class="sg-group">
           <div class="sg-mid-header">
-            <button class="sg-mid-btn" data-sg-mid="色・形" onclick="toggleSgMidAll(this)">色・形</button>
+            <button class="sg-mid-btn" data-sg-mid="色・形" onclick="toggleSgMidAll(this)"><span class="unit-label">色・形</span><span class="unit-progress"></span></button>
             <button class="sg-expand-btn" id="sg-exp-色・形" onclick="toggleSgExpand('色・形')">▾</button>
           </div>
           <div class="sg-sub-area" id="sg-subs-色・形">
@@ -893,6 +808,16 @@
     <div class="selected-count" id="selected-count">0語が選択されています</div>
   </div>
 
+  <!-- v56: 今日の新規単語数（毎日変更できる） -->
+  <div class="settings-section">
+    <div class="settings-label">今日の新規単語数（まだ挑戦していない単語）</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="number" id="new-word-limit" min="1" max="9999" value="10" inputmode="numeric" oninput="saveNewWordLimit()" style="width:80px;padding:6px 8px;border-radius:8px;border:2px solid var(--surface);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;">
+      <span style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">語</span>
+    </div>
+    <div id="new-word-status" style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-top:6px;line-height:1.5;">間違えた単語（苦手）は、この数にかかわらず全部出ます</div>
+  </div>
+
   <!-- 読み上げ速度 -->
   <div class="settings-section">
     <div class="settings-label">スペルアウト速度</div>
@@ -907,7 +832,6 @@
 
 <!-- FLASH SCREEN -->
 <div id="flash-screen" class="screen">
-  <div id="step-banner" class="step-banner"><span class="step-banner-text"></span><button class="step-pause-btn" onclick="pauseStepMode()" id="flash-pause-btn" style="display:none;">⏸ 一時停止</button></div>
   <div class="flash-header">
     <button class="back-btn" onclick="endSessionPrompt()">‹</button>
     <button class="back-btn" id="prev-btn" onclick="backCard()" style="display:none;font-size:14px;" title="前の問題へ">◀</button>
@@ -939,6 +863,11 @@
       <div class="text-input-row" id="text-input-row">
         <input type="text" id="main-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="latin" placeholder="ここに入力してEnter">
         <button onclick="checkAnswer()">確認</button>
+      </div>
+      <div class="answer-menu" id="flash-answer-menu">
+        <button type="button" class="answer-menu-btn" id="flash-menu-speak" onclick="activateAnswerMenuByClick('flash',0)">🔊 発音を聞く</button>
+        <button type="button" class="answer-menu-btn" id="flash-menu-reveal" onclick="activateAnswerMenuByClick('flash',1)">👁 答えを見る</button>
+        <button type="button" class="answer-menu-btn" id="flash-menu-next" onclick="activateAnswerMenuByClick('flash',2)">➡ 次へ</button>
       </div>
     </div>
     <div id="spell-highlight-area"></div>
@@ -984,10 +913,9 @@
     </div>
   </div>
   <div class="action-row">
-    <button class="action-btn btn-skip" onclick="skipCard()">スキップ</button>
     <button class="action-btn btn-retry-again" id="retry-again-btn" onclick="retryCurrentCard()" style="display:none;">もう一度</button>
     <button class="action-btn btn-next" id="next-btn" onclick="nextCard()" style="display:none;">次へ →</button>
-    <button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button>
+    <div style="display:none;"><button class="action-btn btn-reveal" id="reveal-btn" onclick="revealAnswer()">答えを見る</button></div>
   </div>
 </div>
 
@@ -1114,7 +1042,6 @@
     </div>
     <div class="progress-text" id="learn-progress-text">0/0</div>
   </div>
-  <div id="learn-step-banner" class="step-banner"><span class="step-banner-text"></span><button class="step-pause-btn" onclick="pauseStepMode()" id="learn-pause-btn" style="display:none;">⏸ 一時停止</button></div>
   <div class="card-area">
     <div class="flashcard">
       <div class="card-source-badge" id="learn-card-source"></div>
@@ -1127,7 +1054,7 @@
   <div style="background:var(--card);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;">
     <div id="learn-status" style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;height:20px;"></div>
     <div style="display:flex;gap:10px;width:100%;" id="learn-action-row">
-      <button class="action-btn" onclick="learnAgain()" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
+      <button class="action-btn" id="learn-again-btn" onclick="learnAgain()" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
       <button class="action-btn btn-next" onclick="learnNext()" style="flex:1;display:none;" id="learn-next-btn">覚えた！</button>
     </div>
     <button id="learn-replay-btn" onclick="replayLearnSpellOut()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;"></button>
@@ -1148,7 +1075,6 @@
       </div>
       <div class="progress-text" id="smem-progress-text">0/0</div>
     </div>
-    <div id="smem-step-banner" class="step-banner"></div>
     <div id="smem-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
       <div class="settings-label">ユニットを選ぶ</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -1184,7 +1110,7 @@
         <button id="smem-replay-btn" onclick="smemReplay()" style="display:none;padding:8px 24px;border-radius:12px;border:2px solid var(--accent3);background:transparent;color:var(--accent3);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度聞く</button>
         <div style="display:flex;gap:10px;width:100%;" id="smem-action-row">
           <button onclick="smemAgain()" class="action-btn" style="flex:1;background:var(--card);color:var(--text-muted);border:2px solid var(--surface);border-radius:var(--radius);padding:14px;font-size:14px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;">もう一度</button>
-          <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;">覚えた！</button>
+          <button onclick="smemNext()" class="action-btn btn-next" style="flex:1;" id="smem-next-btn">覚えた！</button>
         </div>
         <div id="smem-speak-area" style="display:none;flex-direction:column;gap:8px;align-items:center;width:100%;padding-top:4px;border-top:1px solid var(--surface);">
           <div style="font-size:13px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;" id="smem-voice-status">発音練習する</div>
@@ -1211,7 +1137,6 @@
       </div>
       <div class="progress-text" id="typing-progress-text">0/0</div>
     </div>
-    <div id="typing-step-banner" class="step-banner"></div>
     <div id="typing-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
       <div class="settings-label">ユニットを選ぶ</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -1286,7 +1211,6 @@
       </div>
       <div class="progress-text" id="entype-progress-text">0/0</div>
     </div>
-    <div id="entype-step-banner" class="step-banner"></div>
     <div id="entype-unit-select" style="background:var(--card);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:12px;">
       <div class="settings-label">ユニットを選ぶ</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -1314,6 +1238,11 @@
         <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">英文を入力してEnterまたはボタンで確認</div>
         <input type="text" id="entype-input" class="entype-input" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none" inputmode="text" placeholder="Type the English sentence...">
         <button class="entype-submit-btn" onclick="submitEntypeAnswer()">答え合わせ ✓</button>
+        <div class="answer-menu" id="entype-answer-menu">
+          <button type="button" class="answer-menu-btn" id="entype-menu-speak" onclick="activateAnswerMenuByClick('entype',0)">🔊 発音を聞く</button>
+          <button type="button" class="answer-menu-btn" id="entype-menu-reveal" onclick="activateAnswerMenuByClick('entype',1)">👁 答えを見る</button>
+          <button type="button" class="answer-menu-btn" id="entype-menu-next" onclick="activateAnswerMenuByClick('entype',2)">➡ 次へ</button>
+        </div>
         <div id="entype-feedback" style="min-height:24px;text-align:center;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;"></div>
         <div id="entype-answer-display" style="display:none;background:var(--surface);border-radius:12px;padding:12px 14px;">
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;font-family:'Noto Sans JP',sans-serif;">正解</div>
@@ -1321,9 +1250,8 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;">
-        <button onclick="entypeSkip()" class="action-btn btn-skip">スキップ</button>
         <button onclick="entypeNext()" id="entype-next-btn" class="action-btn btn-next" style="display:none;">次へ →</button>
-        <button onclick="entypeReveal()" id="entype-reveal-btn" class="action-btn btn-reveal">答えを見る</button>
+        <div style="display:none;"><button onclick="entypeReveal()" id="entype-reveal-btn" class="action-btn btn-reveal">答えを見る</button></div>
       </div>
     </div>
   </div>
@@ -1347,7 +1275,7 @@
             <span style="font-size:12px;color:var(--text-muted);">166語</span>
           </label>
           <div id="ls-minilabo-grid" class="unit-grid" style="padding-left:30px;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsMinilabo()">全選択</button>
+            <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsMinilabo()">全選択</button>
             <button class="unit-btn" data-ls-ml="Unit1" onclick="toggleLsMinilabo(this)">Unit1</button>
             <button class="unit-btn" data-ls-ml="Unit2" onclick="toggleLsMinilabo(this)">Unit2</button>
             <button class="unit-btn" data-ls-ml="Unit3" onclick="toggleLsMinilabo(this)">Unit3</button>
@@ -1369,7 +1297,7 @@
             <span style="font-size:12px;color:var(--text-muted);">107語</span>
           </label>
           <div id="ls-eiken-grid" class="unit-grid" style="padding-left:30px;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsEiken()">全選択</button>
+            <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsEiken()">全選択</button>
             <button class="unit-btn" data-ls-eiken="1-25" onclick="toggleLsEiken(this)">1〜25</button>
             <button class="unit-btn" data-ls-eiken="26-50" onclick="toggleLsEiken(this)">26〜50</button>
             <button class="unit-btn" data-ls-eiken="51-75" onclick="toggleLsEiken(this)">51〜75</button>
@@ -1386,7 +1314,7 @@
             <span style="font-size:12px;color:var(--text-muted);">343語</span>
           </label>
           <div id="ls-mabutan-grid" class="unit-grid" style="padding-left:30px;">
-            <button class="unit-btn unit-all-btn" onclick="selectAllLsMabutan()">全選択</button>
+            <button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsMabutan()">全選択</button>
             <button class="unit-btn" data-ls-mabutan="1-16" onclick="toggleLsMabutan(this)">1〜16</button>
             <button class="unit-btn" data-ls-mabutan="17-32" onclick="toggleLsMabutan(this)">17〜32</button>
             <button class="unit-btn" data-ls-mabutan="33-48" onclick="toggleLsMabutan(this)">33〜48</button>
@@ -1420,7 +1348,7 @@
             <span style="font-size:12px;color:var(--text-muted);">332語</span>
           </label>
           <div id="ls-shogakusei-grid" style="padding-left:16px;display:none;flex-direction:column;gap:6px;">
-            <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn" onclick="selectAllLsShogakusei()">全選択</button></div>
+            <div style="margin-bottom:2px;"><button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsShogakusei()">全選択</button></div>
             <!-- 数・時間 -->
             <div class="sg-group">
               <div class="sg-mid-header">
@@ -1769,13 +1697,7 @@
       </div>
     </div>
     <div class="settings-section">
-      <div class="timer-toggle">
-        <div class="toggle-info">
-          <div class="toggle-name">苦手単語を優先</div>
-          <div class="toggle-desc">ミスが多い単語を多めに出題する</div>
-        </div>
-        <button class="toggle-switch on" id="review-weak-toggle" onclick="this.classList.toggle('on');reviewWeakPriority=this.classList.contains('on');"></button>
-      </div>
+      <div class="settings-label" style="line-height:1.6;">出題：苦手単語が中心。覚えた単語も約2割まざります</div>
     </div>
     <button onclick="startReviewTest()" class="start-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 8px 24px rgba(245,158,11,.4);">スタート →</button>
   </div>
@@ -1879,6 +1801,13 @@
     <div id="rec-unit-list"></div>
   </div>
 
+  <!-- v56: 振り返り（前回・前々回） -->
+  <div class="rec-section">
+    <div class="rec-title" style="color:var(--accent3);">振り返り</div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">前回・前々回にまちがえた単語 / まとめて解き直せます</div>
+    <div id="rec-reflect-log"></div>
+  </div>
+
   <!-- 毎日の記録 -->
   <div class="rec-section">
     <div class="rec-title" style="color:var(--accent2);">毎日の記録</div>
@@ -1920,6 +1849,13 @@
   <!-- ツールチップ -->
   <div id="mastery-tooltip" class="mastery-tooltip"></div>
 
+  <!-- 教材別 単語一覧 -->
+  <div class="rec-section">
+    <div class="rec-title" style="color:var(--accent2);">教材別 単語一覧</div>
+    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:8px;">タップして開くと、Unit・カテゴリごとの単語とクリア状況が見られます</div>
+    <div id="word-list-sources"></div>
+  </div>
+
   <!-- データ管理 -->
   <div class="rec-section">
     <div class="rec-title" style="font-size:13px;color:var(--text-muted);">データ管理</div>
@@ -1940,81 +1876,7 @@
     <div class="screen-title">⚙ 個人設定</div>
   </div>
 
-  <!-- 学習モード -->
-  <div class="settings-section">
-    <div class="settings-label">学習モード</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <button class="pref-mode-card active" data-pref-mode="free" onclick="selectPrefMode(this)">
-        <div class="pref-mode-title">フリーモード</div>
-        <div class="pref-mode-desc">試験範囲を自分で選んでスタート</div>
-      </button>
-      <button class="pref-mode-card" data-pref-mode="step" onclick="selectPrefMode(this)">
-        <div class="pref-mode-title">ステップモード</div>
-        <div class="pref-mode-desc">指定数ずつ解放・累積で練習。7割クリアで次のステップへ</div>
-      </button>
-      <button class="pref-mode-card" data-pref-mode="custom" onclick="selectPrefMode(this)">
-        <div class="pref-mode-title">カスタムプール</div>
-        <div class="pref-mode-desc">プール内の語を管理。殿堂入りで自動補充（上級）</div>
-      </button>
-    </div>
-  </div>
-
-  <!-- ステップ解放数（ステップモード時のみ） -->
-  <div class="settings-section" id="pref-step-unlock-section" style="display:none;">
-    <div class="settings-label">ステップ解放数（単語・英文ともに）</div>
-    <div style="display:flex;gap:8px;">
-      <button class="pref-count-btn active" data-pref-step-unlock="5" onclick="selectPrefStepUnlock(this)">5語</button>
-      <button class="pref-count-btn" data-pref-step-unlock="10" onclick="selectPrefStepUnlock(this)">10語</button>
-    </div>
-  </div>
-
-  <!-- カスタムプール設定（カスタムプールモード時のみ） -->
-  <div class="settings-section" id="pref-custom-pool-section" style="display:none;">
-    <div class="settings-label">カスタムプール設定（上級）</div>
-    <div id="pref-custom-pool-settings">
-      <!-- プール合計数 -->
-      <div style="margin-bottom:10px;">
-        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">出題プール合計数</div>
-        <input type="number" id="pref-pool-size" min="5" max="200" value="30" oninput="validatePoolDist()" style="width:80px;padding:6px 8px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:var(--surface);color:var(--text);font-size:15px;text-align:center;font-family:'Nunito',sans-serif;">
-        <span style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-left:6px;">語</span>
-      </div>
-      <!-- 初期プール内訳 -->
-      <div style="margin-bottom:10px;">
-        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:6px;">初期プールの内訳（テキストごとの語数）</div>
-        <div id="pref-init-dist-rows"></div>
-        <div class="cp-validation" id="pref-init-validation"></div>
-      </div>
-      <!-- 殿堂入りしきい値 -->
-      <div style="margin-bottom:10px;">
-        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:4px;">殿堂入りが何語たまったら次を補充する？</div>
-        <input type="number" id="pref-unlock-threshold" min="1" max="100" value="10" oninput="validateReplenishDist()" style="width:80px;padding:6px 8px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:var(--surface);color:var(--text);font-size:15px;text-align:center;font-family:'Nunito',sans-serif;">
-        <span style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-left:6px;">語</span>
-      </div>
-      <!-- 補充内訳 -->
-      <div style="margin-bottom:10px;">
-        <div style="font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;margin-bottom:6px;">補充の内訳（殿堂入りしきい値の合計に合わせる）</div>
-        <div id="pref-replenish-dist-rows"></div>
-        <div class="cp-validation" id="pref-replenish-validation"></div>
-      </div>
-      <!-- プール状況 -->
-      <div class="cp-status" id="pref-custom-pool-status"></div>
-      <!-- 語数不足の注意書き -->
-      <div class="cp-shortage-warning" id="pref-custom-pool-shortage"></div>
-      <!-- プール初期化ボタン -->
-      <button onclick="reinitCustomPool()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(6,214,160,.4);background:transparent;color:#06d6a0;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">プールをリセット・再構築</button>
-    </div>
-  </div>
-
   <!-- 1回の単語数 -->
-  <div class="settings-section" id="pref-count-section">
-    <div class="settings-label">1回に出す単語数（フリーモード時）</div>
-    <div style="display:flex;gap:8px;">
-      <button class="pref-count-btn" data-pref-count="5" onclick="selectPrefCount(this)">5語</button>
-      <button class="pref-count-btn" data-pref-count="10" onclick="selectPrefCount(this)">10語</button>
-      <button class="pref-count-btn" data-pref-count="15" onclick="selectPrefCount(this)">15語</button>
-      <button class="pref-count-btn active" data-pref-count="0" onclick="selectPrefCount(this)">全部</button>
-    </div>
-  </div>
 
   <!-- 1回に出す英文数 -->
   <div class="settings-section" id="pref-sentence-count-section">
@@ -2056,13 +1918,6 @@
       <button class="speed-btn active" data-pref-speed="normal" onclick="selectPrefSpeed(this)">ふつう</button>
       <button class="speed-btn" data-pref-speed="fast" onclick="selectPrefSpeed(this)">はやい</button>
     </div>
-  </div>
-
-  <!-- ステップモード状況 -->
-  <div class="settings-section" id="pref-step-status" style="display:none;">
-    <div class="settings-label">ステップモード状況</div>
-    <div id="pref-step-info" style="font-size:14px;color:var(--accent2);font-weight:700;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:8px;"></div>
-    <button onclick="resetStepProgress()" style="width:100%;padding:10px;border-radius:12px;border:2px solid rgba(255,107,107,.4);background:transparent;color:var(--accent);font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;margin-top:4px;">ステップをリセット</button>
   </div>
 
   <button class="pref-save-btn" onclick="savePrefSettings()">保存して戻る</button>
@@ -3439,6 +3294,33 @@ function mabutanInGroup(w, group) {
   const [lo, hi] = group.split('-').map(Number);
   return num >= lo && num <= hi;
 }
+const MABUTAN_RANGE_GROUPS = ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343'];
+function getMabutanRange() {
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  if (!fromEl || !toEl || fromEl.value === '' || toEl.value === '') return null;
+  let from = parseInt(fromEl.value, 10);
+  let to = parseInt(toEl.value, 10);
+  if (isNaN(from) || isNaN(to)) return null;
+  from = Math.max(1, Math.min(343, from));
+  to = Math.max(1, Math.min(343, to));
+  if (from > to) { const t = from; from = to; to = t; }
+  return [from, to];
+}
+function onMabutanRangeChange() {
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  if (fromEl && fromEl.value !== '') {
+    const from = parseInt(fromEl.value, 10);
+    if (!isNaN(from)) fromEl.value = Math.max(1, Math.min(343, from));
+  }
+  if (toEl && toEl.value !== '') {
+    const to = parseInt(toEl.value, 10);
+    if (!isNaN(to)) toEl.value = Math.max(1, Math.min(343, to));
+  }
+  saveUnitSelection();
+  updateSelectedCount();
+}
 function eikenInGroup(w, group) {
   const s = w['出典_英検5級'] || '';
   const m = s.match(/No\.(\d+)/);
@@ -3470,7 +3352,7 @@ function renderOriginalGroupButtons() {
   if (!groups.length) { grid.style.display = 'none'; return; }
   grid.style.display = origOn ? 'flex' : 'none';
   const activeGroups = getSelectedOrigGroups();
-  grid.innerHTML = `<button class="unit-btn unit-all-btn" onclick="selectAllOrigGroups()">全選択</button>` +
+  grid.innerHTML = `<button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllOrigGroups()">全選択</button>` +
     groups.map(g => `<button class="unit-btn ${activeGroups.includes(g) ? 'active' : ''}" data-orig-group="${g}" onclick="toggleOrigGroup(this)">${g}</button>`).join('');
 }
 function renderLsOrigGroupButtons() {
@@ -3480,7 +3362,7 @@ function renderLsOrigGroupButtons() {
   const lsOn = document.getElementById('ls-chk-original') && document.getElementById('ls-chk-original').checked;
   if (!groups.length) { grid.style.display = 'none'; return; }
   grid.style.display = lsOn ? 'flex' : 'none';
-  grid.innerHTML = `<button class="unit-btn unit-all-btn" onclick="selectAllLsOrigGroups()">全選択</button>` +
+  grid.innerHTML = `<button class="unit-btn unit-all-btn select-all-btn" onclick="selectAllLsOrigGroups()">全選択</button>` +
     groups.map(g => `<button class="unit-btn active" data-ls-orig-group="${g}" onclick="toggleLsOrigGroup(this)">${g}</button>`).join('');
 }
 function toggleOrigGroup(btn) { btn.classList.toggle('active'); updateSelectedCount(); }
@@ -3521,44 +3403,22 @@ function updateSourceUI() {
   saveUnitSelection();
   updateSelectedCount();
 }
-function toggleSrcExpand(groupId) {
-  const sub = document.getElementById('src-subs-' + groupId);
-  const btn = document.getElementById('src-exp-' + groupId);
-  if (!sub) return;
-  const open = sub.style.display === 'none' || sub.style.display === '';
-  sub.style.display = open ? 'flex' : 'none';
-  if (btn) btn.textContent = open ? '▾' : '▸';
-}
-function toggleSrcMidAll(btn) {
-  const mid = btn.dataset.srcMid;
-  const subBtns = document.querySelectorAll(`[data-src-parent="${mid}"]`);
-  const allActive = Array.from(subBtns).every(b => b.classList.contains('active'));
-  subBtns.forEach(b => b.classList.toggle('active', !allActive));
-  btn.classList.toggle('active', !allActive);
-  saveUnitSelection(); updateSelectedCount();
-}
-function syncSrcMidBtn(mid) {
-  const midBtn = document.querySelector(`[data-src-mid="${mid}"]`);
-  if (!midBtn) return;
-  const anyActive = Array.from(document.querySelectorAll(`[data-src-parent="${mid}"].active`)).length > 0;
-  midBtn.classList.toggle('active', anyActive);
-}
-function toggleUnit(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
-function toggleEiken(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
-function toggleMabutan(btn) { btn.classList.toggle('active'); if (btn.dataset.srcParent) syncSrcMidBtn(btn.dataset.srcParent); saveUnitSelection(); updateSelectedCount(); }
+function toggleUnit(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
+function toggleEiken(btn) { btn.classList.toggle('active'); saveUnitSelection(); updateSelectedCount(); }
 function selectAllUnits(select = true) {
   document.querySelectorAll('#unit-grid [data-unit]').forEach(b => b.classList.toggle('active', select));
-  document.querySelectorAll('#unit-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllEiken(select = true) {
   document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => b.classList.toggle('active', select));
-  document.querySelectorAll('#eiken-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllMabutan(select = true) {
-  document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => b.classList.toggle('active', select));
-  document.querySelectorAll('#mabutan-grid [data-src-mid]').forEach(b => b.classList.toggle('active', select));
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  if (!fromEl || !toEl) return;
+  if (select) { fromEl.value = 1; toEl.value = 343; }
+  else { fromEl.value = ''; toEl.value = ''; }
   saveUnitSelection(); updateSelectedCount();
 }
 function selectAllShogakusei(select = true) {
@@ -3574,12 +3434,12 @@ function buildDeckRaw(shuffle = true) {
   const shogakuseiOn = document.getElementById('chk-shogakusei').checked;
   const selectedUnits = Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit);
   const selectedEikenGroups = Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken);
-  const selectedMabutanGroups = Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan);
+  const mabutanRange = getMabutanRange();
   const selectedSgSubs = getSelectedSgSubs(false);
   const result = [];
   if (minilaboOn) MINILABO.filter(w => selectedUnits.includes(w['出典_ミニラボ'])).forEach(w => result.push({...w, _source: 'ミニラボ'}));
   if (eikenOn) EIKEN.filter(w => selectedEikenGroups.some(g => eikenInGroup(w, g))).forEach(w => result.push({...w, _source: '英検5級'}));
-  if (mabutanOn) MABUTAN.filter(w => selectedMabutanGroups.some(g => mabutanInGroup(w, g))).forEach(w => result.push({...w, _source: 'まぶたん'}));
+  if (mabutanOn && mabutanRange) MABUTAN.filter(w => { const num = getMabutanNum(w); return num >= mabutanRange[0] && num <= mabutanRange[1]; }).forEach(w => result.push({...w, _source: 'まぶたん'}));
   if (shogakuseiOn) {
     const sgFiltered = selectedSgSubs.length > 0
       ? SHOGAKUSEI.filter(w => sgWordMatchesSubs(w, selectedSgSubs))
@@ -3607,9 +3467,74 @@ function buildDeckRaw(shuffle = true) {
 
 function buildDeck() { return buildDeckRaw(true); }
 
+// 「全選択」ボタンは、対象範囲を実際に全部選択している時だけハイライトする
+function syncAllSelectedHighlight(gridId, itemSelector) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const allBtn = grid.querySelector('.select-all-btn');
+  if (!allBtn) return;
+  const items = grid.querySelectorAll(itemSelector);
+  const allSelected = items.length > 0 && Array.from(items).every(b => b.classList.contains('active'));
+  allBtn.classList.toggle('all-selected', allSelected);
+}
+// まぶたんは個別ボタンではなく番号範囲指定のため専用に判定する
+function syncMabutanAllHighlight() {
+  const grid = document.getElementById('mabutan-grid');
+  if (!grid) return;
+  const allBtn = grid.querySelector('.select-all-btn');
+  if (!allBtn) return;
+  const fromEl = document.getElementById('mabutan-range-from');
+  const toEl = document.getElementById('mabutan-range-to');
+  const allSelected = !!fromEl && !!toEl && parseInt(fromEl.value, 10) === 1 && parseInt(toEl.value, 10) === 343;
+  allBtn.classList.toggle('all-selected', allSelected);
+}
+function updateAllSelectAllHighlights() {
+  syncAllSelectedHighlight('unit-grid', '[data-unit]');
+  syncAllSelectedHighlight('eiken-grid', '[data-eiken]');
+  syncMabutanAllHighlight();
+  syncAllSelectedHighlight('shogakusei-grid', '[data-sg-sub]');
+  syncAllSelectedHighlight('original-grid', '[data-orig-group]');
+}
+
+// クリア済み（殿堂入り）語数／総語数を返す
+function getClearProgress(words) {
+  const total = words.length;
+  const done = words.filter(w => isHallWord(w['単語'])).length;
+  return { done, total };
+}
+// 中くくり（Unit・カテゴリ）ごとの「◯語中◯語クリア」進捗表示
+function updateUnitProgressLabels() {
+  document.querySelectorAll('#unit-grid [data-unit]').forEach(btn => {
+    const { done, total } = getClearProgress(MINILABO.filter(w => w['出典_ミニラボ'] === btn.dataset.unit));
+    const span = btn.querySelector('.unit-progress');
+    if (span) span.textContent = `${done}/${total}`;
+  });
+  document.querySelectorAll('#eiken-grid [data-eiken]').forEach(btn => {
+    const { done, total } = getClearProgress(EIKEN.filter(w => eikenInGroup(w, btn.dataset.eiken)));
+    const span = btn.querySelector('.unit-progress');
+    if (span) span.textContent = `${done}/${total}`;
+  });
+  const mbLabel = document.getElementById('mabutan-progress-label');
+  if (mbLabel) {
+    const range = getMabutanRange();
+    const words = range ? MABUTAN.filter(w => { const n = getMabutanNum(w); return n >= range[0] && n <= range[1]; }) : [];
+    const { done, total } = getClearProgress(words);
+    mbLabel.textContent = total > 0 ? `選択範囲：${done}/${total}語クリア` : '';
+  }
+  document.querySelectorAll('#shogakusei-grid [data-sg-mid]').forEach(btn => {
+    const subs = SG_SUBS[btn.dataset.sgMid] || [];
+    const { done, total } = getClearProgress(SHOGAKUSEI.filter(w => subs.includes(SG_WORD_SUBS[w['単語']])));
+    const span = btn.querySelector('.unit-progress');
+    if (span) span.textContent = `${done}/${total}`;
+  });
+}
+
 function updateSelectedCount() {
   const deck = buildDeck();
   document.getElementById('selected-count').textContent = `${deck.length}語が選択されています`;
+  updateNewWordStatus();
+  updateAllSelectAllHighlights();
+  updateUnitProgressLabels();
 }
 
 function toggleTimer() {}
@@ -3617,77 +3542,10 @@ function selectTimer(btn) {}
 
 function startFlash() {
   const prefs = getUserPrefSettings();
-  const learningMode = prefs.learningMode || 'free';
-  const stepBanner = document.getElementById('step-banner');
-  const bannerText = stepBanner ? stepBanner.querySelector('.step-banner-text') : null;
-  const pauseBtn = document.getElementById('flash-pause-btn');
-  const isPaused = isStepPaused();
-
-  let baseDeck;
-  if (learningMode === 'custom' && !isPaused) {
-    // カスタムプールモード
-    let pool = getCustomPool();
-    if (!pool.length) { initCustomPool(); pool = getCustomPool(); }
-    if (!pool.length) { alert('カスタムプールが空です。設定を確認してください。'); return; }
-    baseDeck = buildCustomPoolDeck();
-    if (!baseDeck.length) { alert('プール内の単語が見つかりません。'); return; }
-    state._stepMode = true;
-    state._stepPool = pool.length;
-    state._stepUnlocked = pool.length;
-    state._customPoolMode = true;
-    if (stepBanner) {
-      if (bannerText) bannerText.textContent = `カスタムプール：${pool.length}語`;
-      if (pauseBtn) pauseBtn.style.display = '';
-      stepBanner.classList.add('visible');
-    }
-    state.deck = buildWeightedDeck(baseDeck);
-    if (!state.deck.length) state.deck = baseDeck;
-  } else if (learningMode === 'step' && !isPaused) {
-    // ステップモード（シンプル）
-    baseDeck = buildDeckRaw(false);
-    if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getStepUnlocked(totalPool);
-    const stepDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
-    state._stepMode = true;
-    state._stepPool = totalPool;
-    state._stepUnlocked = unlocked;
-    state._customPoolMode = false;
-    if (stepBanner) {
-      if (bannerText) bannerText.textContent = `ステップモード：${unlocked}/${totalPool}語 解放中`;
-      if (pauseBtn) pauseBtn.style.display = '';
-      stepBanner.classList.add('visible');
-    }
-    state.deck = buildWeightedDeck(stepDeck);
-    if (!state.deck.length) state.deck = stepDeck;
-  } else {
-    // フリーモード or 一時停止中（フリー動作）
-    baseDeck = buildDeck();
-    if (!baseDeck.length) { alert('条件に合う単語がありません。設定を確認してください。'); return; }
-    state._stepMode = false;
-    state._customPoolMode = false;
-    if (stepBanner) {
-      if (bannerText) bannerText.textContent = isPaused ? '⏸ ポーズ中（フリー練習）' : '';
-      if (pauseBtn) pauseBtn.style.display = 'none';
-      stepBanner.classList.toggle('visible', isPaused);
-    }
-    // フリーモード：新規単語をwordsPerSession件に制限・苦手復習単語は別途追加
-    const wps = parseInt(prefs.wordsPerSession) || 0;
-    let limitedBase;
-    if (wps > 0) {
-      const newWords = baseDeck.filter(w => !hasEverBeenCorrect(w['単語']));
-      const reviewWords = baseDeck.filter(w => hasEverBeenCorrect(w['単語']) && isWeakWord(w['単語']));
-      const newLimited = newWords.slice(0, wps);
-      const combined = [...newLimited, ...reviewWords];
-      const seen = new Set();
-      limitedBase = combined.filter(w => { const k = w['単語']; if (seen.has(k)) return false; seen.add(k); return true; });
-      if (!limitedBase.length) limitedBase = baseDeck.slice(0, wps);
-    } else {
-      limitedBase = baseDeck;
-    }
-    state.deck = buildWeightedDeck(limitedBase);
-    if (!state.deck.length) state.deck = limitedBase;
-  }
+  const baseDeck = buildFreeModeDeck();
+  if (!baseDeck.length) { alert(lastDeckLimitHit ? '今日の新規単語数に達しました。\n設定で数を増やすか、総復習をしましょう。' : '条件に合う単語がありません。設定を確認してください。'); return; }
+  state.deck = buildWeightedDeck(baseDeck);
+  if (!state.deck.length) state.deck = baseDeck;
 
   // スペルアウト速度を設定に同期
   if (prefs.spelloutSpeed) {
@@ -3700,9 +3558,6 @@ function startFlash() {
   state.current = 0; state.correct = 0; state.wrong = 0; state.skipped = 0; state.wrongWords = []; state.history = [];
   recordUnitPractice();
   saveTodayDeck(state.deck);
-  // v51: 出題する新規単語を今日の単語リストに保存
-  const newInSession = state.deck.filter(w => !hasEverBeenCorrect(w['単語'])).map(w => w['単語']);
-  if (newInSession.length) addTodayWords(newInSession);
   startSession();
   showScreen('flash-screen');
   loadCard();
@@ -3722,7 +3577,7 @@ function loadCard() {
   if (word['優先度'] === '🔴') dot.classList.add('high');
   else if (word['優先度'] === '🟡') dot.classList.add('mid');
   else dot.classList.add('low');
-  document.getElementById('card-source').textContent = word._source || '';
+  document.getElementById('card-source').textContent = getWordSourceLabel(word);
   document.getElementById('card-meaning-main').textContent = word['意味'];
   document.getElementById('pos-badge').textContent = posLabel(word['品詞']);
   document.getElementById('card-answer-wrap').classList.remove('visible');
@@ -3745,7 +3600,7 @@ function loadCard() {
 
   // パーソナライズ
   const wordStr = word['単語'];
-  state.isWeak = isWeakWord(wordStr);
+  state.isWeak = isTrainingWord(wordStr);
   state.isHall = isHallWord(wordStr);
   state.weakWrongCount = 0;
   state.wrongThisCard = 0;
@@ -3764,7 +3619,7 @@ function loadCard() {
   if (trainRes) { trainRes.textContent = ''; trainRes.style.display = 'none'; trainRes.className = ''; }
   const challengeArea = document.getElementById('typing-challenge-area');
   if (challengeArea) challengeArea.style.display = 'none';
-  const skipBtn = document.querySelector('.action-btn.btn-skip');
+  const skipBtn = document.getElementById('flash-skip-btn');
   if (skipBtn) skipBtn.disabled = false;
 
   const rpa = document.getElementById('reveal-pronounce-area');
@@ -3788,11 +3643,17 @@ function loadCard() {
   cardStartTime = Date.now();
   resetVoiceUI();
   if (voiceMode !== 'voice') setTimeout(() => mainInput.focus(), 150);
+  resetAnswerMenu('flash');
 }
 
 const mainInput = document.getElementById('main-input');
 mainInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
+    if (answerMenuIndex >= 0 && getAnswerMenuKeyForActiveScreen() === 'flash') {
+      e.preventDefault();
+      activateAnswerMenu('flash');
+      return;
+    }
     if (state.answered) {
       const nextBtn = document.getElementById('next-btn');
       if (nextBtn && nextBtn.style.display !== 'none') nextCard();
@@ -3834,6 +3695,7 @@ function renderEmptyBoxes() {
 
 function checkAnswer() {
   if (state.answered) return;
+  if (answerMenuIndex !== ANSWER_MENUS.flash.floorIndex) resetAnswerMenu('flash');
   const typed = mainInput.value.trim();
   if (!typed) return;
   const word = state.deck[state.current];
@@ -3851,8 +3713,8 @@ function checkAnswer() {
     state.correct++;
     sessionCorrect++;
     const wasAlreadyCorrect = hasEverBeenCorrect(wordStr);
-    const justEnteredHall = recordCorrect(wordStr, state.wrongThisCard === 0 && state.weakWrongCount === 0);
-    const skipBtn = document.querySelector('.action-btn.btn-skip');
+    const justEnteredHall = recordCorrect(wordStr, state.wrongThisCard === 0 && state.weakWrongCount === 0, word);
+    const skipBtn = document.getElementById('flash-skip-btn');
     if (skipBtn) skipBtn.disabled = false;
     // コイン付与
     const cardSec = cardStartTime ? Math.max(1, Math.round((Date.now()-cardStartTime)/1000)) : 5;
@@ -3907,7 +3769,7 @@ function checkAnswer() {
     document.getElementById('card-answer-wrap').classList.add('visible');
     const spellHL = document.getElementById('spell-highlight-area');
     if (!wasAlreadyCorrectW && spellHL) { spellHL.innerHTML = renderSpellHighlight(wordStr); spellHL.style.display = 'block'; }
-    const skipBtn = document.querySelector('.action-btn.btn-skip');
+    const skipBtn = document.getElementById('flash-skip-btn');
     if (skipBtn) skipBtn.disabled = true;
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     updateHomeBadges();
@@ -3994,8 +3856,10 @@ function checkAnswer() {
       fb.className = 'feedback-area';
       fb.textContent = 'もう一度！';
       if (voiceMode !== 'voice') mainInput.focus();
+      resetAnswerMenu('flash');
     }, 800);
   }
+  renderAnswerMenu('flash');
 }
 
 function retryCurrentCard() {
@@ -4012,6 +3876,7 @@ function retryCurrentCard() {
   if (mi) { mi.value = ''; mi.disabled = false; }
   state.answered = false;
   if (voiceMode !== 'voice' && mi) mi.focus();
+  resetAnswerMenu('flash');
 }
 
 // ===== タイピングチャレンジ（3回以上間違えた後の強化練習）=====
@@ -4146,7 +4011,7 @@ function revealAnswer() {
   if (state.isWeak) { speakWord(wordStr); } else { doSpellOut(wordStr); }
   if (state.isWeak) {
     state.weakWrongCount++;
-    const skipBtn = document.querySelector('.action-btn.btn-skip');
+    const skipBtn = document.getElementById('flash-skip-btn');
     if (skipBtn) skipBtn.disabled = true;
     document.getElementById('next-btn').style.display = 'none';
     const fb2 = document.getElementById('feedback-area');
@@ -4210,6 +4075,7 @@ function revealAnswer() {
     if (etymBtnR) { etymBtnR.disabled = false; etymBtnR.textContent = 'なぜこのスペル？'; }
   }
   updateHomeBadges();
+  resetAnswerMenu('flash');
 }
 function skipCard() {
   if (state.isWeak && !state.answered) return;
@@ -4238,28 +4104,6 @@ function showResult() {
   else if (pct>=50){emoji='💪';title='もう少し！';}
   else {emoji='📚';title='もう一度チャレンジ！';}
 
-  // ステップモード解放チェック
-  if (state._stepMode && state._stepPool) {
-    if (state._customPoolMode) {
-      // v53: カスタムプールモード — 殿堂入りで補充（alert はcheckAndReplenishPool内で出す）
-      checkAndReplenishPool();
-      emoji = '⭐'; title = 'おつかれさま！';
-    } else {
-      const prefs2 = getUserPrefSettings();
-      const stepSize2 = prefs2.stepUnlockSize || 5;
-      if (pct >= 70) {
-        const newUnlocked = Math.min(state._stepUnlocked + stepSize2, state._stepPool);
-        saveStepUnlocked(newUnlocked);
-        if (newUnlocked > state._stepUnlocked) {
-          emoji = '🎉';
-          title = `次の${Math.min(stepSize2, state._stepPool - state._stepUnlocked)}語が解放されました！`;
-        } else {
-          emoji = '🏆'; title = '全語クリア！完璧！';
-        }
-      }
-    }
-  }
-
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
   const total = state.deck.length;
@@ -4270,7 +4114,6 @@ function showResult() {
   showScreen('result-screen');
   updateHomeBadges();
   updateResumeBtn();
-  updateHomePauseBanner();
 }
 
 function endSessionPrompt() {
@@ -4281,7 +4124,7 @@ function endSessionPrompt() {
 }
 
 // ===== 締めのテスト =====
-let stestDeck = [], stestIndex = 0, stestCorrect = 0, stestTotal = 10;
+let stestDeck = [], stestIndex = 0, stestCorrect = 0, stestTotal = 10, stestWrongWords = [];
 
 function startSessionTest() {
   saveSessionCoins();
@@ -4303,7 +4146,7 @@ function startSessionTest() {
     stestDeck = getAllDataWords().sort(() => Math.random()-.5).slice(0, 10);
   }
   if (!stestDeck.length) { showDailyResults(); return; }
-  stestIndex = 0; stestCorrect = 0; stestTotal = stestDeck.length;
+  stestIndex = 0; stestCorrect = 0; stestTotal = stestDeck.length; stestWrongWords = [];
   showScreen('session-test-screen');
   loadStestCard();
 }
@@ -4314,7 +4157,7 @@ function loadStestCard() {
   const pct = stestIndex / stestTotal * 100;
   document.getElementById('stest-progress-fill').style.width = pct + '%';
   document.getElementById('stest-progress-text').textContent = (stestIndex+1) + '/' + stestTotal;
-  document.getElementById('stest-source').textContent = word._source || '';
+  document.getElementById('stest-source').textContent = getWordSourceLabel(word);
   document.getElementById('stest-meaning').textContent = word['意味'];
   document.getElementById('stest-answer-wrap').classList.remove('visible');
   document.getElementById('stest-word-answer').textContent = word['単語'];
@@ -4358,8 +4201,11 @@ function checkStestAnswer() {
     stestCorrect++;
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
     awardCoins(1);
+    recordCorrect(word['単語'], true, word);
   } else {
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
+    recordWrong(word['単語'], word['意味'], typed, word);
+    stestWrongWords.push(word);
   }
   speakWord(word['単語']);
   document.getElementById('stest-next-btn').style.display = 'block';
@@ -4410,7 +4256,6 @@ function retryWrong() {
 
 // ===== 覚えるモード =====
 let learnDeck = [], learnCurrent = 0, learnCurrentWord = null;
-let learn_stepMode = false, learn_stepPool = 0, learn_stepUnlocked = 0;
 
 function goToLearnSettings() {
   showScreen('settings-screen');
@@ -4424,57 +4269,8 @@ function goToLearnSettings() {
   }
 }
 function startLearnMode() {
-  const prefs = getUserPrefSettings();
-  const learningMode = prefs.learningMode || 'free';
-  const stepBanner = document.getElementById('learn-step-banner');
-  const bannerText = stepBanner ? stepBanner.querySelector('.step-banner-text') : null;
-  const pauseBtn = document.getElementById('learn-pause-btn');
-  const isPaused = isStepPaused();
-
-  let deck;
-  if (learningMode === 'custom' && !isPaused) {
-    // カスタムプールモード
-    let pool = getCustomPool();
-    if (!pool.length) { initCustomPool(); pool = getCustomPool(); }
-    if (!pool.length) { alert('カスタムプールが空です。'); return; }
-    deck = buildCustomPoolDeck();
-    if (!deck.length) { alert('プール内の単語が見つかりません。'); return; }
-    if (stepBanner) {
-      if (bannerText) bannerText.textContent = `カスタムプール：${pool.length}語`;
-      if (pauseBtn) pauseBtn.style.display = '';
-      stepBanner.classList.add('visible');
-    }
-    learn_stepMode = true;
-    learn_stepPool = pool.length;
-    learn_stepUnlocked = pool.length;
-  } else if (learningMode === 'step' && !isPaused) {
-    // ステップモード（シンプル）
-    const baseDeck = buildDeckRaw(false);
-    if (!baseDeck.length) { alert('条件に合う単語がありません。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getStepUnlocked(totalPool);
-    deck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
-    if (stepBanner) {
-      if (bannerText) bannerText.textContent = `ステップモード：${unlocked}/${totalPool}語 解放中`;
-      if (pauseBtn) pauseBtn.style.display = '';
-      stepBanner.classList.add('visible');
-    }
-    learn_stepMode = true;
-    learn_stepPool = totalPool;
-    learn_stepUnlocked = unlocked;
-  } else {
-    // フリーモード or 一時停止中
-    deck = buildDeck();
-    if (!deck.length) { alert('条件に合う単語がありません。'); return; }
-    const wps = parseInt(prefs.wordsPerSession) || 0;
-    if (wps > 0 && deck.length > wps) deck = deck.slice(0, wps);
-    if (stepBanner) {
-      if (bannerText) bannerText.textContent = isPaused ? '⏸ ポーズ中（フリー練習）' : '';
-      if (pauseBtn) pauseBtn.style.display = 'none';
-      stepBanner.classList.toggle('visible', isPaused);
-    }
-    learn_stepMode = false;
-  }
+  const deck = buildFreeModeDeck();
+  if (!deck.length) { alert(lastDeckLimitHit ? '今日の新規単語数に達しました。\n設定で数を増やすか、総復習をしましょう。' : '条件に合う単語がありません。'); return; }
 
   learnDeck = deck;
   learnCurrent = 0;
@@ -4490,28 +4286,8 @@ function startLearnMode() {
 }
 function loadLearnCard() {
   if (learnCurrent >= learnDeck.length) {
-    if (learn_stepMode) {
-      const prefsEnd = getUserPrefSettings();
-      if (prefsEnd.learningMode === 'custom') {
-        checkAndReplenishPool();
-        alert('全部おわったよ！');
-      } else {
-        const stepSizeL = prefsEnd.stepUnlockSize || 5;
-        const newUnlocked = Math.min(learn_stepUnlocked + stepSizeL, learn_stepPool);
-        saveStepUnlocked(newUnlocked);
-        const msg = newUnlocked > learn_stepUnlocked
-          ? `全部おわったよ！\n次の${Math.min(stepSizeL, learn_stepPool - learn_stepUnlocked)}語が解放されました！`
-          : '全語クリア！完璧！';
-        alert(msg);
-      }
-      learn_stepMode = false;
-    } else {
-      alert('全部おわったよ！');
-    }
-    const stepBannerL = document.getElementById('learn-step-banner');
-    if (stepBannerL) stepBannerL.classList.remove('visible');
+    alert('全部おわったよ！');
     showScreen('home-screen');
-    updateHomePauseBanner();
     return;
   }
   learnCurrentWord = learnDeck[learnCurrent];
@@ -4520,7 +4296,7 @@ function loadLearnCard() {
   document.getElementById('learn-progress-text').textContent = (learnCurrent+1) + '/' + learnDeck.length;
   document.getElementById('learn-meaning').textContent = learnCurrentWord['意味'];
   document.getElementById('learn-pos-badge').textContent = posLabel(learnCurrentWord['品詞']);
-  document.getElementById('learn-card-source').textContent = learnCurrentWord._source || '';
+  document.getElementById('learn-card-source').textContent = getWordSourceLabel(learnCurrentWord);
   document.getElementById('learn-word-display').style.display = 'none';
   document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
   document.getElementById('learn-replay-btn').style.display = 'none';
@@ -4528,6 +4304,7 @@ function loadLearnCard() {
   document.getElementById('learn-next-btn').style.display = 'none';
   renderLearnEmptyBoxes();
   setTimeout(() => startLearnSpellOut(), 600);
+  resetAnswerMenu('learn');
 }
 function renderLearnEmptyBoxes() {
   const word = learnCurrentWord ? learnCurrentWord['単語'] : '';
@@ -4560,6 +4337,8 @@ function startLearnSpellOut() {
       document.getElementById('learn-action-row').style.display = 'flex';
       document.getElementById('learn-next-btn').style.display = 'block';
       document.getElementById('learn-status').textContent = '覚えた？';
+      answerMenuIndex = 0;
+      renderAnswerMenu('learn');
       return;
     }
     const item = items[idx];
@@ -4601,6 +4380,7 @@ function replayLearnSpellOut() {
   document.getElementById('learn-replay-btn').style.display = 'none';
   document.getElementById('learn-status').textContent = '聞いてスペルを確認しよう';
   setTimeout(() => startLearnSpellOut(), 300);
+  resetAnswerMenu('learn');
 }
 function learnAgain() { replayLearnSpellOut(); }
 function learnNext() { learnCurrent++; loadLearnCard(); }
@@ -4771,7 +4551,6 @@ function normalizeForCompare(text) {
 let entypeDeck = [], entypeCurrent = 0;
 let currentEntypeSentence = null;
 let entypeAllCorrect = false;
-let entype_stepMode = false, entype_stepPool = 0, entype_stepUnlocked = 0;
 
 function selectAllEntypeUnits() {
   const btns = document.querySelectorAll('[data-entype-unit]');
@@ -4793,48 +4572,28 @@ function goToEntypeSettings() {
   document.getElementById('entype-quiz-area').style.display = 'none';
   document.getElementById('entype-settings-header').style.display = '';
   document.getElementById('entype-quiz-header').style.display = 'none';
-  const stepBanner = document.getElementById('entype-step-banner');
-  if (stepBanner) stepBanner.classList.remove('visible');
 }
 
 function startEntypeMode() {
   const prefs = getUserPrefSettings();
-  const learningMode = prefs.learningMode || 'free';
   const sps = parseInt(prefs.sentencesPerSession) || 0;
   const fillNext = prefs.unitEndPolicy === 'fillNext';
-  const stepBanner = document.getElementById('entype-step-banner');
 
   const selected = Array.from(document.querySelectorAll('[data-entype-unit].active')).map(b => parseInt(b.dataset.entypeUnit));
   let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit));
 
-  if (learningMode === 'step') {
-    if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getSentenceStepUnlocked(totalPool);
-    baseDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
-    if (stepBanner) {
-      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}文 解放中`;
-      stepBanner.classList.add('visible');
+  if (sps > 0 && baseDeck.length < sps && fillNext) {
+    const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
+    let remaining = sps - baseDeck.length;
+    for (const unit of allUnits) {
+      if (selected.includes(unit) || remaining <= 0) continue;
+      const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
+      baseDeck = [...baseDeck, ...extra];
+      remaining -= extra.length;
     }
-    entype_stepMode = true;
-    entype_stepPool = totalPool;
-    entype_stepUnlocked = unlocked;
-  } else {
-    if (sps > 0 && baseDeck.length < sps && fillNext) {
-      const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
-      let remaining = sps - baseDeck.length;
-      for (const unit of allUnits) {
-        if (selected.includes(unit) || remaining <= 0) continue;
-        const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
-        baseDeck = [...baseDeck, ...extra];
-        remaining -= extra.length;
-      }
-    }
-    if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
-    baseDeck = baseDeck.sort(() => Math.random() - 0.5);
-    if (stepBanner) stepBanner.classList.remove('visible');
-    entype_stepMode = false;
   }
+  if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
+  baseDeck = baseDeck.sort(() => Math.random() - 0.5);
 
   if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
   entypeDeck = baseDeck;
@@ -4848,23 +4607,9 @@ function startEntypeMode() {
 
 function loadEntypeCard() {
   if (entypeCurrent >= entypeDeck.length) {
-    if (entype_stepMode) {
-      const prefs5 = getUserPrefSettings();
-      const stepSize5 = prefs5.stepUnlockSize || 5;
-      const newUnlocked = Math.min(entype_stepUnlocked + stepSize5, entype_stepPool);
-      saveSentenceStepUnlocked(newUnlocked);
-      const msg = newUnlocked > entype_stepUnlocked
-        ? `全部おわったよ！\n次の${Math.min(stepSize5, entype_stepPool - entype_stepUnlocked)}文が解放されました！`
-        : '全文クリア！完璧！';
-      alert(msg);
-      entype_stepMode = false;
-    } else {
-      alert('全部おわったよ！');
-    }
+    alert('全部おわったよ！');
     document.getElementById('entype-unit-select').style.display = 'flex';
     document.getElementById('entype-quiz-area').style.display = 'none';
-    const stepBanner = document.getElementById('entype-step-banner');
-    if (stepBanner) stepBanner.classList.remove('visible');
     return;
   }
   entypeAllCorrect = false;
@@ -4883,12 +4628,23 @@ function loadEntypeCard() {
   document.getElementById('entype-reveal-btn').style.display = 'block';
   // Enterキーで答え合わせ
   const inp = document.getElementById('entype-input');
-  inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); submitEntypeAnswer(); } };
+  inp.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (answerMenuIndex >= 0 && getAnswerMenuKeyForActiveScreen() === 'entype') {
+        activateAnswerMenu('entype');
+        return;
+      }
+      submitEntypeAnswer();
+    }
+  };
   // スマホではキーボードが出るまで少し待ってfocus
   setTimeout(() => inp.focus(), 100);
+  resetAnswerMenu('entype');
 }
 
 function submitEntypeAnswer() {
+  if (answerMenuIndex !== ANSWER_MENUS.entype.floorIndex) resetAnswerMenu('entype');
   const typed = (document.getElementById('entype-input').value || '').trim();
   if (!typed) return;
   if (entypeAllCorrect) return;
@@ -4920,8 +4676,10 @@ function submitEntypeAnswer() {
       document.getElementById('entype-input').focus();
       // 再送信ボタンを再表示
       document.getElementById('entype-reveal-btn').style.display = 'block';
+      resetAnswerMenu('entype');
     }, 800);
   }
+  resetAnswerMenu('entype');
 }
 
 function entypeReveal() {
@@ -4940,6 +4698,7 @@ function entypeReveal() {
     st.count = (st.count || 0) + 1; st.streak = 0;
     setSentStatus(currentEntypeSentence.en, st);
   }
+  resetAnswerMenu('entype');
 }
 function entypeNext() { entypeCurrent++; loadEntypeCard(); }
 function entypeSkip() { entypeCurrent++; loadEntypeCard(); }
@@ -4970,43 +4729,25 @@ function goToTypingSettings() {
 }
 function startTypingMode() {
   const prefs = getUserPrefSettings();
-  const learningMode = prefs.learningMode || 'free';
   const sps = parseInt(prefs.sentencesPerSession) || 0;
   const fillNext = prefs.unitEndPolicy === 'fillNext';
-  const stepBanner = document.getElementById('typing-step-banner');
 
   const selected = Array.from(document.querySelectorAll('[data-typing-unit].active')).map(b => parseInt(b.dataset.typingUnit));
   let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)); // 順序保持
 
-  if (learningMode === 'step') {
-    if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getSentenceStepUnlocked(totalPool);
-    baseDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
-    if (stepBanner) {
-      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}文 解放中`;
-      stepBanner.classList.add('visible');
+  // フリーモード：選択ユニットから全部出題
+  if (sps > 0 && baseDeck.length < sps && fillNext) {
+    const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
+    let remaining = sps - baseDeck.length;
+    for (const unit of allUnits) {
+      if (selected.includes(unit) || remaining <= 0) continue;
+      const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
+      baseDeck = [...baseDeck, ...extra];
+      remaining -= extra.length;
     }
-    typing_stepMode = true;
-    typing_stepPool = totalPool;
-    typing_stepUnlocked = unlocked;
-  } else {
-    // フリーモード：選択ユニットから全部出題
-    if (sps > 0 && baseDeck.length < sps && fillNext) {
-      const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
-      let remaining = sps - baseDeck.length;
-      for (const unit of allUnits) {
-        if (selected.includes(unit) || remaining <= 0) continue;
-        const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
-        baseDeck = [...baseDeck, ...extra];
-        remaining -= extra.length;
-      }
-    }
-    if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
-    baseDeck = baseDeck.sort(() => Math.random() - 0.5);
-    if (stepBanner) stepBanner.classList.remove('visible');
-    typing_stepMode = false;
   }
+  if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
+  baseDeck = baseDeck.sort(() => Math.random() - 0.5);
 
   if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
   typingDeck = baseDeck;
@@ -5020,23 +4761,9 @@ function startTypingMode() {
 
 function loadTypingCard() {
   if (typingCurrent >= typingDeck.length) {
-    if (typing_stepMode) {
-      const prefs4 = getUserPrefSettings();
-      const stepSize4 = prefs4.stepUnlockSize || 5;
-      const newUnlocked = Math.min(typing_stepUnlocked + stepSize4, typing_stepPool);
-      saveSentenceStepUnlocked(newUnlocked);
-      const msg = newUnlocked > typing_stepUnlocked
-        ? `全部おわったよ！\n次の${Math.min(stepSize4, typing_stepPool - typing_stepUnlocked)}文が解放されました！`
-        : '全文クリア！完璧！';
-      alert(msg);
-      typing_stepMode = false;
-    } else {
-      alert('全部おわったよ！');
-    }
+    alert('全部おわったよ！');
     document.getElementById('typing-unit-select').style.display = 'flex';
     document.getElementById('typing-quiz-area').style.display = 'none';
-    const stepBanner = document.getElementById('typing-step-banner');
-    if (stepBanner) stepBanner.classList.remove('visible');
     return;
   }
   typingAnswered = false;
@@ -5391,8 +5118,6 @@ async function processRevealVoice() {
 // ===== 英文暗記モード =====
 let smemDeck = [], smemCurrent = 0;
 let currentSmemSentence = null;
-let smem_stepMode = false, smem_stepPool = 0, smem_stepUnlocked = 0;
-let typing_stepMode = false, typing_stepPool = 0, typing_stepUnlocked = 0;
 
 function selectAllSmemUnits() {
   const btns = document.querySelectorAll('[data-smem-unit]');
@@ -5409,43 +5134,25 @@ function updateSmemCount() {
 
 function startSmemMode() {
   const prefs = getUserPrefSettings();
-  const learningMode = prefs.learningMode || 'free';
   const sps = parseInt(prefs.sentencesPerSession) || 0;
   const fillNext = prefs.unitEndPolicy === 'fillNext';
   const selected = Array.from(document.querySelectorAll('[data-smem-unit].active')).map(b => parseInt(b.dataset.smemUnit));
-  const stepBanner = document.getElementById('smem-step-banner');
 
   let baseDeck = SENTENCE_DATA.filter(s => selected.includes(s.unit)); // 順序保持
 
-  if (learningMode === 'step') {
-    if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
-    const totalPool = baseDeck.length;
-    const unlocked = getSentenceStepUnlocked(totalPool);
-    baseDeck = baseDeck.slice(0, unlocked).sort(() => Math.random() - 0.5);
-    if (stepBanner) {
-      stepBanner.textContent = `ステップモード：${unlocked}/${totalPool}文 解放中`;
-      stepBanner.classList.add('visible');
+  // フリーモード：選択ユニットから全部出題
+  if (sps > 0 && baseDeck.length < sps && fillNext) {
+    const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
+    let remaining = sps - baseDeck.length;
+    for (const unit of allUnits) {
+      if (selected.includes(unit) || remaining <= 0) continue;
+      const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
+      baseDeck = [...baseDeck, ...extra];
+      remaining -= extra.length;
     }
-    smem_stepMode = true;
-    smem_stepPool = totalPool;
-    smem_stepUnlocked = unlocked;
-  } else {
-    // フリーモード：選択ユニットから全部出題
-    if (sps > 0 && baseDeck.length < sps && fillNext) {
-      const allUnits = [...new Set(SENTENCE_DATA.map(s => s.unit))].sort((a, b) => a - b);
-      let remaining = sps - baseDeck.length;
-      for (const unit of allUnits) {
-        if (selected.includes(unit) || remaining <= 0) continue;
-        const extra = SENTENCE_DATA.filter(s => s.unit === unit).slice(0, remaining);
-        baseDeck = [...baseDeck, ...extra];
-        remaining -= extra.length;
-      }
-    }
-    baseDeck = baseDeck.sort(() => Math.random() - 0.5);
-    if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
-    if (stepBanner) stepBanner.classList.remove('visible');
-    smem_stepMode = false;
   }
+  baseDeck = baseDeck.sort(() => Math.random() - 0.5);
+  if (sps > 0 && baseDeck.length > sps) baseDeck = baseDeck.slice(0, sps);
 
   if (!baseDeck.length) { alert('条件に合う文がありません。'); return; }
 
@@ -5463,23 +5170,9 @@ function startSmemMode() {
 
 function loadSmemCard() {
   if (smemCurrent >= smemDeck.length) {
-    if (smem_stepMode) {
-      const prefs3 = getUserPrefSettings();
-      const stepSize3 = prefs3.stepUnlockSize || 5;
-      const newUnlocked = Math.min(smem_stepUnlocked + stepSize3, smem_stepPool);
-      saveSentenceStepUnlocked(newUnlocked);
-      const msg = newUnlocked > smem_stepUnlocked
-        ? `全部おわったよ！\n次の${Math.min(stepSize3, smem_stepPool - smem_stepUnlocked)}文が解放されました！`
-        : '全文クリア！完璧！';
-      alert(msg);
-      smem_stepMode = false;
-    } else {
-      alert('全部おわったよ！');
-    }
+    alert('全部おわったよ！');
     document.getElementById('smem-unit-select').style.display = 'flex';
     document.getElementById('smem-quiz-area').style.display = 'none';
-    const stepBanner = document.getElementById('smem-step-banner');
-    if (stepBanner) stepBanner.classList.remove('visible');
     return;
   }
   currentSmemSentence = smemDeck[smemCurrent];
@@ -5496,6 +5189,7 @@ function loadSmemCard() {
   document.getElementById('smem-speak-area').style.display = 'none';
   document.getElementById('smem-speak-result').style.display = 'none';
   smemStopRecordingClean();
+  resetAnswerMenu('smem');
   setTimeout(() => {
     speakSentence(currentSmemSentence.en, () => {
       document.getElementById('smem-en-display').textContent = currentSmemSentence.en;
@@ -5508,6 +5202,8 @@ function loadSmemCard() {
       document.getElementById('smem-voice-timer').textContent = '';
       const smemMicBtn = document.getElementById('smem-mic-btn');
       if (smemMicBtn) { smemMicBtn.disabled = false; smemMicBtn.classList.remove('recording'); }
+      answerMenuIndex = 0;
+      renderAnswerMenu('smem');
     }, sentenceSpeed);
   }, 400);
 }
@@ -5521,6 +5217,7 @@ function smemAgain() {
   document.getElementById('smem-action-row').style.display = 'none';
   document.getElementById('smem-speak-area').style.display = 'none';
   document.getElementById('smem-speak-result').style.display = 'none';
+  resetAnswerMenu('smem');
   smemStopRecordingClean();
   setTimeout(() => {
     speakSentence(currentSmemSentence.en, () => {
@@ -5534,6 +5231,8 @@ function smemAgain() {
       document.getElementById('smem-voice-timer').textContent = '';
       const smemMicBtn = document.getElementById('smem-mic-btn');
       if (smemMicBtn) { smemMicBtn.disabled = false; smemMicBtn.classList.remove('recording'); }
+      answerMenuIndex = 0;
+      renderAnswerMenu('smem');
     }, sentenceSpeed);
   }, 300);
 }
@@ -5763,6 +5462,11 @@ function updateListenCount() {
   }
   const el = document.getElementById('ls-selected-count');
   if (el) el.textContent = count + '語が選択されています';
+  syncAllSelectedHighlight('ls-minilabo-grid', '[data-ls-ml]');
+  syncAllSelectedHighlight('ls-eiken-grid', '[data-ls-eiken]');
+  syncAllSelectedHighlight('ls-mabutan-grid', '[data-ls-mabutan]');
+  syncAllSelectedHighlight('ls-shogakusei-grid', '[data-ls-sg-sub]');
+  syncAllSelectedHighlight('ls-original-grid', '[data-ls-orig-group]');
 }
 
 function selectListenInterval(btn) {
@@ -6913,17 +6617,10 @@ function setCharMistakes(word, data) {
   localStorage.setItem(up('mistake_'+wsKey(word)), JSON.stringify(data));
 }
 // ===== v51: 今日の単語・英文リスト =====
-function todayDate() { return new Date().toISOString().slice(0, 10); }
-
-function getTodayWords() {
-  try { const d = JSON.parse(localStorage.getItem(up('today_words')) || '{}');
-    return d.date === todayDate() ? (d.words || []) : [];
-  } catch { return []; }
-}
-function addTodayWords(newWordArr) {
-  const existing = getTodayWords();
-  const merged = [...new Set([...existing, ...newWordArr])];
-  localStorage.setItem(up('today_words'), JSON.stringify({ date: todayDate(), words: merged }));
+// v56: ローカル日付（YYYY-MM-DD）。UTCだと日本の午前0〜9時に前日扱いになるため
+function todayDate() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
 function getTodaySentences() {
@@ -6960,9 +6657,34 @@ function isWeakWordV51(wordStr) {
   return rate <= 0.5 || (st.streak < 3 && (st.mistakeCount || 0) > 0);
 }
 
-function isWeakWord(word) {
+// 特訓モード用：同じ文字位置を3回以上ミスした単語
+function isTrainingWord(word) {
   const cm = getCharMistakes(word);
   return Object.values(cm).some(v => v >= 3);
+}
+
+// v56: 苦手フラグ（間違えた瞬間にON、3日連続で初回正解したらOFF）。総復習・苦手一覧の対象
+const WEAK_GRADUATE_DAYS = 3;
+// その日の初回出題の正誤だけで判定する（同じ日のリトライ・再出題は無視）。連続は「出題された日」で数える
+function noteDailyFirstAttempt(ws, isCorrect) {
+  const today = todayDate();
+  if (ws.lastAnsDate === today) return;
+  ws.lastAnsDate = today;
+  ws.cleanDays = isCorrect ? (ws.cleanDays || 0) + 1 : 0;
+}
+// 苦手の卒業までの進み具合
+function getWeakProgressText(word) {
+  const ws = getWordStatus(word);
+  if (isWeakWord(word)) return `卒業まであと${Math.max(0, WEAK_GRADUATE_DAYS - (ws.cleanDays || 0))}日`;
+  return ws.graduated ? '卒業済み' : '';
+}
+function legacyWeakCheck(word, ws) {
+  return isTrainingWord(word) || ((ws.mistakeCount || 0) > 0 && (ws.streak || 0) === 0);
+}
+function isWeakWord(word) {
+  const ws = getWordStatus(word);
+  if (ws.weak !== undefined) return ws.weak === true; // 旧データ（フラグ未設定）は従来の記録から判定
+  return legacyWeakCheck(word, ws);
 }
 
 // ===== v50: 苦手タグ =====
@@ -7013,7 +6735,7 @@ function showPatternGroup(word) {
   const label = area.querySelector('.pattern-group-label');
   if (label) label.textContent = `-${suffix}グループ`;
   wordsEl.innerHTML = siblings.map(uw =>
-    `<button class="pattern-word-chip" onclick="speakWord('${uw.replace(/'/g, "\\'")}')">${uw}</button>`
+    `<button class="pattern-word-chip" tabindex="-1" onclick="speakWord('${uw.replace(/'/g, "\\'")}')">${uw}</button>`
   ).join('');
   area.classList.add('visible');
 }
@@ -7077,8 +6799,10 @@ function hasEverBeenCorrect(word) {
   return getWordStatus(word).everCorrect === true;
 }
 
-function recordCorrect(word, allowHall = true) {
+function recordCorrect(word, allowHall = true, wordObj = null) {
   const ws = getWordStatus(word);
+  if (ws.weak === undefined) ws.weak = legacyWeakCheck(word, ws);
+  noteDailyFirstAttempt(ws, true);
   ws.count = (ws.count||0) + 1;
   if (allowHall) {
     ws.streak = (ws.streak||0) + 1;
@@ -7086,6 +6810,7 @@ function recordCorrect(word, allowHall = true) {
     ws.streak = 0;
   }
   const justEnteredHall = allowHall && !ws.hall && ws.streak >= 3;
+  if (ws.weak && (ws.cleanDays || 0) >= WEAK_GRADUATE_DAYS) { ws.weak = false; ws.graduated = true; } // 3日連続で初回正解 → 苦手を卒業
   if (justEnteredHall) ws.hall = true;
   ws.everCorrect = true;
   setWordStatus(word, ws);
@@ -7113,7 +6838,7 @@ function getWordUnit(wordObj) {
   }
   if (src === 'まぶたん') {
     const no = getMabutanNum(wordObj);
-    for (const g of ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343']) {
+    for (const g of MABUTAN_RANGE_GROUPS) {
       const [lo, hi] = g.split('-').map(Number);
       if (no >= lo && no <= hi) return 'まぶたん ' + g;
     }
@@ -7122,8 +6847,35 @@ function getWordUnit(wordObj) {
   return src;
 }
 
+// v56: 出題中カードのバッジ表示用（範囲グループではなく正確な番号/Unitを表示）
+function getWordSourceLabel(wordObj) {
+  if (!wordObj) return '';
+  const src = wordObj._source || '';
+  if (src === 'ミニラボ') return 'ミニラボ ' + (wordObj['出典_ミニラボ'] || '');
+  if (src === '英検5級') {
+    const s = wordObj['出典_英検5級'] || '';
+    const m = s.match(/No\.(\d+)/);
+    return m ? '英検5級 ' + m[1] + '番' : '英検5級';
+  }
+  if (src === 'まぶたん') {
+    const no = getMabutanNum(wordObj);
+    return no ? 'まぶたん ' + no + '番' : 'まぶたん';
+  }
+  if (src === '小学生英語' || src === 'オリジナル') {
+    const grp = wordObj['_group'] || '';
+    return grp ? src + ' ' + grp : src;
+  }
+  return src;
+}
+
 function recordWrong(word, meaning, typedStr, wordObj) {
   const ws = getWordStatus(word);
+  if (ws.weak === undefined) ws.weak = legacyWeakCheck(word, ws);
+  const wasWeak = ws.weak === true;
+  noteDailyFirstAttempt(ws, false);
+  if (!wasWeak) ws.cleanDays = 0; // 新たに苦手になった日から数え直す
+  ws.weak = true; // 間違えた単語は自動的に苦手プールへ
+  logWrongWord(word, meaning);
   ws.count = (ws.count||0) + 1;
   ws.streak = 0;
   ws.mistakeCount = (ws.mistakeCount||0) + 1;
@@ -7207,7 +6959,6 @@ function updateHomeBadges() {
   badgeRow.style.display = total > 0 ? 'flex' : 'none';
   document.getElementById('badge-weak-num').textContent = weakWords.length + '語';
   document.getElementById('badge-hall-num').textContent = hallWords.length + '語';
-  updateHomePauseBanner();
 }
 
 function getWordRegistrationKey(w) {
@@ -7915,7 +7666,7 @@ function saveUnitSelection() {
       original: document.getElementById('chk-original').checked,
       minilaboUnits: Array.from(document.querySelectorAll('#unit-grid [data-unit].active')).map(b => b.dataset.unit),
       eikenUnits: Array.from(document.querySelectorAll('#eiken-grid [data-eiken].active')).map(b => b.dataset.eiken),
-      mabutanUnits: Array.from(document.querySelectorAll('#mabutan-grid [data-mabutan].active')).map(b => b.dataset.mabutan),
+      mabutanRange: getMabutanRange(),
       shogakuseiSubs: getSelectedSgSubs(false),
       origGroups: getSelectedOrigGroups(),
     };
@@ -7937,19 +7688,19 @@ function restoreUnitSelection() {
       document.querySelectorAll('#unit-grid [data-unit]').forEach(b => {
         b.classList.toggle('active', sel.minilaboUnits.includes(b.dataset.unit));
       });
-      document.querySelectorAll('#unit-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
     if (sel.eikenUnits) {
       document.querySelectorAll('#eiken-grid [data-eiken]').forEach(b => {
         b.classList.toggle('active', sel.eikenUnits.includes(b.dataset.eiken));
       });
-      document.querySelectorAll('#eiken-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
     }
-    if (sel.mabutanUnits) {
-      document.querySelectorAll('#mabutan-grid [data-mabutan]').forEach(b => {
-        b.classList.toggle('active', sel.mabutanUnits.includes(b.dataset.mabutan));
-      });
-      document.querySelectorAll('#mabutan-grid [data-src-mid]').forEach(b => syncSrcMidBtn(b.dataset.srcMid));
+    if (sel.mabutanRange !== undefined) {
+      const fromEl = document.getElementById('mabutan-range-from');
+      const toEl = document.getElementById('mabutan-range-to');
+      if (fromEl && toEl) {
+        fromEl.value = (sel.mabutanRange && sel.mabutanRange[0] != null) ? sel.mabutanRange[0] : '';
+        toEl.value = (sel.mabutanRange && sel.mabutanRange[1] != null) ? sel.mabutanRange[1] : '';
+      }
     }
     if (sel.shogakuseiSubs) {
       document.querySelectorAll('[data-sg-sub]').forEach(b => {
@@ -7981,10 +7732,16 @@ function recordUnitPractice() {
     });
   }
   if (document.getElementById('chk-mabutan').checked) {
-    document.querySelectorAll('#mabutan-grid [data-mabutan].active').forEach(b => {
-      const k = up('practice_mb_' + b.dataset.mabutan);
-      localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
-    });
+    const range = getMabutanRange();
+    if (range) {
+      MABUTAN_RANGE_GROUPS.forEach(g => {
+        const [lo, hi] = g.split('-').map(Number);
+        if (lo <= range[1] && hi >= range[0]) {
+          const k = up('practice_mb_' + g);
+          localStorage.setItem(k, (parseInt(localStorage.getItem(k)||'0') + 1).toString());
+        }
+      });
+    }
   }
   if (document.getElementById('chk-shogakusei').checked) {
     document.querySelectorAll('[data-sg-sub].active').forEach(b => {
@@ -8006,6 +7763,7 @@ function resetForWeakRetry(wordStr) {
   const weakHintArea = document.getElementById('weak-hint-area');
   if (weakHintArea) weakHintArea.style.display = 'none';
   mainInput.focus();
+  resetAnswerMenu('flash');
 }
 
 function startWeakOnlyMode() {
@@ -8078,7 +7836,7 @@ function renderRecords() {
       const st = getWordStatus(w['単語']);
       const mc = st.mistakeCount || 0;
       const cnt = st.count || 0;
-      const spellRatio = cnt > 0 ? `スペルミス ${mc}回/${cnt}回中` : `スペルミス ${mc}回`;
+      const spellRatio = (cnt > 0 ? `スペルミス ${mc}回/${cnt}回中` : `スペルミス ${mc}回`) + ' ・ ' + getWeakProgressText(w['単語']);
       const tag = getWeaknessTag(w['単語']);
       const { suffix: ps, siblings } = getPatternSiblings(w['単語']);
       const patternHtml = siblings.length >= 1
@@ -8158,7 +7916,7 @@ function renderRecords() {
     const cnt = parseInt(localStorage.getItem(up('practice_ek_'+g))||'0');
     unitRows.push({name:'英検 '+g, cnt, key:'ek_'+g});
   });
-  ['1-16','17-32','33-48','49-64','65-80','81-96','97-112','113-128','129-144','145-160','161-176','177-192','193-208','209-224','225-240','241-256','257-272','273-288','289-304','305-320','321-336','337-343'].forEach(g => {
+  MABUTAN_RANGE_GROUPS.forEach(g => {
     const cnt = parseInt(localStorage.getItem(up('practice_mb_'+g))||'0');
     unitRows.push({name:'まぶたん '+g, cnt, key:'mb_'+g});
   });
@@ -8241,8 +7999,112 @@ function renderRecords() {
     }
   }
 
+  // 振り返り（前回・前々回）
+  renderReflectLog();
+
   // 習熟度マップ
   renderMasteryMap();
+
+  // 教材別 単語一覧
+  renderWordListSources();
+}
+
+// ===== v56: 教材別 単語一覧（わたしの記録） =====
+const RECORD_SOURCES = [
+  {
+    key: 'ミニラボ',
+    getGroups: () => ['Unit1','Unit2','Unit3','Unit4','Unit5','Unit6','Unit7','Unit8','Unit9','Unit10']
+      .map(u => ({ name: u, words: MINILABO.filter(w => w['出典_ミニラボ'] === u) })),
+  },
+  {
+    key: '英検5級',
+    getGroups: () => ['1-25','26-50','51-75','76-100','101-107']
+      .map(g => ({ name: g.replace('-', '〜'), words: EIKEN.filter(w => eikenInGroup(w, g)) })),
+  },
+  {
+    key: 'まぶたん',
+    getGroups: () => MABUTAN_RANGE_GROUPS
+      .map(g => ({ name: g.replace('-', '〜'), words: MABUTAN.filter(w => mabutanInGroup(w, g)) })),
+  },
+  {
+    key: '小学生英語',
+    getGroups: () => Object.keys(SG_SUBS)
+      .map(mid => ({ name: mid, words: SHOGAKUSEI.filter(w => SG_SUBS[mid].includes(SG_WORD_SUBS[w['単語']])) })),
+  },
+  {
+    key: 'オリジナル',
+    getGroups: () => {
+      const words = loadOriginalWords();
+      const groupNames = [...new Set(words.map(w => w['_group'] || 'その他'))];
+      return groupNames.map(g => ({ name: g, words: words.filter(w => (w['_group'] || 'その他') === g) }));
+    },
+  },
+];
+function getRecordSourceGroups(si) {
+  return RECORD_SOURCES[si].getGroups().filter(g => g.words.length > 0);
+}
+function renderWordListSources() {
+  const container = document.getElementById('word-list-sources');
+  if (!container) return;
+  container.innerHTML = RECORD_SOURCES.map((src, si) => {
+    const groups = getRecordSourceGroups(si);
+    if (!groups.length) return '';
+    const { done, total } = getClearProgress(groups.flatMap(g => g.words));
+    return `
+    <div class="wl-source">
+      <button class="wl-source-header" onclick="toggleWlSource(${si})">
+        <span>${src.key}</span>
+        <span class="wl-progress">${done}/${total}クリア</span>
+        <span class="wl-arrow" id="wl-src-arrow-${si}">▸</span>
+      </button>
+      <div class="wl-groups" id="wl-src-${si}" style="display:none;">
+        ${groups.map((g, gi) => {
+          const gp = getClearProgress(g.words);
+          return `
+          <div class="wl-group">
+            <button class="wl-group-header" onclick="toggleWlGroup(${si},${gi})">
+              <span>${g.name}</span>
+              <span class="wl-progress">${gp.done}/${gp.total}クリア</span>
+              <span class="wl-arrow" id="wl-grp-arrow-${si}-${gi}">▸</span>
+            </button>
+            <div class="wl-words" id="wl-words-${si}-${gi}" style="display:none;" data-rendered="0"></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleWlSource(si) {
+  const el = document.getElementById('wl-src-' + si);
+  const arrow = document.getElementById('wl-src-arrow-' + si);
+  if (!el) return;
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'flex' : 'none';
+  if (arrow) arrow.textContent = open ? '▾' : '▸';
+}
+// カテゴリ（Unit・範囲）を開いた時にだけ単語一覧を描画する（遅延表示）
+function toggleWlGroup(si, gi) {
+  const el = document.getElementById(`wl-words-${si}-${gi}`);
+  const arrow = document.getElementById(`wl-grp-arrow-${si}-${gi}`);
+  if (!el) return;
+  const open = el.style.display === 'none';
+  if (open && el.dataset.rendered !== '1') {
+    const words = getRecordSourceGroups(si)[gi].words;
+    el.innerHTML = words.map(w => {
+      const st = getWordStatus(w['単語']);
+      const cleared = !!st.hall;
+      const mc = st.mistakeCount || 0;
+      return `<div class="wl-word-row">
+        <span class="wl-word-text">${w['単語']}</span>
+        <span class="wl-word-meaning">${w['意味'] || ''}</span>
+        <span class="wl-word-status ${cleared ? 'cleared' : ''}">${cleared ? 'クリア済み' : 'まだ'}</span>
+        <span class="wl-word-mistake">${mc}回間違い</span>
+      </div>`;
+    }).join('');
+    el.dataset.rendered = '1';
+  }
+  el.style.display = open ? 'flex' : 'none';
+  if (arrow) arrow.textContent = open ? '▾' : '▸';
 }
 
 function speakWord(word) {
@@ -8563,15 +8425,192 @@ async function handleOCRPhoto(event) {
   }
 }
 
-// ===== スペースキーで次へ =====
+// ===== v56: 出題画面キーボードメニュー（常時表示の「発音を聞く／答えを見る／次へ」・「音声を聞く／次へ」） =====
+// flash/entype: 入力欄と同時に常時表示される3択（floorIndex=-1で入力欄にフォーカスが戻る）
+// learn/smem: 入力欄がない暗記系の2択（floorIndex=0。既存の action-row 等のボタンをそのまま流用）
+const ANSWER_MENUS = {
+  flash: {
+    floorIndex: -1,
+    items: [
+      { id: 'flash-menu-speak', keepOpen: true,
+        available: () => true,
+        action: () => { const w = state.deck[state.current]; if (w) speakWord(w['単語']); } },
+      { id: 'flash-menu-reveal', keepOpen: false,
+        available: () => { const b = document.getElementById('reveal-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => revealAnswer() },
+      { id: 'flash-menu-next', keepOpen: false,
+        available: () => { const b = document.getElementById('next-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => nextCard() }
+    ]
+  },
+  entype: {
+    floorIndex: -1,
+    items: [
+      { id: 'entype-menu-speak', keepOpen: true,
+        available: () => true,
+        action: () => { if (currentEntypeSentence) speakSentence(currentEntypeSentence.en, null, 'normal'); } },
+      { id: 'entype-menu-reveal', keepOpen: false,
+        available: () => { const b = document.getElementById('entype-reveal-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => entypeReveal() },
+      { id: 'entype-menu-next', keepOpen: false,
+        available: () => { const b = document.getElementById('entype-next-btn'); return !!b && b.style.display !== 'none'; },
+        action: () => entypeNext() }
+    ]
+  },
+  learn: {
+    floorIndex: 0,
+    items: [
+      { id: 'learn-again-btn', keepOpen: true, reused: true,
+        available: () => { const r = document.getElementById('learn-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => learnAgain() },
+      { id: 'learn-next-btn', keepOpen: false, reused: true,
+        available: () => { const r = document.getElementById('learn-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => learnNext() }
+    ]
+  },
+  smem: {
+    floorIndex: 0,
+    items: [
+      { id: 'smem-replay-btn', keepOpen: true, reused: true,
+        available: () => { const r = document.getElementById('smem-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => smemReplay() },
+      { id: 'smem-next-btn', keepOpen: false, reused: true,
+        available: () => { const r = document.getElementById('smem-action-row'); return !!r && r.style.display !== 'none'; },
+        action: () => smemNext() }
+    ]
+  }
+};
+
+let answerMenuIndex = -1;
+
+function getAnswerMenuKeyForActiveScreen() {
+  const el = document.querySelector('.screen.active');
+  if (!el) return null;
+  if (el.id === 'flash-screen') return 'flash';
+  if (el.id === 'entype-screen') return 'entype';
+  if (el.id === 'learn-screen') return 'learn';
+  if (el.id === 'sentence-memory-screen') return 'smem';
+  return null;
+}
+
+function renderAnswerMenu(key) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  menu.items.forEach((item, i) => {
+    const btn = document.getElementById(item.id);
+    if (!btn) return;
+    const avail = item.available();
+    if (item.reused) {
+      btn.classList.toggle('kbd-menu-active', i === answerMenuIndex);
+    } else {
+      btn.classList.toggle('menu-active', i === answerMenuIndex);
+      btn.classList.toggle('menu-disabled', !avail);
+    }
+  });
+}
+
+function resetAnswerMenu(key) {
+  const menu = ANSWER_MENUS[key];
+  answerMenuIndex = menu ? menu.floorIndex : -1;
+  renderAnswerMenu(key);
+}
+
+function moveAnswerMenu(key, delta) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  let idx = answerMenuIndex + delta;
+  if (idx < menu.floorIndex) idx = menu.floorIndex;
+  if (idx > menu.items.length - 1) idx = menu.items.length - 1;
+  answerMenuIndex = idx;
+  renderAnswerMenu(key);
+  focusAnswerMenuSelection(key);
+}
+
+// v56: 左右キー操作のたびにDOMフォーカスを「3択メニューのボタン」か「入力欄」だけに固定し、
+// 「同じパターンの仲間」などページ内の他のボタンへ矢印キー移動が漏れないようにする
+function focusAnswerMenuSelection(key) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  if (answerMenuIndex >= 0) {
+    const item = menu.items[answerMenuIndex];
+    const btn = item && document.getElementById(item.id);
+    if (btn) btn.focus();
+    return;
+  }
+  if (key === 'flash') { mainInput.focus(); }
+  else if (key === 'entype') { const el = document.getElementById('entype-input'); if (el) el.focus(); }
+}
+
+function activateAnswerMenu(key) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu || answerMenuIndex < 0) return false;
+  const item = menu.items[answerMenuIndex];
+  if (!item || !item.available()) return false;
+  item.action();
+  if (!item.keepOpen) answerMenuIndex = menu.floorIndex;
+  renderAnswerMenu(key);
+  return true;
+}
+
+function activateAnswerMenuByClick(key, idx) {
+  const menu = ANSWER_MENUS[key];
+  if (!menu) return;
+  const item = menu.items[idx];
+  if (!item || !item.available()) return;
+  answerMenuIndex = idx;
+  item.action();
+  if (!item.keepOpen) answerMenuIndex = menu.floorIndex;
+  renderAnswerMenu(key);
+}
+
+// v56: 入力欄に文字が打たれたら、メニューのハイライト（発音を聞く等）を解除して入力欄に選択を戻す
+// これによりEnterキーが常にスペル確定（checkAnswer/submitEntypeAnswer）に届くようにする
+mainInput.addEventListener('input', () => {
+  if (getAnswerMenuKeyForActiveScreen() === 'flash' && answerMenuIndex !== ANSWER_MENUS.flash.floorIndex) {
+    resetAnswerMenu('flash');
+  }
+});
+const entypeInputEl = document.getElementById('entype-input');
+if (entypeInputEl) {
+  entypeInputEl.addEventListener('input', () => {
+    if (getAnswerMenuKeyForActiveScreen() === 'entype' && answerMenuIndex !== ANSWER_MENUS.entype.floorIndex) {
+      resetAnswerMenu('entype');
+    }
+  });
+}
+
+// ===== スペース／矢印キーでの出題画面操作 =====
 document.addEventListener('keydown', (e) => {
-  if (e.key !== ' ') return;
-  const focused = document.activeElement;
-  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
   const activeScreen = document.querySelector('.screen.active');
   if (!activeScreen) return;
+  const menuKey = getAnswerMenuKeyForActiveScreen();
+  const focused = document.activeElement;
+  const focusedInputLive = !!(focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA') && !focused.disabled);
+
+  // 左右キーでメニュー移動（入力欄フォーカス中でも常に処理する）
+  if (menuKey) {
+    const isLeftRight = e.key === 'ArrowLeft' || e.key === 'ArrowRight';
+    if (isLeftRight) {
+      e.preventDefault();
+      const delta = (e.key === 'ArrowRight') ? 1 : -1;
+      moveAnswerMenu(menuKey, delta);
+      return;
+    }
+    // Enter: 入力欄に生きたフォーカスがある場合はその場のkeydownハンドラ側で処理済み
+    if (e.key === 'Enter' && answerMenuIndex >= 0 && !focusedInputLive) {
+      e.preventDefault();
+      activateAnswerMenu(menuKey);
+      return;
+    }
+  }
+
+  if (e.key !== ' ') return;
+  if (focused && (focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA')) return;
   if (activeScreen.id === 'flash-screen' && state.answered) {
     e.preventDefault(); nextCard();
+  } else if (activeScreen.id === 'entype-screen') {
+    const nb = document.getElementById('entype-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); entypeNext(); }
   } else if (activeScreen.id === 'session-test-screen') {
     const nb = document.getElementById('stest-next-btn');
     if (nb && nb.style.display !== 'none') { e.preventDefault(); stestNext(); }
@@ -8745,7 +8784,8 @@ function rateTriviaIgnore() {
 
 // ===== 総復習テスト =====
 let reviewDeck = [], reviewIndex = 0, reviewCorrect = 0, reviewWrong = 0;
-let reviewCount = 20, reviewWeakPriority = true;
+let reviewCount = 20;
+let reviewUniqueWords = [], reviewFinalStatus = {};
 
 function selectReviewCount(btn) {
   document.querySelectorAll('[data-review-count]').forEach(b => b.classList.remove('active'));
@@ -8760,29 +8800,31 @@ function openReviewTestSetup() {
   document.getElementById('review-result-area').style.display = 'none';
 }
 
+// v56: 総復習の出題（苦手単語が中心＋克服済み・練習済みの単語を約2割まぜる）
+const GRAND_REVIEW_CLEARED_RATIO = 0.2;
+function buildGrandReviewDeck(count) {
+  const shuffle = a => a.sort(() => Math.random() - 0.5);
+  const all = getAllDataWords();
+  const weak = shuffle(all.filter(w => isWeakWord(w['単語'])));
+  const clearedAll = all.filter(w => !isWeakWord(w['単語']) && (getWordStatus(w['単語']).count || 0) > 0);
+  // 苦手を克服した単語を優先し、次に他の練習済み単語
+  const graduated = shuffle(clearedAll.filter(w => getWordStatus(w['単語']).graduated));
+  const others = shuffle(clearedAll.filter(w => !getWordStatus(w['単語']).graduated));
+  const cleared = [...graduated, ...others];
+  const target = count >= 9999 ? Math.max(10, Math.ceil(weak.length / (1 - GRAND_REVIEW_CLEARED_RATIO))) : count;
+  let nCleared = Math.min(cleared.length, Math.round(target * GRAND_REVIEW_CLEARED_RATIO));
+  if (nCleared === 0 && cleared.length > 0 && target >= 3) nCleared = 1;
+  const nWeak = Math.min(weak.length, target - nCleared);
+  nCleared = Math.min(cleared.length, target - nWeak); // 苦手が足りない分は覚えた単語で補う
+  return shuffle([...weak.slice(0, nWeak), ...cleared.slice(0, nCleared)]);
+}
+
 function startReviewTest() {
-  const allWords = getAllDataWords();
-  // 1回以上練習した単語のみ対象
-  const practicedWords = allWords.filter(w => (getWordStatus(w['単語']).count || 0) > 0);
-  if (!practicedWords.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
-  let pool;
-  if (reviewWeakPriority) {
-    const weakWords = practicedWords.filter(w => isWeakWord(w['単語']));
-    const others = practicedWords.filter(w => !isWeakWord(w['単語']));
-    // 弱い単語を3倍の重みで入れる
-    const weighted = [...weakWords, ...weakWords, ...weakWords, ...others];
-    pool = weighted.sort(() => Math.random() - 0.5);
-    // 重複除去しながら必要数取得
-    const seen = new Set();
-    reviewDeck = [];
-    for (const w of pool) {
-      if (!seen.has(w['単語'])) { seen.add(w['単語']); reviewDeck.push(w); }
-      if (reviewDeck.length >= reviewCount) break;
-    }
-  } else {
-    reviewDeck = practicedWords.sort(() => Math.random() - 0.5).slice(0, reviewCount);
-  }
-  if (!reviewDeck.length) { alert('条件に合う単語がありません。'); return; }
+  const words = buildGrandReviewDeck(reviewCount);
+  if (!words.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
+  reviewDeck = words;
+  reviewUniqueWords = reviewDeck.slice();
+  reviewFinalStatus = {};
   reviewIndex = 0; reviewCorrect = 0; reviewWrong = 0;
   document.getElementById('review-setup-area').style.display = 'none';
   document.getElementById('review-result-area').style.display = 'none';
@@ -8796,7 +8838,7 @@ function loadReviewCard() {
   const pct = reviewIndex / reviewDeck.length * 100;
   document.getElementById('review-progress-fill').style.width = pct + '%';
   document.getElementById('review-progress-text').textContent = (reviewIndex+1) + '/' + reviewDeck.length;
-  document.getElementById('review-source').textContent = word._source || '';
+  document.getElementById('review-source').textContent = getWordSourceLabel(word);
   document.getElementById('review-meaning').textContent = word['意味'];
   document.getElementById('review-answer-wrap').classList.remove('visible');
   document.getElementById('review-word-answer').textContent = word['単語'];
@@ -8838,20 +8880,15 @@ function checkReviewAnswer() {
     boxes.appendChild(b);
   }
   const fb = document.getElementById('review-feedback');
+  reviewFinalStatus[word['単語']] = isOk ? 'correct' : 'wrong';
   if (isOk) {
-    reviewCorrect++;
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
-    // 単語ステータス更新
-    const ws = getWordStatus(word['単語']);
-    ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
-    if (ws.streak >= 3) ws.hall = true;
-    setWordStatus(word['単語'], ws);
+    recordCorrect(word['単語'], true, word);
   } else {
-    reviewWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
-    const ws = getWordStatus(word['単語']);
-    ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
-    setWordStatus(word['単語'], ws);
+    recordWrong(word['単語'], word['意味'], typed, word);
+    // ①テスト中の再出題：数問（3〜5問）挟んで再度出題する
+    scheduleRetryInsertion(reviewDeck, reviewIndex, word);
   }
   speakWord(word['単語']);
   document.getElementById('review-next-btn').style.display = 'block';
@@ -8865,6 +8902,13 @@ function reviewNext() {
 
 function showReviewResult() {
   document.getElementById('review-quiz-area').style.display = 'none';
+  // 再出題があっても、各単語の最終正誤だけを結果に反映する
+  reviewCorrect = 0; reviewWrong = 0;
+  reviewUniqueWords.forEach(w => {
+    const st = reviewFinalStatus[w['単語']];
+    if (st === 'correct') reviewCorrect++;
+    else if (st === 'wrong') reviewWrong++;
+  });
   const total = reviewCorrect + reviewWrong;
   const pct = total > 0 ? Math.round(reviewCorrect / total * 100) : 0;
   document.getElementById('review-score-pct').textContent = pct + '%';
@@ -8885,6 +8929,7 @@ function showReviewResult() {
 let todayTestDeck = [], todayTestIndex = 0, todayTestCorrect = 0, todayTestWrong = 0;
 let todayTestCount = 5;
 let todayTestFromSession = false;
+let todayTestUniqueWords = [], todayTestFinalStatus = {};
 
 function selectTodayCount(btn) {
   document.querySelectorAll('[data-today-count]').forEach(b => b.classList.remove('active'));
@@ -8893,13 +8938,15 @@ function selectTodayCount(btn) {
 }
 
 function openTodayTestSetup() {
+  replayMode = false;
   showScreen('today-test-screen');
   document.getElementById('today-setup-area').style.display = 'flex';
   document.getElementById('today-quiz-area').style.display = 'none';
   document.getElementById('today-result-area').style.display = 'none';
 }
 
-function startTodayTest() {
+// 振り返りテストの候補プール（優先順位：今日のセッション単語 → 苦手単語 → 過去練習済み単語）
+function buildReflectionCandidatePool() {
   const allWords = getAllDataWords();
   // 今日のセッション単語（重複除去）
   const uniqueMap = {};
@@ -8913,10 +8960,17 @@ function startTodayTest() {
   const practicedOthers = allWords.filter(w =>
     (getWordStatus(w['単語']).count || 0) > 0 && !combinedKeys.has(w['単語'])
   ).sort(() => Math.random() - 0.5);
-  // 優先順位：セッション → 苦手 → 練習済み
-  const pool = [...sessionUnique, ...weakWords, ...practicedOthers];
-  if (!pool.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
-  todayTestDeck = pool.slice(0, todayTestCount);
+  return [...sessionUnique, ...weakWords, ...practicedOthers];
+}
+
+function startTodayTest() {
+  replayMode = false;
+  const candidatePool = buildReflectionCandidatePool();
+  if (!candidatePool.length) { alert('まだ練習した単語がありません。\nフラッシュカードで練習してから挑戦しましょう！'); return; }
+  const words = candidatePool.slice(0, todayTestCount);
+  todayTestDeck = words.sort(() => Math.random() - 0.5);
+  todayTestUniqueWords = todayTestDeck.slice();
+  todayTestFinalStatus = {};
   todayTestIndex = 0; todayTestCorrect = 0; todayTestWrong = 0;
   document.getElementById('today-setup-area').style.display = 'none';
   document.getElementById('today-result-area').style.display = 'none';
@@ -8930,7 +8984,7 @@ function loadTodayCard() {
   const pct = todayTestIndex / todayTestDeck.length * 100;
   document.getElementById('today-progress-fill').style.width = pct + '%';
   document.getElementById('today-progress-text').textContent = (todayTestIndex+1) + '/' + todayTestDeck.length;
-  document.getElementById('today-source').textContent = word._source || '';
+  document.getElementById('today-source').textContent = getWordSourceLabel(word);
   document.getElementById('today-meaning').textContent = word['意味'];
   document.getElementById('today-answer-wrap').classList.remove('visible');
   document.getElementById('today-word-answer').textContent = word['単語'];
@@ -8972,21 +9026,15 @@ function checkTodayAnswer() {
     boxes.appendChild(b);
   }
   const fb = document.getElementById('today-feedback');
+  todayTestFinalStatus[word['単語']] = isOk ? 'correct' : 'wrong';
   if (isOk) {
-    todayTestCorrect++;
     fb.className = 'feedback-area correct'; fb.textContent = '正解！';
-    const ws = getWordStatus(word['単語']);
-    ws.streak = (ws.streak||0) + 1; ws.count = (ws.count||0) + 1;
-    const justEnteredHall = !ws.hall && ws.streak >= 3;
-    if (justEnteredHall) ws.hall = true;
-    setWordStatus(word['単語'], ws);
-    if (justEnteredHall) checkAndReplenishPool();
+    recordCorrect(word['単語'], true, word);
   } else {
-    todayTestWrong++;
     fb.className = 'feedback-area wrong'; fb.textContent = 'まちがい　正解: ' + word['単語'];
-    const ws = getWordStatus(word['単語']);
-    ws.streak = 0; ws.count = (ws.count||0) + 1; ws.mistakeCount = (ws.mistakeCount||0) + 1;
-    setWordStatus(word['単語'], ws);
+    recordWrong(word['単語'], word['意味'], typed, word);
+    // ①テスト中の再出題：数問（3〜5問）挟んで再度出題する
+    scheduleRetryInsertion(todayTestDeck, todayTestIndex, word);
   }
   speakWord(word['単語']);
   document.getElementById('today-next-btn').style.display = 'block';
@@ -9000,6 +9048,13 @@ function todayNext() {
 
 function showTodayResult() {
   document.getElementById('today-quiz-area').style.display = 'none';
+  // 再出題があっても、各単語の最終正誤だけを結果に反映する
+  todayTestCorrect = 0; todayTestWrong = 0;
+  todayTestUniqueWords.forEach(w => {
+    const st = todayTestFinalStatus[w['単語']];
+    if (st === 'correct') todayTestCorrect++;
+    else if (st === 'wrong') todayTestWrong++;
+  });
   const total = todayTestCorrect + todayTestWrong;
   const pct = total > 0 ? Math.round(todayTestCorrect / total * 100) : 0;
   document.getElementById('today-score-pct').textContent = pct + '%';
@@ -9017,7 +9072,10 @@ function showTodayResult() {
   // セッション終了後は「今日の結果を見る」ボタンに切り替え
   const backBtn = document.getElementById('today-back-btn');
   if (backBtn) {
-    if (todayTestFromSession) {
+    if (replayMode) {
+      backBtn.textContent = '記録へ戻る';
+      backBtn.onclick = () => { replayMode = false; showScreen('records-screen'); renderRecords(); };
+    } else if (todayTestFromSession) {
       backBtn.textContent = '今日の結果を見る';
       backBtn.onclick = () => { todayTestFromSession = false; showDailyResults(); };
     } else {
@@ -9039,16 +9097,6 @@ function saveUserPrefToStorage(prefs) {
 
 function loadPrefScreen() {
   const prefs = getUserPrefSettings();
-  // 学習モード
-  const mode = prefs.learningMode || 'free';
-  document.querySelectorAll('[data-pref-mode]').forEach(b => {
-    b.classList.toggle('active', b.dataset.prefMode === mode);
-  });
-  // 単語数
-  const wps = String(prefs.wordsPerSession !== undefined ? prefs.wordsPerSession : 0);
-  document.querySelectorAll('[data-pref-count]').forEach(b => {
-    b.classList.toggle('active', b.dataset.prefCount === wps);
-  });
   // 英文数 (v51)
   const sps = String(prefs.sentencesPerSession !== undefined ? prefs.sentencesPerSession : 0);
   document.querySelectorAll('[data-pref-sent-count]').forEach(b => {
@@ -9069,73 +9117,8 @@ function loadPrefScreen() {
   document.querySelectorAll('[data-pref-speed]').forEach(b => {
     b.classList.toggle('active', b.dataset.prefSpeed === speed);
   });
-  // ステップ解放数 (v51拡張)
-  const stepUnlock = String(prefs.stepUnlockSize !== undefined ? prefs.stepUnlockSize : 5);
-  document.querySelectorAll('[data-pref-step-unlock]').forEach(b => {
-    b.classList.toggle('active', b.dataset.prefStepUnlock === stepUnlock);
-  });
-  // ステップ状況
-  const stepSection = document.getElementById('pref-step-status');
-  const stepUnlockSection = document.getElementById('pref-step-unlock-section');
-  const customPoolSection = document.getElementById('pref-custom-pool-section');
-  const stepInfo = document.getElementById('pref-step-info');
-  if (mode === 'step') {
-    if (stepSection) stepSection.style.display = 'block';
-    if (stepUnlockSection) stepUnlockSection.style.display = 'block';
-    if (customPoolSection) customPoolSection.style.display = 'none';
-    const unlocked = getStepUnlocked(0);
-    if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
-  } else if (mode === 'custom') {
-    if (stepSection) stepSection.style.display = 'none';
-    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
-    if (customPoolSection) customPoolSection.style.display = 'block';
-    loadCustomPoolPrefUI();
-  } else {
-    if (stepSection) stepSection.style.display = 'none';
-    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
-    if (customPoolSection) customPoolSection.style.display = 'none';
-  }
-  const countSection = document.getElementById('pref-count-section');
-  if (countSection) countSection.style.display = (mode === 'step' || mode === 'custom') ? 'none' : 'block';
 }
 
-function selectPrefMode(btn) {
-  document.querySelectorAll('[data-pref-mode]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const mode = btn.dataset.prefMode;
-  const stepSection = document.getElementById('pref-step-status');
-  const stepUnlockSection = document.getElementById('pref-step-unlock-section');
-  const customPoolSection = document.getElementById('pref-custom-pool-section');
-  const countSection = document.getElementById('pref-count-section');
-  if (mode === 'step') {
-    if (stepSection) stepSection.style.display = 'block';
-    if (stepUnlockSection) stepUnlockSection.style.display = 'block';
-    if (customPoolSection) customPoolSection.style.display = 'none';
-    if (countSection) countSection.style.display = 'none';
-    const stepInfo = document.getElementById('pref-step-info');
-    const unlocked = getStepUnlocked(0);
-    if (stepInfo) stepInfo.textContent = `現在 ${unlocked} 語が解放されています`;
-  } else if (mode === 'custom') {
-    if (stepSection) stepSection.style.display = 'none';
-    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
-    if (customPoolSection) customPoolSection.style.display = 'block';
-    if (countSection) countSection.style.display = 'none';
-    loadCustomPoolPrefUI();
-  } else {
-    if (stepSection) stepSection.style.display = 'none';
-    if (stepUnlockSection) stepUnlockSection.style.display = 'none';
-    if (customPoolSection) customPoolSection.style.display = 'none';
-    if (countSection) countSection.style.display = 'block';
-  }
-}
-function selectPrefStepUnlock(btn) {
-  document.querySelectorAll('[data-pref-step-unlock]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function selectPrefCount(btn) {
-  document.querySelectorAll('[data-pref-count]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
 function selectPrefSentCount(btn) {
   document.querySelectorAll('[data-pref-sent-count]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -9150,62 +9133,155 @@ function selectPrefSpeed(btn) {
 }
 
 function savePrefSettings() {
-  const modeBtn = document.querySelector('[data-pref-mode].active');
-  const countBtn = document.querySelector('[data-pref-count].active');
   const sentCountBtn = document.querySelector('[data-pref-sent-count].active');
   const unitEndBtn = document.querySelector('[data-pref-unit-end].active');
   const speedBtn = document.querySelector('[data-pref-speed].active');
-  const stepUnlockBtn = document.querySelector('[data-pref-step-unlock].active');
   const wrongDisplayBtns = [...document.querySelectorAll('[data-wrong-display].active')].map(b => b.dataset.wrongDisplay);
   const prefs = {
-    learningMode: modeBtn ? modeBtn.dataset.prefMode : 'free',
-    wordsPerSession: countBtn ? parseInt(countBtn.dataset.prefCount) : 0,
     sentencesPerSession: sentCountBtn ? parseInt(sentCountBtn.dataset.prefSentCount) : 0,
     unitEndPolicy: unitEndBtn ? unitEndBtn.dataset.prefUnitEnd : 'stop',
     wrongDisplaySettings: wrongDisplayBtns,
     spelloutSpeed: speedBtn ? speedBtn.dataset.prefSpeed : 'normal',
-    stepUnlockSize: stepUnlockBtn ? parseInt(stepUnlockBtn.dataset.prefStepUnlock) : 5,
-    customStep: readCustomPoolPrefUI(),
   };
   saveUserPrefToStorage(prefs);
   showScreen('home-screen');
-  updateHomePauseBanner();
 }
 
-// ===== ステップモード進捗管理 =====
-
-function getStepUnlocked(poolSize) {
-  const prefs = getUserPrefSettings();
-  const stepSize = prefs.stepUnlockSize || 5;
-  const saved = parseInt(localStorage.getItem(up('step_unlocked')) || '0');
-  if (saved === 0) return Math.min(stepSize, poolSize || stepSize);
-  return poolSize > 0 ? Math.min(saved, poolSize) : saved;
+// ===== v56: 今日の新規単語数（フリーモード） =====
+let lastDeckLimitHit = false;
+function getNewWordLimit() {
+  const n = parseInt(localStorage.getItem(up('new_word_limit')), 10);
+  return n >= 1 ? n : 10;
+}
+function saveNewWordLimit() {
+  const el = document.getElementById('new-word-limit');
+  const n = el ? parseInt(el.value, 10) : NaN;
+  if (n >= 1) localStorage.setItem(up('new_word_limit'), String(n));
+  updateNewWordStatus();
+}
+// 今日、新規枠として出題対象にした単語（日付が変われば空になる）
+function getNewIntroducedToday() {
+  try {
+    const d = JSON.parse(localStorage.getItem(up('new_introduced')) || '{}');
+    return d.date === todayDate() ? (d.words || []) : [];
+  } catch { return []; }
+}
+function saveNewIntroducedToday(words) {
+  localStorage.setItem(up('new_introduced'), JSON.stringify({ date: todayDate(), words }));
+}
+function updateNewWordStatus() {
+  const inp = document.getElementById('new-word-limit');
+  const st = document.getElementById('new-word-status');
+  if (inp && document.activeElement !== inp) inp.value = getNewWordLimit();
+  if (!st) return;
+  const used = getNewIntroducedToday().length;
+  const left = Math.max(0, getNewWordLimit() - used);
+  st.textContent = `今日は新規${used}語を開始済み・あと${left}語。間違えた単語（苦手）は、この数にかかわらず全部出ます`;
 }
 
-function saveStepUnlocked(count) {
-  localStorage.setItem(up('step_unlocked'), String(count));
+// フリーモードの出題デッキ：新規（未挑戦）は今日の上限まで、苦手（間違えた単語）は範囲外も含めて全部
+function buildFreeModeDeck() {
+  const base = buildDeck();
+  const limit = getNewWordLimit();
+  const introduced = getNewIntroducedToday();
+  const introSet = new Set(introduced);
+  const isNew = w => (getWordStatus(w['単語']).count || 0) === 0;
+  const newPool = base.filter(isNew).sort((a, b) => getWordRegistrationKey(a) - getWordRegistrationKey(b));
+  const carry = newPool.filter(w => introSet.has(w['単語']));
+  const fresh = newPool.filter(w => !introSet.has(w['単語'])).slice(0, Math.max(0, limit - introduced.length));
+  const allowedNew = new Set([...carry, ...fresh].map(w => w['単語']));
+  const result = base.filter(w => !isNew(w) || allowedNew.has(w['単語']));
+  const baseKeys = new Set(base.map(w => w['単語']));
+  getWeakWordsFromData().forEach(w => { if (!baseKeys.has(w['単語'])) result.push(w); });
+  if (fresh.length) saveNewIntroducedToday([...introduced, ...fresh.map(w => w['単語'])]);
+  lastDeckLimitHit = base.length > 0 && result.length === 0;
+  updateNewWordStatus();
+  return result;
 }
 
-function getSentenceStepUnlocked(poolSize) {
-  const prefs = getUserPrefSettings();
-  const stepSize = prefs.stepUnlockSize || 5;
-  const saved = parseInt(localStorage.getItem(up('step_sent_unlocked')) || '0');
-  if (saved === 0) return Math.min(stepSize, poolSize || stepSize);
-  return poolSize > 0 ? Math.min(saved, poolSize) : saved;
+// ===== v56: 学習ログ（その日に一度でも間違えた単語。今日＋直近2回分だけ保持） =====
+function getStudyLog() {
+  try { return JSON.parse(localStorage.getItem(up('study_log')) || '{}'); } catch { return {}; }
+}
+function saveStudyLog(log) {
+  const today = todayDate();
+  const past = Object.keys(log).filter(d => d !== today).sort();
+  while (past.length > 2) delete log[past.shift()]; // 古い日は捨てる（苦手はフラグで既にプールにいる）
+  localStorage.setItem(up('study_log'), JSON.stringify(log));
+}
+function logWrongWord(word, meaning) {
+  const log = getStudyLog();
+  const today = todayDate();
+  if (!log[today]) log[today] = { wrong: [] };
+  if (!Array.isArray(log[today].wrong)) log[today].wrong = [];
+  if (!log[today].wrong.some(x => x.w === word)) log[today].wrong.push({ w: word, m: meaning || '' });
+  saveStudyLog(log);
 }
 
-function saveSentenceStepUnlocked(count) {
-  localStorage.setItem(up('step_sent_unlocked'), String(count));
+function fmtJaDate(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  return `${m}月${d}日（${'日月火水木金土'[new Date(y, m - 1, d).getDay()]}）`;
+}
+function escLogHtml(t) { return String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+// 「わたしの記録」：前回・前々回（実際のカレンダー日付）に間違えた単語の一覧
+function renderReflectLog() {
+  const el = document.getElementById('rec-reflect-log');
+  if (!el) return;
+  const log = getStudyLog();
+  const today = todayDate();
+  const dates = Object.keys(log).filter(d => d !== today).sort().reverse().slice(0, 2);
+  if (!dates.length) { el.innerHTML = '<div class="rec-empty">まだ記録がありません</div>'; return; }
+  const labels = ['前回', '前々回'];
+  el.innerHTML = dates.map((d, i) => {
+    const wrong = log[d].wrong || [];
+    const list = wrong.length
+      ? wrong.map(x => {
+          const prog = getWeakProgressText(x.w);
+          return `<div style="display:flex;justify-content:space-between;gap:8px;width:100%;font-size:12px;">
+            <span>${escLogHtml(x.w)}<span style="color:var(--text-muted);font-size:10px;"> ${escLogHtml(x.m)}</span></span>
+            <span style="color:var(--accent2);font-size:11px;white-space:nowrap;">${escLogHtml(prog)}</span>
+          </div>`;
+        }).join('')
+      : '<div style="font-size:12px;color:var(--text-muted);">まちがえた単語はありません</div>';
+    const btn = wrong.length
+      ? `<button class="result-btn secondary" style="padding:10px;font-size:13px;margin-top:6px;" onclick="startReplayWrong('${d}')">この${wrong.length}語をまとめて解き直す</button>` : '';
+    return `<div class="rec-item" style="cursor:default;flex-direction:column;align-items:flex-start;gap:4px;">
+      <div class="rec-word" style="font-size:13px;">${labels[i]}：${fmtJaDate(d)}</div>
+      <div style="font-size:12px;font-weight:700;">まちがえた単語（${wrong.length}語）</div>
+      ${list}
+      ${btn}
+    </div>`;
+  }).join('');
 }
 
-function resetStepProgress() {
-  if (!confirm('ステップの進行状況をリセットしますか？')) return;
-  localStorage.removeItem(up('step_unlocked'));
-  localStorage.removeItem(up('step_sent_unlocked'));
-  const stepInfo = document.getElementById('pref-step-info');
-  const prefs = getUserPrefSettings();
-  const stepSize = prefs.stepUnlockSize || 5;
-  if (stepInfo) stepInfo.textContent = `現在 ${stepSize} 語が解放されています（リセット済み）`;
+// 前回・前々回にまちがえた単語をまとめて解き直す（振り返りテスト画面を再利用。記録処理は通常のテストと同じ）
+let replayMode = false;
+function startReplayWrong(dateKey) {
+  const day = getStudyLog()[dateKey];
+  const wrong = (day && day.wrong) || [];
+  const map = new Map(getAllDataWords().map(w => [w['単語'], w]));
+  const words = wrong.map(x => map.get(x.w)).filter(Boolean);
+  if (!words.length) { alert('解き直せる単語が見つかりませんでした。'); return; }
+  replayMode = true;
+  todayTestFromSession = false;
+  showScreen('today-test-screen');
+  todayTestDeck = words.sort(() => Math.random() - 0.5);
+  todayTestUniqueWords = todayTestDeck.slice();
+  todayTestFinalStatus = {};
+  todayTestIndex = 0; todayTestCorrect = 0; todayTestWrong = 0;
+  document.getElementById('today-setup-area').style.display = 'none';
+  document.getElementById('today-result-area').style.display = 'none';
+  document.getElementById('today-quiz-area').style.display = 'flex';
+  loadTodayCard();
+}
+
+// ===== v56: テスト中の再出題 =====
+// 不正解になった単語を、数問（3〜5問）挟んだ後に同じデッキ内へ再挿入する
+function scheduleRetryInsertion(deck, index, word) {
+  const offset = 3 + Math.floor(Math.random() * 3); // 3〜5問後
+  const insertAt = Math.min(index + offset, deck.length);
+  deck.splice(insertAt, 0, word);
 }
 
 // ===== 習熟度マップ =====
@@ -9308,314 +9384,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-// ===== v53 STEP1: カスタムプール管理 =====
-
-const CP_SOURCES = [
-  { key: 'ミニラボ',   getData: () => (typeof MINILABO !== 'undefined' ? MINILABO : []) },
-  { key: '英検5級',   getData: () => (typeof EIKEN !== 'undefined' ? EIKEN : []) },
-  { key: 'まぶたん',  getData: () => (typeof MABUTAN !== 'undefined' ? MABUTAN : []) },
-  { key: '小学生英語', getData: () => (typeof SHOGAKUSEI !== 'undefined' ? SHOGAKUSEI : []) },
-  { key: 'オリジナル', getData: () => loadOriginalWords() },
-];
-
-function getCustomPoolSettings() {
-  const prefs = getUserPrefSettings();
-  return prefs.customStep || { enabled: false, poolSize: 30, initDist: {}, unlockThreshold: 10, replenishDist: {} };
-}
-
-function getCustomPool() {
-  try { return JSON.parse(localStorage.getItem(up('custom_pool')) || '[]'); } catch { return []; }
-}
-function saveCustomPool(pool) { localStorage.setItem(up('custom_pool'), JSON.stringify(pool)); }
-
-function getCustomPoolQueues() {
-  try { return JSON.parse(localStorage.getItem(up('custom_pool_queues')) || '{}'); } catch { return {}; }
-}
-function saveCustomPoolQueues(q) { localStorage.setItem(up('custom_pool_queues'), JSON.stringify(q)); }
-
-function getAllWordsBySource() {
-  const result = {};
-  let sel = {};
-  try { sel = JSON.parse(localStorage.getItem(up('unit_selection')) || '{}'); } catch {}
-
-  CP_SOURCES.forEach(s => {
-    let data = s.getData();
-
-    if (s.key === 'ミニラボ') {
-      if (sel.minilabo === false) { result[s.key] = []; return; }
-      const units = sel.minilaboUnits || [];
-      if (units.length > 0) data = data.filter(w => units.includes(w['出典_ミニラボ']));
-    } else if (s.key === '英検5級') {
-      if (sel.eiken === false) { result[s.key] = []; return; }
-      const units = sel.eikenUnits || [];
-      if (units.length > 0) data = data.filter(w => units.some(g => eikenInGroup(w, g)));
-    } else if (s.key === 'まぶたん') {
-      if (sel.mabutan === false) { result[s.key] = []; return; }
-      const units = sel.mabutanUnits || [];
-      if (units.length > 0) data = data.filter(w => units.some(g => mabutanInGroup(w, g)));
-    } else if (s.key === '小学生英語') {
-      if (sel.shogakusei === false) { result[s.key] = []; return; }
-      const subs = sel.shogakuseiSubs || [];
-      if (subs.length > 0) data = data.filter(w => sgWordMatchesSubs(w, subs));
-    } else if (s.key === 'オリジナル') {
-      if (sel.original === false) { result[s.key] = []; return; }
-    }
-
-    const words = data.map(w => w['単語']).filter(Boolean);
-    const unique = [...new Set(words)];
-    result[s.key] = unique;
-  });
-  return result;
-}
-
-function initCustomPool() {
-  const settings = getCustomPoolSettings();
-  if (getUserPrefSettings().learningMode !== 'custom') return;
-  const allBySource = getAllWordsBySource();
-  const gradSet = new Set(getHallWordsFromData().map(w => w['単語']));
-  const pool = [];
-  const queues = {};
-  for (const src of CP_SOURCES.map(s => s.key)) {
-    const cnt = settings.initDist[src] || 0;
-    if (!cnt) continue;
-    const words = (allBySource[src] || []).filter(w => !gradSet.has(w));
-    const shuffled = [...words].sort(() => Math.random() - 0.5);
-    pool.push(...shuffled.slice(0, cnt));
-    queues[src] = shuffled.slice(cnt);
-  }
-  saveCustomPool([...new Set(pool)]);
-  saveCustomPoolQueues(queues);
-}
-
-function reinitCustomPool() {
-  if (!confirm('プールをリセットして再構築します。現在のプール内容は消えます。よろしいですか？')) return;
-  localStorage.removeItem(up('custom_pool'));
-  localStorage.removeItem(up('custom_pool_queues'));
-  initCustomPool();
-  const pool = getCustomPool();
-  const el = document.getElementById('pref-custom-pool-status');
-  if (el) el.textContent = `プールを再構築しました（${pool.length}語）`;
-  updateCustomPoolShortageWarning();
-}
-
-// ② 選択範囲内の単語が不足していてpoolSizeを維持できない場合の注意書き
-function updateCustomPoolShortageWarning() {
-  const el = document.getElementById('pref-custom-pool-shortage');
-  if (!el) return;
-  const settings = getCustomPoolSettings();
-  const pool = getCustomPool();
-  if (pool.length > 0 && pool.length < (settings.poolSize || 0)) {
-    el.textContent = '⚠️ 選択している範囲内の単語が不足しています。出題ソースの範囲を広げてください。';
-    el.classList.add('visible');
-  } else {
-    el.textContent = '';
-    el.classList.remove('visible');
-  }
-}
-
-function buildCustomPoolDeck() {
-  const pool = getCustomPool();
-  if (!pool.length) return [];
-  const allWords = getAllDataWords();
-  const wordMap = {};
-  allWords.forEach(w => { if (w['単語']) wordMap[w['単語'].toLowerCase()] = w; });
-  const result = [];
-  pool.forEach(wStr => {
-    const obj = wordMap[wStr.toLowerCase()];
-    if (obj) result.push({ ...obj });
-  });
-  return result.sort(() => Math.random() - 0.5);
-}
-
-function checkAndReplenishPool() {
-  const settings = getCustomPoolSettings();
-  if (getUserPrefSettings().learningMode !== 'custom') return;
-  const pool = getCustomPool();
-  const threshold = settings.unlockThreshold || 10;
-  const hallPool = pool.filter(w => isHallWord(w));
-  if (hallPool.length < threshold) return;
-
-  // 前回チェック以降にしきい値を超えて殿堂入りが溜まっていた場合も、
-  // バッチ単位（しきい値の倍数）で処理することでpoolSizeを正しく維持する。
-  // しきい値未満の余り分は殿堂入りしたまま次回のチェックに持ち越す。
-  const batches = Math.floor(hallPool.length / threshold);
-  const removeCount = batches * threshold;
-  const hallToRemove = new Set(hallPool.slice(0, removeCount));
-  let newPool = pool.filter(w => !hallToRemove.has(w));
-
-  const queues = getCustomPoolQueues();
-  const allBySource = getAllWordsBySource();
-  const gradSet = new Set(getHallWordsFromData().map(w => w['単語']));
-  const toAdd = [];
-  let shortfall = 0;
-
-  for (const src of CP_SOURCES.map(s => s.key)) {
-    const cnt = (settings.replenishDist[src] || 0) * batches;
-    if (!cnt) continue;
-    const q = queues[src] || [];
-    const alreadyIn = new Set([...newPool, ...toAdd]);
-    let available = q.filter(w => !gradSet.has(w) && !alreadyIn.has(w));
-    if (available.length < cnt) {
-      const all = (allBySource[src] || []).filter(w => !gradSet.has(w) && !alreadyIn.has(w) && !q.includes(w));
-      available = [...available, ...all.sort(() => Math.random() - 0.5)];
-    }
-    queues[src] = available.slice(cnt);
-    const picked = available.slice(0, cnt);
-    toAdd.push(...picked);
-    if (picked.length < cnt) shortfall += (cnt - picked.length);
-  }
-
-  // ① 新規（未挑戦）単語が不足する分は、苦手単語（間違えたことがあり、まだ殿堂入りしていない単語）で補充
-  if (shortfall > 0) {
-    const alreadyIn = new Set([...newPool, ...toAdd]);
-    const weakCandidates = [...new Set(Object.values(allBySource).flat())]
-      .filter(w => !gradSet.has(w) && !alreadyIn.has(w))
-      .filter(w => (getWordStatus(w).mistakeCount || 0) > 0)
-      .sort(() => Math.random() - 0.5);
-    toAdd.push(...weakCandidates.slice(0, shortfall));
-  }
-
-  newPool = [...new Set([...newPool, ...toAdd])].slice(0, settings.poolSize);
-  saveCustomPool(newPool);
-  saveCustomPoolQueues(queues);
-  updateCustomPoolShortageWarning();
-  if (toAdd.length > 0) {
-    alert(`殿堂入り ${removeCount}語達成！\n新しい ${toAdd.length}語 がプールに追加されました。\n現在のプール：${newPool.length}語`);
-  }
-}
-
-// カスタムプール設定UI
-function loadCustomPoolPrefUI() {
-  const settings = getCustomPoolSettings();
-
-  const poolSizeEl = document.getElementById('pref-pool-size');
-  if (poolSizeEl) poolSizeEl.value = settings.poolSize || 30;
-
-  const thresholdEl = document.getElementById('pref-unlock-threshold');
-  if (thresholdEl) thresholdEl.value = settings.unlockThreshold || 10;
-
-  renderCustomPoolSourceRows('pref-init-dist-rows', settings.initDist || {}, 'init');
-  renderCustomPoolSourceRows('pref-replenish-dist-rows', settings.replenishDist || {}, 'replenish');
-
-  const pool = getCustomPool();
-  const statusEl = document.getElementById('pref-custom-pool-status');
-  if (statusEl) {
-    if (pool.length) {
-      const hallInPool = pool.filter(w => isHallWord(w)).length;
-      statusEl.textContent = `現在のプール：${pool.length}語（殿堂入り済み：${hallInPool}語）`;
-    } else {
-      statusEl.textContent = '（プール未構築 — 保存後「プールをリセット・再構築」で初期化してください）';
-    }
-  }
-  updateCustomPoolShortageWarning();
-}
-
-function renderCustomPoolSourceRows(containerId, distObj, mode) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  const allBySource = getAllWordsBySource();
-  container.innerHTML = '';
-  CP_SOURCES.forEach(s => {
-    const total = (allBySource[s.key] || []).length;
-    if (total === 0) return;
-    const val = distObj[s.key] || 0;
-    const row = document.createElement('div');
-    row.className = 'cp-source-row';
-    row.innerHTML = `
-      <div class="cp-source-label">${s.key}<span class="cp-source-sub">（計${total}語）</span></div>
-      <input type="number" class="cp-source-input" min="0" max="${total}" value="${val}"
-        data-cp-src="${s.key}" data-cp-mode="${mode}" oninput="${mode === 'init' ? 'validatePoolDist()' : 'validateReplenishDist()'}">
-      <span style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">語</span>`;
-    container.appendChild(row);
-  });
-}
-
-function toggleCustomPoolUI() {
-  // 廃止：学習モード選択で表示制御するため不要
-}
-
-function validatePoolDist() {
-  const poolSize = parseInt(document.getElementById('pref-pool-size')?.value) || 30;
-  const inputs = document.querySelectorAll('[data-cp-src][data-cp-mode="init"]');
-  const total = Array.from(inputs).reduce((s, el) => s + (parseInt(el.value) || 0), 0);
-  const el = document.getElementById('pref-init-validation');
-  if (!el) return;
-  if (total === poolSize) {
-    el.textContent = `OK（合計 ${total} 語）`;
-    el.style.color = '#06d6a0';
-  } else {
-    el.textContent = `合計 ${total} 語 — プール合計（${poolSize}）と一致させてください`;
-    el.style.color = 'var(--accent)';
-  }
-}
-
-function validateReplenishDist() {
-  const threshold = parseInt(document.getElementById('pref-unlock-threshold')?.value) || 10;
-  const inputs = document.querySelectorAll('[data-cp-src][data-cp-mode="replenish"]');
-  const total = Array.from(inputs).reduce((s, el) => s + (parseInt(el.value) || 0), 0);
-  const el = document.getElementById('pref-replenish-validation');
-  if (!el) return;
-  if (total === threshold) {
-    el.textContent = `OK（合計 ${total} 語）`;
-    el.style.color = '#06d6a0';
-  } else {
-    el.textContent = `合計 ${total} 語 — 殿堂入りしきい値（${threshold}）と一致させてください`;
-    el.style.color = 'var(--accent)';
-  }
-}
-
-function readCustomPoolPrefUI() {
-  const poolSize = parseInt(document.getElementById('pref-pool-size')?.value) || 30;
-  const unlockThreshold = parseInt(document.getElementById('pref-unlock-threshold')?.value) || 10;
-  const initDist = {};
-  document.querySelectorAll('[data-cp-src][data-cp-mode="init"]').forEach(el => {
-    const v = parseInt(el.value) || 0;
-    if (v > 0) initDist[el.dataset.cpSrc] = v;
-  });
-  const replenishDist = {};
-  document.querySelectorAll('[data-cp-src][data-cp-mode="replenish"]').forEach(el => {
-    const v = parseInt(el.value) || 0;
-    if (v > 0) replenishDist[el.dataset.cpSrc] = v;
-  });
-  return { enabled: true, poolSize, initDist, unlockThreshold, replenishDist };
-}
-
-// ===== v53 STEP2: ステップモード一時停止/再開 =====
-
-function isStepPaused() {
-  return localStorage.getItem(up('step_paused')) === 'true';
-}
-
-function pauseStepMode() {
-  const prefs = getUserPrefSettings();
-  const mode = prefs.learningMode || 'free';
-  if (mode !== 'step' && mode !== 'custom') return;
-  localStorage.setItem(up('step_paused'), 'true');
-  alert('ステップモードを一時停止しました。\nホーム画面から「再開」ボタンで戻れます。');
-  showScreen('home-screen');
-  updateHomePauseBanner();
-}
-
-function resumeStepMode() {
-  localStorage.removeItem(up('step_paused'));
-  // ポーズ中に殿堂入りした単語があれば補充チェック
-  const prefsR = getUserPrefSettings();
-  if (prefsR.learningMode === 'custom') {
-    checkAndReplenishPool();
-  }
-  updateHomePauseBanner();
-  alert('ステップモードを再開しました！');
-}
-
-function updateHomePauseBanner() {
-  const banner = document.getElementById('home-step-pause-banner');
-  if (!banner) return;
-  const prefs = getUserPrefSettings();
-  const isStepMode = (prefs.learningMode || 'free') === 'step';
-  const paused = isStepPaused();
-  banner.classList.toggle('visible', isStepMode && paused);
-}
 
 // ===== v53 STEP3: 豆知識拡張（派生語・類義語）=====
 

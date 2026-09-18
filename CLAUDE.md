@@ -7,7 +7,7 @@
   1. CLAUDE.md・引き継ぎメモ.md・開発日誌.md を最新状態に更新
   2. GitHubにpushする
 - CLAUDE.mdはシンプルに保つ（詳細は他の3ファイルへ）
-- ファイル管理：最新版（v55）と1つ前のバックアップ（v54）だけ残す
+- ファイル管理：最新版（v56）と1つ前のバックアップ（v55）だけ残す
 
 ---
 
@@ -24,8 +24,8 @@
 
 ## 現在地（2026/9/18）
 
-- 最新ファイル：`vocab_app_v55.html`
-- バックアップ：`vocab_app_v54.html`
+- 最新ファイル：`vocab_app_v56.html`
+- バックアップ：`vocab_app_v55.html`
 - GitHub Pages：`ai-katei-labo.github.io/kateigakushu-akapen/`
 - APIキー：Anthropic・OpenAI ともに取得済み・上限$10設定済み
 
