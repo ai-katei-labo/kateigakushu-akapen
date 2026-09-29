@@ -303,12 +303,6 @@
   #training-result-area { display:none; text-align:center; font-size:18px; font-weight:900; padding:6px 0; animation:bounce .5s ease; }
   #training-result-area.training-win { color:var(--accent3); }
   #training-result-area.hall-keep { color:var(--accent3); font-size:14px; }
-  #typing-challenge-area { display:none; flex-direction:column; gap:10px; background:rgba(255,107,107,.08); border:1px solid rgba(255,107,107,.3); border-radius:10px; padding:12px; }
-  #typing-challenge-msg { font-size:14px; font-weight:800; color:var(--accent); text-align:center; font-family:'Noto Sans JP',sans-serif; }
-  #typing-challenge-counter { font-size:32px; font-weight:900; color:var(--accent2); text-align:center; letter-spacing:2px; }
-  #challenge-input { flex:1; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:8px; color:#fff; font-size:16px; padding:10px 14px; outline:none; }
-  #challenge-feedback { min-height:18px; text-align:center; font-size:13px; font-weight:700; color:var(--accent); font-family:'Noto Sans JP',sans-serif; }
-  .challenge-submit-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 16px; font-size:18px; font-weight:700; cursor:pointer; }
   .home-badge-row { display:none; flex-direction:row; gap:10px; width:100%; max-width:480px; }
   .home-badge { flex:1; padding:12px 8px; background:var(--card); border-radius:14px; text-align:center; cursor:pointer; border:2px solid transparent; transition:all .2s; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .home-badge.weak-badge-card { border-color:rgba(255,107,107,.35); }
@@ -449,6 +443,41 @@
   .weakness-tag { display:inline-block; font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; background:rgba(255,107,107,.18); color:var(--accent); margin-left:6px; vertical-align:middle; }
   /* スペルミス比率 */
   .spell-mistake-ratio { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; margin-top:1px; }
+  /* ===== コインの貯金箱 ===== */
+  .coin-bank-total { display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 0 4px; }
+  .coin-bank-num { font-size:52px; font-weight:900; font-family:'Nunito',sans-serif; color:var(--gold); line-height:1.1; text-shadow:0 0 24px rgba(212,175,55,.45); }
+  .coin-bank-label { font-size:12px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; }
+  .coin-bank-tier { text-align:center; font-size:13px; font-weight:800; font-family:'Noto Sans JP',sans-serif; min-height:20px; }
+  .coin-bank-note { text-align:center; font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; padding:0 16px; line-height:1.6; }
+  .coin-bank-stage { position:relative; width:100%; min-height:220px; border-radius:var(--radius); background:radial-gradient(ellipse at 50% 100%, rgba(212,175,55,.12), rgba(0,0,0,0) 70%); padding:10px; display:flex; flex-wrap:wrap; align-content:flex-end; justify-content:center; gap:1px; overflow:hidden; }
+  .coin-bank-stage.rich { box-shadow:inset 0 -30px 60px -20px rgba(212,175,55,.35); animation:coinGlow 2.4s ease-in-out infinite; }
+  @keyframes coinGlow { 0%,100%{box-shadow:inset 0 -30px 60px -20px rgba(212,175,55,.25);} 50%{box-shadow:inset 0 -40px 80px -20px rgba(212,175,55,.5);} }
+  .coin-pc { font-size:20px; line-height:1; display:inline-block; opacity:0; animation:coinDrop .5s ease forwards; }
+  .coin-pc.bundle { font-size:24px; position:relative; }
+  .coin-pc.bundle::after { content:'×10'; position:absolute; right:-2px; bottom:-2px; font-size:8px; font-weight:900; color:var(--gold-light); font-family:'Nunito',sans-serif; }
+  @keyframes coinDrop { 0%{opacity:0;transform:translateY(-40px) rotate(0deg) scale(.6);} 70%{opacity:1;transform:translateY(3px) rotate(var(--rot,0deg)) scale(1.05);} 100%{opacity:1;transform:translateY(0) rotate(var(--rot,0deg)) scale(1);} }
+  .coin-pc.quiet { animation:coinFade .6s ease forwards; }
+  @keyframes coinFade { from{opacity:0;} to{opacity:1;} }
+  .coin-bank-empty { text-align:center; font-size:13px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; padding:40px 0; width:100%; }
+  .coin-spark { position:absolute; font-size:14px; pointer-events:none; animation:coinSpark 1.6s ease-in-out infinite; }
+  @keyframes coinSpark { 0%,100%{opacity:0;transform:scale(.6);} 50%{opacity:1;transform:scale(1.15);} }
+  /* ===== v56: 特訓モード ===== */
+  #training-area { display:none; flex-direction:column; gap:10px; align-items:center; width:100%; padding:12px; background:rgba(255,107,107,.06); border:1px solid rgba(255,107,107,.22); border-radius:var(--radius); }
+  #training-stage-label { font-size:10px; font-weight:800; letter-spacing:1px; color:var(--accent); font-family:'Nunito',sans-serif; }
+  #training-msg { font-size:13px; font-weight:700; font-family:'Noto Sans JP',sans-serif; text-align:center; }
+  #training-feedback { font-size:12px; font-family:'Noto Sans JP',sans-serif; min-height:18px; text-align:center; }
+  #training-live-input { text-align:center; letter-spacing:4px; font-size:20px; font-family:'Nunito',sans-serif; }
+  .letter-box.live-ok { background:rgba(6,214,160,.22); border-color:var(--accent3); color:var(--accent3); }
+  .letter-box.live-ng { background:rgba(255,107,107,.3); border-color:var(--accent); color:#fff; animation:liveShake .3s ease; }
+  @keyframes liveShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+  .scramble-slots, .scramble-pool { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; min-height:44px; width:100%; }
+  .scramble-slots { padding:8px; border:1.5px dashed rgba(255,255,255,.18); border-radius:12px; }
+  .scramble-chip { min-width:36px; height:40px; padding:0 8px; border-radius:10px; border:none; background:var(--surface); color:var(--text); font-size:20px; font-weight:900; font-family:'Nunito',sans-serif; cursor:pointer; text-transform:uppercase; transition:transform .12s; }
+  .scramble-chip:active { transform:scale(.92); }
+  .scramble-chip.placed { background:linear-gradient(135deg,var(--accent2),#ffb300); color:var(--bg); }
+  .scramble-slots.ok .scramble-chip { background:linear-gradient(135deg,var(--accent3),#00b894); color:var(--bg); }
+  .scramble-slots.ng { animation:liveShake .3s ease; }
+  .scramble-empty { font-size:11px; color:var(--text-muted); font-family:'Noto Sans JP',sans-serif; align-self:center; }
 </style>
 </head>
 <body>
@@ -570,6 +599,14 @@
       </div>
       <div class="mode-arrow">›</div>
     </div>
+    <div class="mode-card flash" onclick="openCoinBank()" style="border-color:var(--gold);grid-column:1/-1;">
+      <div class="mode-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold),#ffb300);border-radius:6px;font-size:18px;flex-shrink:0;">🪙</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mode-name">コインの貯金箱</div>
+        <div class="mode-desc" id="home-coin-desc">貯まったコインを見る</div>
+      </div>
+      <div class="mode-arrow">›</div>
+    </div>
   </div>
   <!-- 今日の続き -->
   <div id="today-resume-area" style="display:none;width:100%;max-width:480px;">
@@ -593,6 +630,21 @@
   <div style="color:var(--text-muted);font-size:12px;text-align:center;font-family:'Noto Sans JP',sans-serif;">
     ミニラボ166語 / 英検5級107語 / まぶたん343語
   </div>
+</div>
+
+<!-- COIN BANK SCREEN -->
+<div id="coin-screen" class="screen" style="max-width:480px;margin:0 auto;width:100%;padding-bottom:40px;">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('home-screen')">‹</button>
+    <div class="screen-title">コインの貯金箱</div>
+  </div>
+  <div class="coin-bank-total">
+    <div class="coin-bank-num" id="coin-bank-num">0</div>
+    <div class="coin-bank-label" id="coin-bank-label">まいのコイン</div>
+  </div>
+  <div class="coin-bank-tier" id="coin-bank-tier"></div>
+  <div class="coin-bank-stage" id="coin-bank-stage"></div>
+  <div class="coin-bank-note" id="coin-bank-note"></div>
 </div>
 
 <!-- SETTINGS -->
@@ -902,14 +954,27 @@
       <div style="font-size:18px;font-weight:900;color:var(--accent2);min-height:24px;" id="reveal-voice-timer"></div>
       <div id="reveal-pronounce-result" style="display:none;font-size:13px;font-family:'Noto Sans JP',sans-serif;text-align:center;padding:6px 10px;border-radius:10px;border:1px solid;"></div>
     </div>
-    <div id="typing-challenge-area">
-      <div id="typing-challenge-msg"></div>
-      <div id="typing-challenge-counter">0/5</div>
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="challenge-input" placeholder="スペルを打とう" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkChallengeInput()">
-        <button class="challenge-submit-btn" onclick="checkChallengeInput()">→</button>
+    <!-- v56: 特訓モード（①1文字判定 ②並べ替え ③AIと話す） -->
+    <div id="training-area" style="display:none;">
+      <div id="training-stage-label"></div>
+      <div id="training-msg"></div>
+      <!-- ① 1文字ずつのリアルタイム判定 -->
+      <div id="training-live" style="display:none;flex-direction:column;gap:8px;width:100%;">
+        <div class="letter-boxes" id="training-live-boxes"></div>
+        <input type="text" id="training-live-input" class="ai-apikey-input" placeholder="1文字ずつ打ってみよう" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="latin" oninput="onTrainingLiveInput()" oncompositionstart="trainLiveComposing=true" oncompositionend="trainLiveComposing=false;onTrainingLiveInput()">
       </div>
-      <div id="challenge-feedback"></div>
+      <!-- ② シャッフル並べ替え -->
+      <div id="training-scramble" style="display:none;flex-direction:column;gap:10px;width:100%;">
+        <div class="scramble-slots" id="scramble-slots"></div>
+        <div class="scramble-pool" id="scramble-pool"></div>
+        <button class="result-btn secondary" style="padding:8px;font-size:12px;" onclick="resetScramble()">やり直す</button>
+      </div>
+      <!-- ③ AIと話す（条件を満たしたときだけ出る） -->
+      <div id="training-ai" style="display:none;flex-direction:column;gap:8px;width:100%;">
+        <button class="result-btn primary" style="padding:12px;font-size:14px;" onclick="startWordCoachChat()">AIとこの単語について話してみる</button>
+        <button class="result-btn secondary" style="padding:10px;font-size:12px;" onclick="skipWordCoach()">今はやめておく</button>
+      </div>
+      <div id="training-feedback"></div>
     </div>
   </div>
   <div class="action-row">
@@ -2065,8 +2130,31 @@ function updateCoinDisplay() {
 }
 function awardCoins(n) {
   sessionCoins += n;
+  addTotalCoins(n);
   updateCoinDisplay();
   showCoinAnimation(n);
+}
+
+// ===== v56: コインの累計（貯金箱）=====
+// coin_logは直近30日で切り捨てられるため合計に使えない。累計は専用キーで持つ
+function getTotalCoins() {
+  migrateTotalCoinsOnce();
+  return parseInt(localStorage.getItem(up('total_coins')) || '0', 10) || 0;
+}
+function addTotalCoins(n) {
+  migrateTotalCoinsOnce();
+  const next = (parseInt(localStorage.getItem(up('total_coins')) || '0', 10) || 0) + n;
+  localStorage.setItem(up('total_coins'), String(next));
+}
+// 初回だけ、残っているcoin_log（直近30日）を累計の初期値として取り込む
+function migrateTotalCoinsOnce() {
+  if (localStorage.getItem(up('total_coins_migrated')) === '1') return;
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem(up('coin_log')) || '[]'); } catch {}
+  const sum = log.reduce((a, e) => a + (parseInt(e.coins, 10) || 0), 0);
+  const cur = parseInt(localStorage.getItem(up('total_coins')) || '0', 10) || 0;
+  localStorage.setItem(up('total_coins'), String(cur + sum));
+  localStorage.setItem(up('total_coins_migrated'), '1');
 }
 function showCoinAnimation(n) {
   const el = document.getElementById('coin-display');
@@ -2100,6 +2188,166 @@ function saveSessionCoins() {
     log.unshift({ date: today, coins: sessionCoins, secs: sessionTotalSec, eff: eff.toString() });
   }
   localStorage.setItem(up('coin_log'), JSON.stringify(log.slice(0,30)));
+}
+
+// ===== v56: コインの貯金箱 =====
+// 表示方式の切替：〜300枚は1枚ずつ／〜2000枚は10枚束／それ以上は山（canvas）
+const COIN_ONE_BY_ONE_MAX = 300;
+const COIN_BUNDLE_MAX = 2000;
+const COIN_BUNDLE_UNIT = 10;
+// 演出の賑やかさの閾値
+const COIN_TIER_QUIET = 50;
+const COIN_TIER_LIVELY = 200;
+const COIN_TIER_RICH = 500;
+
+function openCoinBank() {
+  showScreen('coin-screen');
+  renderCoinBank();
+}
+
+function getCoinTier(n) {
+  if (n <= 0) return 'empty';
+  if (n < COIN_TIER_QUIET) return 'quiet';
+  if (n < COIN_TIER_LIVELY) return 'lively';
+  if (n < COIN_TIER_RICH) return 'party';
+  return 'rich';
+}
+
+function renderCoinBank() {
+  const total = getTotalCoins();
+  const numEl = document.getElementById('coin-bank-num');
+  const tierEl = document.getElementById('coin-bank-tier');
+  const stage = document.getElementById('coin-bank-stage');
+  const note = document.getElementById('coin-bank-note');
+  if (!stage) return;
+  if (numEl) numEl.textContent = total.toLocaleString();
+  const tier = getCoinTier(total);
+
+  const tierText = {
+    empty: '',
+    quiet: '🪙 コツコツ貯まってきた',
+    lively: '✨ いい調子！ざくざく貯まってる',
+    party: '🎉 すごい！お宝の山になってきた',
+    rich: '👑 大富豪！コインがあふれてる',
+  };
+  if (tierEl) {
+    tierEl.textContent = tierText[tier];
+    tierEl.style.color = tier === 'rich' ? 'var(--gold)' : tier === 'party' ? 'var(--accent2)' : 'var(--text-muted)';
+  }
+
+  stage.className = 'coin-bank-stage' + (tier === 'rich' ? ' rich' : '');
+  stage.innerHTML = '';
+
+  if (total <= 0) {
+    stage.innerHTML = '<div class="coin-bank-empty">まだコインがありません<br>フラッシュカードで正解すると貯まります</div>';
+    if (note) note.textContent = '';
+    return;
+  }
+
+  if (total <= COIN_ONE_BY_ONE_MAX) {
+    renderCoinPieces(stage, total, false, tier);
+    if (note) note.textContent = `コイン1枚ぶんを1つずつ並べています（${total}枚）`;
+  } else if (total <= COIN_BUNDLE_MAX) {
+    const bundles = Math.floor(total / COIN_BUNDLE_UNIT);
+    const rest = total % COIN_BUNDLE_UNIT;
+    renderCoinPieces(stage, bundles, true, tier);
+    if (rest > 0) renderCoinPieces(stage, rest, false, tier, true);
+    if (note) note.textContent = `コイン${COIN_BUNDLE_UNIT}枚を1つの束にまとめて表示しています（束${bundles}個${rest ? ' ＋ ' + rest + '枚' : ''}）`;
+  } else {
+    renderCoinMountain(stage, total, tier);
+    if (note) note.textContent = 'コインが多すぎるので山として表示しています';
+  }
+
+  if (tier === 'party' || tier === 'rich') addCoinSparkles(stage, tier === 'rich' ? 14 : 7);
+  playCoinBankSound(tier);
+}
+
+// 1枚（または束）を1つのDOMとして並べる。落ちてくる順番をずらして「じゃらじゃら」感を出す
+function renderCoinPieces(stage, count, isBundle, tier, append) {
+  const frag = document.createDocumentFragment();
+  const quiet = (tier === 'quiet');
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('span');
+    c.className = 'coin-pc' + (isBundle ? ' bundle' : '') + (quiet ? ' quiet' : '');
+    c.textContent = '🪙';
+    const rot = (Math.random() * 50 - 25).toFixed(1);
+    c.style.setProperty('--rot', rot + 'deg');
+    // 賑やかなほど詰めて重ねる
+    const overlap = tier === 'rich' ? -9 : tier === 'party' ? -7 : tier === 'lively' ? -4 : 0;
+    c.style.marginLeft = overlap + 'px';
+    c.style.marginTop = (Math.random() * (tier === 'quiet' ? 2 : 6)).toFixed(1) + 'px';
+    // 枚数が多いときは一気に、少ないときはゆっくり降らせる
+    const step = count > 150 ? 4 : count > 60 ? 10 : 26;
+    c.style.animationDelay = Math.min(i * step, 2600) + 'ms';
+    frag.appendChild(c);
+  }
+  stage.appendChild(frag);
+}
+
+// 2000枚超：DOMを増やさずcanvasに敷き詰める
+function renderCoinMountain(stage, total, tier) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;';
+  const cv = document.createElement('canvas');
+  const w = Math.max(240, stage.clientWidth - 20), h = 200;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = w * dpr; cv.height = h * dpr;
+  cv.style.cssText = `width:${w}px;height:${h}px;`;
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  // 山なりに点を打つ。描画数は上限を設けて重くならないようにする
+  const dots = Math.min(1200, Math.round(total / 4));
+  for (let i = 0; i < dots; i++) {
+    const t = Math.random();
+    const x = w * (0.5 + (Math.random() - 0.5) * (1 - t * 0.75));
+    const y = h - 8 - t * (h - 30) * Math.pow(Math.random(), 0.5);
+    const r = 4 + Math.random() * 3;
+    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.2, x, y, r);
+    g.addColorStop(0, '#ffe9a3'); g.addColorStop(0.6, '#d4af37'); g.addColorStop(1, '#8a6d1f');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.72, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  const cap = document.createElement('div');
+  cap.style.cssText = "font-size:12px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;";
+  cap.textContent = `${total.toLocaleString()}枚のコインの山`;
+  wrap.appendChild(cv); wrap.appendChild(cap);
+  stage.appendChild(wrap);
+}
+
+function addCoinSparkles(stage, n) {
+  for (let i = 0; i < n; i++) {
+    const sp = document.createElement('span');
+    sp.className = 'coin-spark';
+    sp.textContent = '✨';
+    sp.style.left = (5 + Math.random() * 90) + '%';
+    sp.style.top = (10 + Math.random() * 75) + '%';
+    sp.style.animationDelay = (Math.random() * 1.6).toFixed(2) + 's';
+    stage.appendChild(sp);
+  }
+}
+
+// 賑やかさに応じた効果音。playCorrectSound()と同じWebAudio方式で、音声ファイルは増やさない
+function playCoinBankSound(tier) {
+  if (tier === 'empty' || tier === 'quiet') return; // 少ないうちは鳴らさない
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const chime = (f, t, v, dur) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(v, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + dur);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + dur + 0.02);
+    };
+    if (tier === 'lively') {
+      [[1046.5, 0, .12], [1318.5, .08, .10]].forEach(([f, t, v]) => chime(f, t, v, .25));
+    } else if (tier === 'party') {
+      [[1046.5, 0, .13], [1318.5, .07, .12], [1567.98, .14, .11]].forEach(([f, t, v]) => chime(f, t, v, .3));
+    } else {
+      [[783.99, 0, .13], [1046.5, .09, .13], [1318.5, .18, .12], [1567.98, .27, .12], [2093, .36, .10]]
+        .forEach(([f, t, v]) => chime(f, t, v, .45));
+    }
+  } catch (e) {}
 }
 
 // ===== 説明トグル =====
@@ -3612,8 +3860,7 @@ function loadCard() {
   if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
   const trainRes = document.getElementById('training-result-area');
   if (trainRes) { trainRes.textContent = ''; trainRes.style.display = 'none'; trainRes.className = ''; }
-  const challengeArea = document.getElementById('typing-challenge-area');
-  if (challengeArea) challengeArea.style.display = 'none';
+  resetTrainingArea();
   const skipBtn = document.getElementById('flash-skip-btn');
   if (skipBtn) skipBtn.disabled = false;
 
@@ -3719,8 +3966,7 @@ function checkAnswer() {
     sessionWords.push(word);
     speakWord(wordStr);
 
-    const needChallenge = state.isWeak && state.weakWrongCount >= 3;
-    const challengeCount = state.weakWrongCount >= 4 ? 10 : 5;
+    const needChallenge = false; // v56: 旧「高速で5回打つ」チャレンジは廃止（特訓は段階式に移行）
 
     if (state.isWeak) {
       fb.className = 'feedback-area correct'; fb.textContent = '正解！ +' + coins + '🪙';
@@ -3751,7 +3997,7 @@ function checkAnswer() {
     if (justEnteredHall) { showHallAnimation(); }
     else if (state.weakWrongCount >= 4) { showCelebrationStamps(); }
     else if (state.wrongThisCard > 0 || state.weakWrongCount > 0) { showCorrectAnimation(); }
-    if (needChallenge) setTimeout(() => startTypingChallenge(wordStr, challengeCount), 1400);
+    if (state.isWeak) finishTrainingStage(wordStr); // 特訓の進行状態を片付ける
 
   } else if (state.isWeak) {
     // 特訓モード: 正解するまでリトライ
@@ -3769,39 +4015,13 @@ function checkAnswer() {
     if (wc2) wc2.textContent = '✗ ' + state.wrong;
     updateHomeBadges();
 
-    if (state.weakWrongCount >= 4) {
-      // 4回目以降 → 飛び散って集まる
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb.textContent = '';
-        showFearAnimation(wordStr, typed, () => resetForWeakRetry(wordStr));
-      }, 150);
-    } else if (state.weakWrongCount >= 3) {
-      // 3回目 → ドン震え
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb.textContent = '';
-        showDonShakeAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 150);
-    } else if (state.weakWrongCount >= 2) {
-      // 2回目 → ドン大きく
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb.textContent = '';
-        showDonAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 150);
-    } else {
-      // 1回目 → トン
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb.textContent = '';
-        showTonAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 150);
-    }
+    // v56: 段階式の特訓へ。①1文字判定 →（クリアしてもミスが続けば）②並べ替え → ③AIと話す
+    setTimeout(() => {
+      document.getElementById('card-answer-wrap').classList.remove('visible');
+      if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+      fb.textContent = '';
+      startTrainingStage(wordStr, word);
+    }, 150);
 
   } else {
     // 通常モード: 不正解 → リトライ可能 (STEP4)
@@ -3875,48 +4095,262 @@ function retryCurrentCard() {
 }
 
 // ===== タイピングチャレンジ（3回以上間違えた後の強化練習）=====
-let challengeWord = '', challengeTarget = 0, challengeDone = 0;
 
-function startTypingChallenge(word, count) {
-  challengeWord = word;
-  challengeTarget = count;
-  challengeDone = 0;
-  const area = document.getElementById('typing-challenge-area');
-  const msg = document.getElementById('typing-challenge-msg');
-  const counter = document.getElementById('typing-challenge-counter');
-  const inp = document.getElementById('challenge-input');
-  const fb = document.getElementById('challenge-feedback');
-  if (!area) return;
-  if (msg) msg.textContent = count === 5 ? 'もう一度！高速で5回打ってみよう！' : '高速で10回打ってみよう！';
-  if (counter) counter.textContent = `0 / ${count}`;
-  if (inp) { inp.value = ''; inp.disabled = false; }
-  if (fb) { fb.textContent = ''; }
-  area.style.display = 'flex';
-  setTimeout(() => { if (inp) inp.focus(); }, 100);
+// ===== v56: 特訓モード（①1文字判定 → ②並べ替え → ③AIと話す）=====
+// 旧「間違えるほど演出が激化する」方式を廃止し、段階的に練習内容を変える方式に置き換えた。
+// テスト画面側の scheduleRetryInsertion（数問後の再出題）とは別系統で、干渉しない。
+const TRAIN_AI_MIN_MISTAKES = 5; // ③AI対話に進める最低ミス回数
+let trainWord = '';
+let trainWordObj = null;
+let trainStage = 0;             // 1=1文字判定 / 2=並べ替え / 3=AI
+let trainLivePos = 0;           // ①で何文字目まで正解したか
+let trainLiveComposing = false; // IME変換中は判定しない
+let trainScramblePlaced = [];
+let trainScramblePool = [];
+
+function resetTrainingArea() {
+  const area = document.getElementById('training-area');
+  if (area) area.style.display = 'none';
+  ['training-live', 'training-scramble', 'training-ai'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const fb = document.getElementById('training-feedback');
+  if (fb) { fb.textContent = ''; fb.style.color = ''; }
+  trainLivePos = 0; trainLiveComposing = false;
+  trainScramblePlaced = []; trainScramblePool = [];
 }
 
-function checkChallengeInput() {
-  const inp = document.getElementById('challenge-input');
-  const counter = document.getElementById('typing-challenge-counter');
-  const fb = document.getElementById('challenge-feedback');
-  const area = document.getElementById('typing-challenge-area');
-  const tr = document.getElementById('training-result-area');
-  if (!inp || inp.disabled) return;
-  const typed = inp.value.trim().toLowerCase();
-  if (typed === challengeWord.toLowerCase()) {
-    challengeDone++;
-    if (counter) counter.textContent = `${challengeDone} / ${challengeTarget}`;
-    inp.value = '';
-    if (fb) { fb.textContent = ''; }
-    if (challengeDone >= challengeTarget) {
-      if (area) area.style.display = 'none';
-      if (tr) { tr.textContent = 'やった！特訓クリア！'; tr.style.display = 'block'; tr.className = 'training-win'; }
-      document.getElementById('next-btn').style.display = 'block';
-    }
-  } else {
-    if (fb) { fb.textContent = 'もう一度！'; }
-    inp.select();
+// 正解してカードを離れるとき、特訓の進行状態ごと片付ける
+function finishTrainingStage() {
+  resetTrainingArea();
+  trainStage = 0;
+}
+
+// 特訓の入口。ミスするたびに呼ばれ、到達している段階を出す
+function startTrainingStage(wordStr, wordObj) {
+  if (wordStr !== trainWord) trainStage = 0; // 別の単語に移ったら最初から
+  trainWord = wordStr;
+  trainWordObj = wordObj;
+  const area = document.getElementById('training-area');
+  if (!area) { resetForWeakRetry(wordStr); return; }
+  area.style.display = 'flex';
+  if (trainStage === 0 || trainStage === 1) startTrainingLive();
+  else if (trainStage === 2) startTrainingScramble();
+  else offerWordCoach();
+}
+
+// ===== ① 1文字ずつのリアルタイム判定 =====
+function startTrainingLive() {
+  trainStage = 1;
+  trainLivePos = 0;
+  document.getElementById('training-stage-label').textContent = 'STEP 1 / 1文字ずつ';
+  document.getElementById('training-msg').textContent = '1文字ずつ打ってみよう。合っていればピンポン、ちがえばブブーが鳴るよ';
+  document.getElementById('training-live').style.display = 'flex';
+  document.getElementById('training-scramble').style.display = 'none';
+  document.getElementById('training-ai').style.display = 'none';
+  renderTrainingLiveBoxes();
+  const inp = document.getElementById('training-live-input');
+  if (inp) { inp.value = ''; inp.disabled = false; setTimeout(() => inp.focus(), 100); }
+}
+
+function renderTrainingLiveBoxes(ngIndex) {
+  const boxes = document.getElementById('training-live-boxes');
+  if (!boxes) return;
+  boxes.innerHTML = '';
+  for (let i = 0; i < trainWord.length; i++) {
+    const b = document.createElement('div');
+    b.className = 'letter-box';
+    if (i < trainLivePos) { b.className += ' live-ok'; b.textContent = trainWord[i]; }
+    else if (i === ngIndex) { b.className += ' live-ng'; b.textContent = '?'; }
+    else { b.className += ' empty'; b.textContent = '_'; }
+    boxes.appendChild(b);
   }
+}
+
+// 打たれた1文字だけを見て即判定する。IME変換中は何もしない
+function onTrainingLiveInput() {
+  if (trainLiveComposing || trainStage !== 1) return;
+  const inp = document.getElementById('training-live-input');
+  const fb = document.getElementById('training-feedback');
+  if (!inp) return;
+  const v = inp.value;
+  if (v.length <= trainLivePos) { // 消された分は表示を戻すだけ
+    trainLivePos = Math.min(trainLivePos, v.length);
+    renderTrainingLiveBoxes();
+    return;
+  }
+  const ch = v[v.length - 1];
+  const expect = trainWord[trainLivePos];
+  if (ch && expect && ch.toLowerCase() === expect.toLowerCase()) {
+    trainLivePos++;
+    inp.value = trainWord.slice(0, trainLivePos);
+    playPingSound();
+    renderTrainingLiveBoxes();
+    if (fb) fb.textContent = '';
+    if (trainLivePos >= trainWord.length) onTrainingLiveCleared();
+  } else {
+    inp.value = trainWord.slice(0, trainLivePos); // 間違った文字は消す
+    playBuzzSound();
+    renderTrainingLiveBoxes(trainLivePos);
+    if (fb) { fb.style.color = 'var(--accent)'; fb.textContent = (trainLivePos + 1) + '文字目がちがうよ。もう一度'; }
+    setTimeout(() => renderTrainingLiveBoxes(), 400);
+  }
+}
+
+function onTrainingLiveCleared() {
+  const fb = document.getElementById('training-feedback');
+  if (fb) { fb.style.color = 'var(--accent3)'; fb.textContent = 'STEP 1 クリア！'; }
+  const inp = document.getElementById('training-live-input');
+  if (inp) inp.disabled = true;
+  playCorrectSound();
+  setTimeout(() => {
+    const w = trainWord;
+    resetTrainingArea();
+    trainStage = 2; // 次にまた間違えたら並べ替えへ
+    resetForWeakRetry(w);
+  }, 1100);
+}
+
+// ===== ② シャッフル並べ替え（タップで置く／もう一度タップで戻す）=====
+function startTrainingScramble() {
+  trainStage = 2;
+  document.getElementById('training-stage-label').textContent = 'STEP 2 / 並べ替え';
+  document.getElementById('training-msg').textContent = 'バラバラの文字を、正しい順にタップして並べよう';
+  document.getElementById('training-live').style.display = 'none';
+  document.getElementById('training-scramble').style.display = 'flex';
+  document.getElementById('training-ai').style.display = 'none';
+  buildScramblePool();
+  renderScramble();
+}
+
+// シャッフル結果が偶然そのままにならないよう振り直す
+function buildScramblePool() {
+  const letters = trainWord.split('');
+  let shuffled, guard = 0;
+  do {
+    shuffled = letters.slice().sort(() => Math.random() - 0.5);
+    guard++;
+  } while (guard < 20 && shuffled.join('') === letters.join('') && letters.length > 1);
+  trainScramblePool = shuffled;
+  trainScramblePlaced = [];
+}
+
+function renderScramble() {
+  const slots = document.getElementById('scramble-slots');
+  const pool = document.getElementById('scramble-pool');
+  if (!slots || !pool) return;
+  slots.className = 'scramble-slots';
+  slots.innerHTML = trainScramblePlaced.length
+    ? trainScramblePlaced.map((pi, si) =>
+        '<button class="scramble-chip placed" onclick="unplaceScramble(' + si + ')">' + trainScramblePool[pi] + '</button>').join('')
+    : '<span class="scramble-empty">ここに並べてね</span>';
+  pool.innerHTML = trainScramblePool.map((ch, pi) =>
+    trainScramblePlaced.includes(pi)
+      ? ''
+      : '<button class="scramble-chip" onclick="placeScramble(' + pi + ')">' + ch + '</button>').join('');
+}
+
+function placeScramble(poolIndex) {
+  if (trainScramblePlaced.includes(poolIndex)) return;
+  trainScramblePlaced.push(poolIndex);
+  renderScramble();
+  if (trainScramblePlaced.length === trainScramblePool.length) checkScramble();
+}
+
+function unplaceScramble(slotIndex) {
+  trainScramblePlaced.splice(slotIndex, 1);
+  renderScramble();
+  const fb = document.getElementById('training-feedback');
+  if (fb) fb.textContent = '';
+}
+
+function resetScramble() {
+  trainScramblePlaced = [];
+  renderScramble();
+  const fb = document.getElementById('training-feedback');
+  if (fb) fb.textContent = '';
+}
+
+function checkScramble() {
+  const made = trainScramblePlaced.map(pi => trainScramblePool[pi]).join('');
+  const slots = document.getElementById('scramble-slots');
+  const fb = document.getElementById('training-feedback');
+  if (made.toLowerCase() === trainWord.toLowerCase()) {
+    if (slots) slots.className = 'scramble-slots ok';
+    if (fb) { fb.style.color = 'var(--accent3)'; fb.textContent = 'STEP 2 クリア！'; }
+    playCorrectSound();
+    showCelebrationStamps();
+    setTimeout(() => {
+      const w = trainWord;
+      resetTrainingArea();
+      trainStage = 3; // ここまで来た単語は次に間違えたらAI判定へ
+      resetForWeakRetry(w);
+    }, 1300);
+  } else {
+    if (slots) slots.className = 'scramble-slots ng';
+    if (fb) { fb.style.color = 'var(--accent)'; fb.textContent = 'おしい！もう一度並べ替えてみよう'; }
+    playBuzzSound();
+    trainStage = 3;
+    setTimeout(() => resetScramble(), 700);
+  }
+}
+
+// ===== ③ AIと話す（本当に手強い単語だけ・1日1回まで）=====
+// 条件：②で失敗 ＋ mistakeCount>=5 ＋ 同じ日に1回まで ＋ APIキー登録済み。自動では始めずボタンを出すだけ
+function canOfferWordCoach(wordStr) {
+  if (!localStorage.getItem('wordsuck_claude_api_key')) return false;
+  const mc = getWordStatus(wordStr).mistakeCount || 0;
+  if (mc < TRAIN_AI_MIN_MISTAKES) return false;
+  return localStorage.getItem(up('ai_training_date')) !== todayDate();
+}
+
+function offerWordCoach() {
+  if (!canOfferWordCoach(trainWord)) { // 条件を満たさなければ①からやり直す
+    startTrainingLive();
+    return;
+  }
+  document.getElementById('training-stage-label').textContent = 'STEP 3 / AIと話す';
+  document.getElementById('training-msg').textContent = 'この単語はてごわいね。AIの先生と話して、覚え方を見つけてみる？';
+  document.getElementById('training-live').style.display = 'none';
+  document.getElementById('training-scramble').style.display = 'none';
+  document.getElementById('training-ai').style.display = 'flex';
+}
+
+function skipWordCoach() {
+  const w = trainWord;
+  resetTrainingArea();
+  trainStage = 0;
+  resetForWeakRetry(w);
+}
+
+// ===== 効果音（WebAudioで生成。音声ファイルは増やさない）=====
+function playPingSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[880, 0, .14], [1318.5, .06, .12]].forEach(([f, t, v]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(v, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.16);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.18);
+    });
+  } catch (e) {}
+}
+
+function playBuzzSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[196, 0], [155, .11]].forEach(([f, t]) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sawtooth'; o.frequency.value = f;
+      g.gain.setValueAtTime(.09, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.18);
+      o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.2);
+    });
+  } catch (e) {}
 }
 
 function testVoice() {
@@ -4010,35 +4444,13 @@ function revealAnswer() {
     if (skipBtn) skipBtn.disabled = true;
     document.getElementById('next-btn').style.display = 'none';
     const fb2 = document.getElementById('feedback-area');
-    if (state.weakWrongCount >= 4) {
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb2.textContent = '';
-        showFearAnimation(wordStr, '', () => resetForWeakRetry(wordStr));
-      }, 150);
-    } else if (state.weakWrongCount >= 3) {
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb2.textContent = '';
-        showDonShakeAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 150);
-    } else if (state.weakWrongCount >= 2) {
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb2.textContent = '';
-        showDonAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 150);
-    } else {
-      setTimeout(() => {
-        document.getElementById('card-answer-wrap').classList.remove('visible');
-        if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
-        fb2.textContent = '';
-        showTonAnimation(wordStr, () => resetForWeakRetry(wordStr));
-      }, 150);
-    }
+    // v56: 段階式の特訓へ。①1文字判定 →（クリアしてもミスが続けば）②並べ替え → ③AIと話す
+    setTimeout(() => {
+      document.getElementById('card-answer-wrap').classList.remove('visible');
+      if (spellHL) { spellHL.innerHTML = ''; spellHL.style.display = 'none'; }
+      fb2.textContent = '';
+      startTrainingStage(wordStr, word);
+    }, 150);
   } else {
     document.getElementById('next-btn').style.display = 'block';
     // 同じ問題をデッキの次の位置に再挿入
@@ -4960,6 +5372,16 @@ function stopTypingSpeakingRecording() {
   document.getElementById('typing-voice-timer').textContent = '';
 }
 
+// ===== v56: 音声認識の通信エラーを日本語で説明する =====
+// fetchがTypeErrorを投げるのは「HTTPレスポンスが1バイトも返っていない」とき。
+// APIキー不正(401)や残高切れ(429)はres.ok側で拾えるので、ここに来たら通信そのものが遮断されている。
+function describeVoiceFetchError(e) {
+  if (e instanceof TypeError) {
+    return '音声認識サーバーにつながりませんでした。広告ブロッカーやセキュリティソフトが api.openai.com を遮断していないか確認してください（ネットは生きている可能性があります）';
+  }
+  return 'エラー: ' + (e && e.message ? e.message : e);
+}
+
 async function processTypingSpeakingVoice() {
   const key = localStorage.getItem('wordsuck_openai_api_key');
   if (!key || typingSpeakingChunks.length === 0) {
@@ -4997,7 +5419,7 @@ async function processTypingSpeakingVoice() {
     document.getElementById('typing-voice-status').textContent = '「' + text + '」';
     checkTypingAnswer(text);
   } catch (e) {
-    document.getElementById('typing-voice-status').textContent = 'エラー: ' + e.message;
+    document.getElementById('typing-voice-status').textContent = describeVoiceFetchError(e);
   }
 }
 
@@ -5106,7 +5528,7 @@ async function processRevealVoice() {
     }
     document.getElementById('reveal-voice-timer').textContent = '';
   } catch (e) {
-    document.getElementById('reveal-pronounce-status').textContent = 'エラー: ' + e.message;
+    document.getElementById('reveal-pronounce-status').textContent = describeVoiceFetchError(e);
   }
 }
 
@@ -5339,7 +5761,7 @@ async function processSmemVoice() {
     }
     document.getElementById('smem-voice-timer').textContent = '';
   } catch (e) {
-    document.getElementById('smem-voice-status').textContent = 'エラー: ' + e.message;
+    document.getElementById('smem-voice-status').textContent = describeVoiceFetchError(e);
   }
 }
 
@@ -6047,6 +6469,7 @@ function toggleAISound() {
 
 function aiChatBack() {
   stopAITTS();
+  endWordCoachMode();
   showScreen(aiReturnScreen);
 }
 
@@ -6186,7 +6609,87 @@ function restartAIChat() {
   if (apiKey) startAIConversation();
 }
 
+// ===== v56: 単語コーチ（特訓STEP3）=====
+// 既存のAI英会話画面（ai-chat-screen）と callClaude を流用しつつ、
+// 「その単語をどう覚えるか」に特化したモードとして動かす。
+let wordCoachMode = false;   // true の間は英会話用プロンプトではなく単語コーチ用を使う
+let wordCoachWord = '';
+let wordCoachMeaning = '';
+const WORD_COACH_MAX_TURNS = 6;
+
+// 暗記法の候補。単語ごとに違うアプローチを選ばせるため、毎回シャッフルして提示する
+const MEMORY_TECHNIQUES = [
+  '語源分解（接頭辞・語根・接尾辞に分けて意味を説明する）',
+  '似た単語との対比（つづりや意味が近い語と並べて違いを際立たせる）',
+  '語呂合わせ（日本語の音に当てはめて覚える）',
+  '情景イメージ（絵が浮かぶような場面に結びつける）',
+  '例文でのニュアンス説明（実際に使う場面と気持ちを伝える）',
+  'リズム反復（手拍子やメロディに乗せて何度も唱えさせる）',
+];
+
+function buildWordCoachSystemPrompt() {
+  const shuffled = MEMORY_TECHNIQUES.slice().sort(() => Math.random() - 0.5);
+  return [
+    'あなたは小学生の英単語学習をサポートする、やさしい日本語の先生です。',
+    `今日いっしょに攻略する単語は「${wordCoachWord}」（意味：${wordCoachMeaning}）です。この子はこの単語を何度も間違えています。`,
+    '',
+    '【最重要】この単語の性質を自分で見極めて、いちばん効果がありそうな覚え方を1つ選んでください。以下は候補です（順不同）:',
+    ...shuffled.map((t, i) => `${i + 1}. ${t}`),
+    '',
+    '選び方のルール:',
+    '- 単語ごとに違うアプローチを選ぶこと。「まず語源から」のような決まったパターンを毎回繰り返さないでください。',
+    '- 語源がはっきりしない短い単語に無理やり語源分解を当てはめないこと。そういう語は語呂合わせ・情景イメージ・リズム反復のほうが向いています。',
+    '- つづりを間違えやすい語は、似た単語との対比が効きます。',
+    '- 選んだ理由を長々と説明せず、いきなりその覚え方で遊びはじめてください。',
+    '',
+    '【進め方】',
+    '- 一方的に教えないこと。かならず子どもに問いかけながら、対話で進めてください。',
+    '- 1回の発言は3〜4文まで。最後は必ず子どもへの質問で終えること。',
+    '- 子どもの答えがずれていても否定せず、「おしい！」と受け止めてからヒントを出すこと。',
+    '- むずかしい英単語や文法用語は使わないこと。説明は日本語で、漢字は小学生が読める範囲に。',
+    `- ${WORD_COACH_MAX_TURNS}往復くらいで、その子が「これなら覚えられそう」と思える状態まで持っていってください。`,
+    '',
+    'まずは「この単語、どんな感じがする？」のような軽い問いかけか、選んだ覚え方の入口となる質問から始めてください。',
+  ].join('\n');
+}
+
+// 特訓STEP3から呼ばれる入口
+function startWordCoachChat() {
+  if (!localStorage.getItem('wordsuck_claude_api_key')) { skipWordCoach(); return; }
+  wordCoachWord = trainWord;
+  wordCoachMeaning = (trainWordObj && trainWordObj['意味']) || '';
+  localStorage.setItem(up('ai_training_date'), todayDate()); // 1日1回に絞る
+  wordCoachMode = true;
+  aiHistory = [];
+  aiTurnCount = 0;
+  aiLoading = false;
+  resetTrainingArea();
+  trainStage = 0;
+
+  showScreen('ai-chat-screen');
+  const chat = document.getElementById('ai-chat-area');
+  if (chat) chat.innerHTML = '';
+  const bar = document.getElementById('ai-words-bar');
+  if (bar) bar.textContent = `特訓中の単語：${wordCoachWord}（${wordCoachMeaning}）`;
+  const hint = document.getElementById('ai-hint-btn');
+  if (hint) hint.style.display = 'none';
+  const status = document.getElementById('ai-voice-status');
+  if (status) status.textContent = 'ボタンを押して話す';
+
+  callClaude([{ role: 'user', content: `「${wordCoachWord}」の覚え方を教えて` }]);
+}
+
+// 単語コーチを終了して通常のAI英会話に戻せる状態にする
+function endWordCoachMode() {
+  wordCoachMode = false;
+  wordCoachWord = '';
+  wordCoachMeaning = '';
+  const hint = document.getElementById('ai-hint-btn');
+  if (hint) hint.style.display = '';
+}
+
 function buildAISystemPrompt() {
+  if (wordCoachMode) return buildWordCoachSystemPrompt(); // 特訓STEP3は単語コーチ用に差し替え
   const levelMap = { elementary: '小学生', junior: '中学生', high: '高校生' };
   const levelLabel = levelMap[aiLevel] || '中学生';
   const wordList = aiSessionWords.length ? aiSessionWords.join(', ') : '';
@@ -6264,7 +6767,7 @@ async function callClaude(messages) {
 
   try {
     const apiKey = localStorage.getItem('wordsuck_claude_api_key');
-    const isLastTurn = aiTurnCount >= AI_MAX_TURNS;
+    const isLastTurn = aiTurnCount >= (wordCoachMode ? WORD_COACH_MAX_TURNS : AI_MAX_TURNS);
     const finalMessages = isLastTurn
       ? messages.map((m, i) => i === messages.length - 1 && m.role === 'user'
           ? { ...m, content: m.content + '\n\n[最終ターンです。絶対に新しい質問をしないでください。「今日はここまで！よくできました！」の言葉を必ず使って温かく締めくくってください。]' }
@@ -6311,7 +6814,7 @@ async function callClaude(messages) {
     aiHistory.push(...messages);
     aiHistory.push({ role: 'assistant', content: aiText });
 
-    if (aiTurnCount >= AI_MAX_TURNS) showAIChatEnding();
+    if (aiTurnCount >= (wordCoachMode ? WORD_COACH_MAX_TURNS : AI_MAX_TURNS)) showAIChatEnding();
 
   } catch (e) {
     const loading = document.getElementById('ai-loading-wrap');
@@ -6589,7 +7092,7 @@ async function processAIChatVoice() {
     addBubble('user', text);
     await callClaude([{ role: 'user', content: text }]);
   } catch (e) {
-    document.getElementById('ai-voice-status').textContent = 'エラー: ' + e.message;
+    document.getElementById('ai-voice-status').textContent = describeVoiceFetchError(e);
   }
 }
 
@@ -6954,6 +7457,11 @@ function updateHomeBadges() {
   badgeRow.style.display = total > 0 ? 'flex' : 'none';
   document.getElementById('badge-weak-num').textContent = weakWords.length + '語';
   document.getElementById('badge-hall-num').textContent = hallWords.length + '語';
+  const coinDesc = document.getElementById('home-coin-desc');
+  if (coinDesc) {
+    const tc = getTotalCoins();
+    coinDesc.textContent = tc > 0 ? `いま ${tc.toLocaleString()} まい貯まっています` : '貯まったコインを見る';
+  }
 }
 
 function getWordRegistrationKey(w) {
@@ -7072,57 +7580,6 @@ function renderWeakHint(word) {
   return html;
 }
 
-function showHyunHyunAnimation(word, typed) {
-  const existing = document.getElementById('hyun-overlay');
-  if (existing) existing.remove();
-  const overlay = document.createElement('div');
-  overlay.id = 'hyun-overlay';
-  document.body.appendChild(overlay);
-
-  const correct = word.toLowerCase();
-  const typedL = (typed || '').toLowerCase();
-  const chars = [];
-  for (let i = 0; i < correct.length; i++) {
-    if (typedL[i] !== correct[i]) chars.push(correct[i].toUpperCase());
-  }
-  if (!chars.length) word.split('').forEach(c => chars.push(c.toUpperCase()));
-
-  const count = Math.max(10, chars.length * 4);
-  const vw = window.innerWidth, vh = window.innerHeight;
-
-  for (let i = 0; i < count; i++) {
-    const span = document.createElement('span');
-    const ch = chars[i % chars.length];
-    const size = Math.floor(Math.random() * 90 + 16);
-    const startX = Math.random() * (vw - 80);
-    const startY = Math.random() * (vh - 80);
-    span.textContent = ch;
-    span.style.cssText = `
-      position:absolute;left:${startX}px;top:${startY}px;
-      font-size:${size}px;font-weight:900;
-      font-family:'Nunito',sans-serif;
-      color:hsl(${Math.random()*25+355}deg,100%,${Math.random()*20+50}%);
-      opacity:0;transition:all ${0.6+Math.random()*1.2}s cubic-bezier(.2,1.2,.8,1);
-    `;
-    overlay.appendChild(span);
-
-    const delay = i * 40;
-    setTimeout(() => {
-      span.style.opacity = '1';
-      span.style.left = (Math.random() * (vw - 80)) + 'px';
-      span.style.top = (Math.random() * (vh - 80)) + 'px';
-      span.style.transform = `rotate(${Math.random()*360-180}deg) scale(${0.5+Math.random()*2})`;
-    }, delay);
-
-    setTimeout(() => {
-      span.style.opacity = '0';
-      span.style.transform += ' scale(0.1)';
-    }, delay + 1600);
-  }
-
-  setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 3000);
-}
-
 function playCorrectSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -7222,46 +7679,6 @@ function showHallAnimation() {
 
 
 // ===== 新しい苦手演出 =====
-
-function showTonAnimation(word, callback) {
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-  const t = document.createElement('div');
-  t.textContent = word.toUpperCase();
-  const fs = Math.max(2, Math.min(4, 18 / Math.max(word.length, 1)));
-  t.style.cssText = `font-size:${fs}rem;font-weight:900;color:#ff9f43;font-family:'Nunito',sans-serif;letter-spacing:3px;transform:scale(0.6);opacity:0;transition:transform 0.2s cubic-bezier(.36,2,.6,1),opacity 0.15s;text-shadow:0 0 24px rgba(255,159,67,0.7);`;
-  ov.appendChild(t); document.body.appendChild(ov);
-  setTimeout(() => { t.style.transform = 'scale(1.25)'; t.style.opacity = '1'; }, 30);
-  setTimeout(() => { t.style.transform = 'scale(1)'; }, 250);
-  setTimeout(() => { t.style.opacity = '0'; }, 650);
-  setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 950);
-}
-
-function showDonAnimation(word, callback) {
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,30,0,0.06);transition:background 0.35s;';
-  const t = document.createElement('div');
-  t.textContent = word.toUpperCase();
-  const fs = Math.max(2.5, Math.min(5, 22 / Math.max(word.length, 1)));
-  t.style.cssText = `font-size:${fs}rem;font-weight:900;color:var(--accent);font-family:'Nunito',sans-serif;letter-spacing:4px;transform:scale(0.1);opacity:0;transition:transform 0.22s cubic-bezier(.36,2.2,.6,1),opacity 0.16s;text-shadow:0 0 50px rgba(255,107,107,0.95);`;
-  ov.appendChild(t); document.body.appendChild(ov);
-  setTimeout(() => { t.style.transform = 'scale(1.5)'; t.style.opacity = '1'; ov.style.background = 'rgba(255,30,0,0.14)'; }, 30);
-  setTimeout(() => { t.style.transform = 'scale(1)'; ov.style.background = 'rgba(255,30,0,0)'; }, 270);
-  setTimeout(() => { t.style.opacity = '0'; }, 900);
-  setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 1400);
-}
-
-function showDonShakeAnimation(word, callback) {
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9992;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,30,0,0.1);';
-  const t = document.createElement('div');
-  t.textContent = word.toUpperCase();
-  const fs = Math.max(2.5, Math.min(5.5, 24 / Math.max(word.length, 1)));
-  t.style.cssText = `font-size:${fs}rem;font-weight:900;color:var(--accent);font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 60px rgba(255,107,107,1);animation:don-shake 0.12s ease infinite;`;
-  ov.appendChild(t); document.body.appendChild(ov);
-  setTimeout(() => { ov.style.transition = 'opacity 0.25s'; ov.style.opacity = '0'; }, 800);
-  setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 1050);
-}
 
 function rapidSpellFlash(word, times, msEach, callback) {
   const ov = document.createElement('div');
@@ -7394,149 +7811,6 @@ function showCelebrationStamps() {
   });
 
   setTimeout(() => { if (ov.parentNode) ov.remove(); }, 3200);
-}
-
-function showFearAnimation(word, typed, callback) {
-  // 恐怖演出（4回以上間違え）
-  if (!document.getElementById('fear-kf')) {
-    const sk = document.createElement('style');
-    sk.id = 'fear-kf';
-    sk.textContent = `
-      @keyframes fearGrowShake {
-        0%   {transform:translate(-50%,-50%) scale(0.08) rotate(0deg);}
-        4%   {transform:translate(calc(-50% - 6px),calc(-50% + 3px)) scale(0.16) rotate(3.5deg);}
-        8%   {transform:translate(calc(-50% + 7px),calc(-50% - 4px)) scale(0.26) rotate(-3deg);}
-        12%  {transform:translate(calc(-50% - 7px),calc(-50% + 4px)) scale(0.37) rotate(4deg);}
-        16%  {transform:translate(calc(-50% + 8px),calc(-50% - 3px)) scale(0.48) rotate(-3.5deg);}
-        20%  {transform:translate(calc(-50% - 8px),calc(-50% + 4px)) scale(0.58) rotate(4deg);}
-        24%  {transform:translate(calc(-50% + 9px),calc(-50% - 4px)) scale(0.67) rotate(-4deg);}
-        28%  {transform:translate(calc(-50% - 9px),calc(-50% + 5px)) scale(0.76) rotate(4.5deg);}
-        32%  {transform:translate(calc(-50% + 9px),calc(-50% - 4px)) scale(0.84) rotate(-4deg);}
-        36%  {transform:translate(calc(-50% - 10px),calc(-50% + 5px)) scale(0.91) rotate(4.5deg);}
-        40%  {transform:translate(calc(-50% + 10px),calc(-50% - 5px)) scale(0.98) rotate(-4deg);}
-        44%  {transform:translate(calc(-50% - 10px),calc(-50% + 5px)) scale(1.06) rotate(4.5deg);}
-        48%  {transform:translate(calc(-50% + 11px),calc(-50% - 5px)) scale(1.14) rotate(-4.5deg);}
-        52%  {transform:translate(calc(-50% - 11px),calc(-50% + 5px)) scale(1.22) rotate(4.5deg);}
-        56%  {transform:translate(calc(-50% + 11px),calc(-50% - 5px)) scale(1.30) rotate(-4deg);}
-        60%  {transform:translate(calc(-50% - 10px),calc(-50% + 5px)) scale(1.38) rotate(4deg);}
-        64%  {transform:translate(calc(-50% + 10px),calc(-50% - 4px)) scale(1.47) rotate(-4deg);}
-        68%  {transform:translate(calc(-50% - 9px),calc(-50% + 5px)) scale(1.56) rotate(4deg);}
-        72%  {transform:translate(calc(-50% + 9px),calc(-50% - 4px)) scale(1.65) rotate(-3.5deg);}
-        76%  {transform:translate(calc(-50% - 8px),calc(-50% + 4px)) scale(1.73) rotate(3.5deg);}
-        80%  {transform:translate(calc(-50% + 8px),calc(-50% - 4px)) scale(1.80) rotate(-3deg);}
-        84%  {transform:translate(calc(-50% - 7px),calc(-50% + 3px)) scale(1.87) rotate(3deg);}
-        88%  {transform:translate(calc(-50% + 6px),calc(-50% - 3px)) scale(1.92) rotate(-2.5deg);}
-        92%  {transform:translate(calc(-50% - 5px),calc(-50% + 3px)) scale(1.97) rotate(2deg);}
-        96%  {transform:translate(calc(-50% + 4px),calc(-50% - 2px)) scale(2.00) rotate(-1deg);}
-        100% {transform:translate(-50%,-50%) scale(2.0) rotate(0deg);}
-      }
-      @keyframes fearBloom {
-        0%   {transform:translate(-50%,-50%) scale(1.8); opacity:1;}
-        55%  {transform:translate(-50%,-50%) scale(5.5); opacity:0.7;}
-        100% {transform:translate(-50%,-50%) scale(12); opacity:0;}
-      }
-      @keyframes wrongShake {
-        0%,100%{transform:translate(-50%,-50%) translateX(0);}
-        15%   {transform:translate(-50%,-50%) translateX(-8px);}
-        30%   {transform:translate(-50%,-50%) translateX(8px);}
-        45%   {transform:translate(-50%,-50%) translateX(-8px);}
-        60%   {transform:translate(-50%,-50%) translateX(8px);}
-        75%   {transform:translate(-50%,-50%) translateX(-5px);}
-        90%   {transform:translate(-50%,-50%) translateX(5px);}
-      }
-    `;
-    document.head.appendChild(sk);
-  }
-
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9994;overflow:hidden;pointer-events:none;background:rgba(0,0,0,0);';
-  document.body.appendChild(ov);
-
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const wordUp = word.toUpperCase();
-  const letters = wordUp.split('');
-  const lw = Math.min(54, Math.floor(vw * 0.88 / Math.max(letters.length, 1)));
-  const startX = (vw - lw * letters.length) / 2;
-  const cy = vh * 0.44;
-  // Phase1はより大きく・赤く
-  const fs1 = Math.max(2.5, Math.min(5.5, 24 / Math.max(word.length, 1)));
-
-  // フェーズ1: 暗転 + 真っ赤なスペルが震えながらどんどん大きく迫ってくる (0〜1600ms)
-  setTimeout(() => { ov.style.transition = 'background 0.45s'; ov.style.background = 'rgba(0,0,0,0.92)'; }, 20);
-  const growDiv = document.createElement('div');
-  growDiv.textContent = wordUp;
-  growDiv.style.cssText = `position:absolute;top:50%;left:50%;white-space:nowrap;font-size:${fs1}rem;font-weight:900;color:#ff0000;font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 20px #ff0000,0 0 60px rgba(255,0,0,0.9),0 0 120px rgba(255,0,0,0.5);animation:fearGrowShake 1.55s ease forwards;`;
-  ov.appendChild(growDiv);
-
-  // フェーズ2: 爆発・飛び散る (1600ms〜)
-  setTimeout(() => {
-    growDiv.remove();
-    const spans = letters.map((ch, i) => {
-      const sp = document.createElement('span');
-      sp.textContent = ch;
-      const wrong = typed && i < typed.length && typed[i].toLowerCase() !== word[i].toLowerCase();
-      const spFs = Math.max(1.6, Math.min(3.4, lw * 0.075));
-      sp.style.cssText = `position:absolute;width:${lw}px;text-align:center;line-height:1;font-size:${spFs}rem;font-weight:900;font-family:'Nunito',sans-serif;color:${wrong ? '#ff2020' : '#ff6060'};left:${startX + i*lw}px;top:${cy - lw*0.35}px;text-shadow:0 0 16px currentColor;`;
-      ov.appendChild(sp);
-      return { el: sp, fx: startX + i*lw, fy: cy - lw*0.35 };
-    });
-    setTimeout(() => {
-      spans.forEach(s => {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 0.32 + Math.random() * 0.42;
-        s.el.style.transition = 'all 0.38s cubic-bezier(.1,1.8,.4,.5)';
-        s.el.style.left = (vw/2 + Math.cos(angle)*vw*dist - lw/2) + 'px';
-        s.el.style.top  = (vh/2 + Math.sin(angle)*vh*dist) + 'px';
-        s.el.style.transform = `rotate(${Math.random()*360-180}deg) scale(${0.15+Math.random()*1.2})`;
-        s.el.style.opacity = '0.05';
-      });
-    }, 20);
-
-    // フェーズ3: 暗闇からゆっくり集まってくる (500ms〜)
-    setTimeout(() => {
-      spans.forEach(s => {
-        s.el.style.transition = 'all 1.05s cubic-bezier(0.04, 0.88, 0.22, 1)';
-        s.el.style.left = s.fx + 'px';
-        s.el.style.top  = s.fy + 'px';
-        s.el.style.transform = 'rotate(0deg) scale(1)';
-        s.el.style.opacity = '1';
-        s.el.style.color = 'var(--accent2)';
-        s.el.style.textShadow = '0 0 30px rgba(255,209,102,0.9)';
-      });
-    }, 500);
-
-    // フェーズ4: 完成した文字が画面いっぱいに迫ってくる (1700ms〜)
-    setTimeout(() => {
-      spans.forEach(s => s.el.remove());
-      const bloomDiv = document.createElement('div');
-      bloomDiv.textContent = wordUp;
-      bloomDiv.style.cssText = `position:absolute;top:50%;left:50%;white-space:nowrap;font-size:${fs1}rem;font-weight:900;color:var(--accent2);font-family:'Nunito',sans-serif;letter-spacing:4px;text-shadow:0 0 50px rgba(255,209,102,0.95),0 0 120px rgba(255,180,50,0.5);animation:fearBloom 0.65s cubic-bezier(.35,0,.85,.5) forwards;`;
-      ov.appendChild(bloomDiv);
-    }, 1700);
-
-    // フェーズ5: 間違えた箇所だけ真っ赤・正しい箇所は暗く・画面いっぱい (2480ms〜)
-    setTimeout(() => {
-      const hasTyped = typed && typed.trim().length > 0;
-      const fs5 = Math.max(2.8, Math.min(6.5, 28 / Math.max(word.length, 1)));
-      const charHtml = wordUp.split('').map((ch, i) => {
-        const isWrong = !hasTyped
-          || (i < typed.length ? typed[i].toLowerCase() !== word[i].toLowerCase() : true);
-        return isWrong
-          ? `<span style="color:#ff0000;text-shadow:0 0 30px #ff0000,0 0 70px rgba(255,0,0,0.8);">${ch}</span>`
-          : `<span style="color:rgba(255,255,255,0.18);">${ch}</span>`;
-      }).join('');
-      const endDiv = document.createElement('div');
-      endDiv.innerHTML = charHtml;
-      endDiv.style.cssText = `position:absolute;top:50%;left:50%;white-space:nowrap;font-size:${fs5}rem;font-weight:900;font-family:'Nunito',sans-serif;letter-spacing:5px;opacity:0;transition:opacity 0.22s;animation:wrongShake 0.55s ease 0.25s 2;`;
-      ov.appendChild(endDiv);
-      ov.style.transition = 'background 0.18s'; ov.style.background = 'rgba(18,0,0,0.96)';
-      setTimeout(() => { endDiv.style.opacity = '1'; }, 30);
-      setTimeout(() => { endDiv.style.opacity = '0'; ov.style.transition = 'background 0.5s'; ov.style.background = 'rgba(0,0,0,0)'; }, 1000);
-    }, 2480);
-
-    // コールバック (3700ms〜)
-    setTimeout(() => { if (ov.parentNode) ov.remove(); if (callback) callback(); }, 3700);
-  }, 1600);
 }
 
 // ===== 今日の進捗管理 =====
@@ -8360,7 +8634,7 @@ async function processVoiceInput() {
     mainInput.value = transcript;
     checkAnswer();
   } catch (err) {
-    document.getElementById('voice-status').textContent = 'エラーが発生しました';
+    document.getElementById('voice-status').textContent = describeVoiceFetchError(err);
     resetVoiceUI();
   }
 }
