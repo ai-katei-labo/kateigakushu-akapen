@@ -8617,6 +8617,9 @@ document.addEventListener('keydown', (e) => {
   } else if (activeScreen.id === 'review-test-screen') {
     const nb = document.getElementById('review-next-btn');
     if (nb && nb.style.display !== 'none') { e.preventDefault(); reviewNext(); }
+  } else if (activeScreen.id === 'today-test-screen') {
+    const nb = document.getElementById('today-next-btn');
+    if (nb && nb.style.display !== 'none') { e.preventDefault(); todayNext(); }
   }
 });
 
