@@ -1779,6 +1779,7 @@
     <div class="rec-title" style="color:var(--accent3);">殿堂入り <span id="rec-hall-count" style="font-size:20px;margin-left:6px;">0</span>語</div>
     <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">3回連続正解した単語 / タップで発音</div>
     <div id="rec-hall-list"></div>
+    <div id="rec-hall-more"></div>
   </div>
 
   <!-- よく間違えるランキング -->
@@ -1786,6 +1787,7 @@
     <div class="rec-title" style="color:var(--accent);">よく間違えるランキング <span id="rec-weak-count" style="font-size:16px;margin-left:6px;color:var(--text-muted);">0語</span></div>
     <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">間違い回数が多い順 / タップで苦手単語特訓</div>
     <div id="rec-weak-list"></div>
+    <div id="rec-weak-more"></div>
   </div>
 
   <!-- 最近の間違い -->
@@ -1806,13 +1808,6 @@
     <div class="rec-title" style="color:var(--accent3);">振り返り</div>
     <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">前回・前々回にまちがえた単語 / まとめて解き直せます</div>
     <div id="rec-reflect-log"></div>
-  </div>
-
-  <!-- 毎日の記録 -->
-  <div class="rec-section">
-    <div class="rec-title" style="color:var(--accent2);">毎日の記録</div>
-    <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">日ごとの達成率 / 続けた分だけ積み上がる</div>
-    <div id="rec-daily-log"></div>
   </div>
 
   <!-- 習熟度マップ -->
@@ -6811,7 +6806,7 @@ function recordCorrect(word, allowHall = true, wordObj = null) {
   }
   const justEnteredHall = allowHall && !ws.hall && ws.streak >= 3;
   if (ws.weak && (ws.cleanDays || 0) >= WEAK_GRADUATE_DAYS) { ws.weak = false; ws.graduated = true; } // 3日連続で初回正解 → 苦手を卒業
-  if (justEnteredHall) ws.hall = true;
+  if (justEnteredHall) { ws.hall = true; ws.hallDate = todayDate(); } // v56: 殿堂入りした日（記録画面の新しい順に使う）
   ws.everCorrect = true;
   setWordStatus(word, ws);
   localStorage.setItem(up('total_questions'), (parseInt(localStorage.getItem(up('total_questions'))||'0')+1));
@@ -7790,6 +7785,30 @@ function startSingleWordTraining(word) {
   showScreen('flash-screen'); loadCard();
 }
 
+// ===== v56: 記録画面の長いリストの折りたたみ（殿堂入り・よく間違えるランキング）=====
+const RECORD_LIST_LIMIT = 10; // メイン表示の件数
+let hallExpanded = false;
+let weakExpanded = false;
+
+// 「もっと見る（残りN語）／閉じる」ボタン。総数がLIMIT以下なら何も出さない
+function renderMoreBtn(total, expanded, onclickExpr) {
+  if (total <= RECORD_LIST_LIMIT) return '';
+  const label = expanded ? '閉じる' : `もっと見る（残り${total - RECORD_LIST_LIMIT}語）`;
+  return `<button class="result-btn secondary" style="padding:10px;font-size:13px;margin-top:8px;" onclick="${onclickExpr}">${label}</button>`;
+}
+
+function toggleHallList() {
+  hallExpanded = !hallExpanded;
+  renderRecords();
+  if (!hallExpanded) document.getElementById('rec-hall-list').scrollIntoView({ block: 'nearest' });
+}
+
+function toggleWeakList() {
+  weakExpanded = !weakExpanded;
+  renderRecords();
+  if (!weakExpanded) document.getElementById('rec-weak-list').scrollIntoView({ block: 'nearest' });
+}
+
 function renderRecords() {
   const weakWords = getWeakWordsFromData();
   const hallWords = getHallWordsFromData();
@@ -7804,26 +7823,35 @@ function renderRecords() {
   document.getElementById('rec-pct').textContent = totalQ > 0 ? pct+'%' : '-%';
   document.getElementById('rec-streak').textContent = streak + '日';
 
-  // 殿堂入り（重複なし）
+  // 殿堂入り（重複なし・殿堂入りした日の新しい順）
   const hallList = document.getElementById('rec-hall-list');
   const seenHall = new Set();
   const uniqueHall = hallWords.filter(w => {
     if (seenHall.has(w['単語'])) return false;
     seenHall.add(w['単語']); return true;
   });
-  document.getElementById('rec-hall-count').textContent = uniqueHall.length;
-  if (uniqueHall.length) {
-    hallList.innerHTML = uniqueHall.map(w =>
-      `<div class="rec-item" onclick="speakWord('${w['単語'].replace(/'/g,"\\'")}')">
+  // hallDateがある語を新しい順に並べる。未記録（日付を残し始める前の殿堂入り）は従来の並びのまま後ろへ
+  const datedHall = [], undatedHall = [];
+  uniqueHall.forEach(w => { (getWordStatus(w['単語']).hallDate ? datedHall : undatedHall).push(w); });
+  datedHall.sort((a, b) => (getWordStatus(b['単語']).hallDate || '').localeCompare(getWordStatus(a['単語']).hallDate || ''));
+  const sortedHall = [...datedHall, ...undatedHall];
+  document.getElementById('rec-hall-count').textContent = sortedHall.length;
+  const hallMore = document.getElementById('rec-hall-more');
+  if (sortedHall.length) {
+    const shownHall = hallExpanded ? sortedHall : sortedHall.slice(0, RECORD_LIST_LIMIT);
+    hallList.innerHTML = shownHall.map(w =>
+      `<div class="rec-item" onclick="speakWord('${w['単語'].replace(/'/g,"\'")}')">
         <span class="rec-word">${w['単語']}</span>
         <span class="rec-meaning">${w['意味']}</span>
       </div>`
     ).join('');
+    if (hallMore) hallMore.innerHTML = renderMoreBtn(sortedHall.length, hallExpanded, 'toggleHallList()');
   } else {
     hallList.innerHTML = '<div class="rec-empty">まだ殿堂入りはありません（3回連続正解で入れます）</div>';
+    if (hallMore) hallMore.innerHTML = '';
   }
 
-  // よく間違えるランキング（mistakeCount降順）
+  // よく間違えるランキング（mistakeCount降順・上位10語＋もっと見る）
   const weakList = document.getElementById('rec-weak-list');
   const rankedWeak = [...weakWords].sort((a, b) => {
     const ma = getWordStatus(a['単語']).mistakeCount || 0;
@@ -7831,8 +7859,11 @@ function renderRecords() {
     return mb - ma;
   });
   document.getElementById('rec-weak-count').textContent = rankedWeak.length + '語';
+  const weakMore = document.getElementById('rec-weak-more');
   if (rankedWeak.length) {
-    weakList.innerHTML = rankedWeak.map((w, i) => {
+    // 表示する分だけHTMLを組む（getPatternSiblings()が重いので全語ぶんは回さない）
+    const shownWeak = weakExpanded ? rankedWeak : rankedWeak.slice(0, RECORD_LIST_LIMIT);
+    weakList.innerHTML = shownWeak.map((w, i) => {
       const st = getWordStatus(w['単語']);
       const mc = st.mistakeCount || 0;
       const cnt = st.count || 0;
@@ -7853,8 +7884,10 @@ function renderRecords() {
         <span style="font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap;">${mc}回</span>
       </div>`;
     }).join('');
+    if (weakMore) weakMore.innerHTML = renderMoreBtn(rankedWeak.length, weakExpanded, 'toggleWeakList()');
   } else {
     weakList.innerHTML = '<div class="rec-empty">苦手単語はありません！すごい！</div>';
+    if (weakMore) weakMore.innerHTML = '';
   }
 
   // 最近間違えた単語（直近7語）
@@ -7974,28 +8007,6 @@ function renderRecords() {
       } else {
         unitEl.innerHTML = '<div class="rec-empty">全単元バランスよく練習できています！</div>';
       }
-    }
-  }
-
-  // 毎日の記録
-  const dailyLog = getDailyLog();
-  const logEl = document.getElementById('rec-daily-log');
-  if (logEl) {
-    if (dailyLog.length) {
-      logEl.innerHTML = dailyLog.map(e => {
-        const bar = Math.round(e.pct / 10);
-        const filled = '■'.repeat(bar) + '□'.repeat(10 - bar);
-        return `<div class="rec-item" style="cursor:default;flex-direction:column;align-items:flex-start;gap:3px;">
-          <div style="display:flex;justify-content:space-between;width:100%;">
-            <span class="rec-word" style="font-size:13px;">${e.date}</span>
-            <span class="rec-meaning" style="color:${e.pct>=90?'var(--accent3)':e.pct>=70?'var(--accent2)':'var(--text-muted)'};">${e.pct}%</span>
-          </div>
-          <div style="font-size:11px;color:var(--accent2);letter-spacing:1px;font-family:'Nunito',sans-serif;">${filled}</div>
-          <div style="font-size:11px;color:var(--text-muted);font-family:'Noto Sans JP',sans-serif;">${e.done}/${e.total}問</div>
-        </div>`;
-      }).join('');
-    } else {
-      logEl.innerHTML = '<div class="rec-empty">まだ記録がありません</div>';
     }
   }
 
